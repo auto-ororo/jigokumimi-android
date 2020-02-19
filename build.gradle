@@ -10,6 +10,11 @@ buildscript {
         coroutineVersion = '1.0.0'
         gradleVersion = '3.5.3'
         navigationVersion = '2.2.1'
+        timberVersion = '4.7.1'
+        workVersion = "2.3.1"
+        moshiVersion = "1.6.0"
+        retrofitVersion = "2.7.1"
+        glideVersion = "4.11.0"
         dataBindingCompilerVersion = gradleVersion // Always need to be the same.
     }
 
