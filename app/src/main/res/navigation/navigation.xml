@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/detectedSongListFragment">
+
+    <fragment
+        android:id="@+id/detectedSongListFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.DetectedSongListFragment"
+        android:label="fragment_detected_song_list"
+        tools:layout="@layout/fragment_detected_song_list" />
+</navigation>
