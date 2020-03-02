@@ -8,5 +8,14 @@ package com.ororo.auto.jigokumimi.domain
  * @see network for objects that parse or prepare network calls
  */
 
-class Models {
-}
+/**
+ * domain song
+ */
+data class Song(
+    val id: String,
+    val album: String,
+    val name: String,
+    val artist: String,
+    val imageUrl: String,
+    val previewUrl: String
+)

@@ -13,15 +13,36 @@ import androidx.room.*
 @Dao
 interface SongDao {
     @Query("select * from databasesong")
-    fun getVideos(): LiveData<List<DatabaseSong>>
+    fun getSongs(): LiveData<List<DatabaseSong>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(videos: List<DatabaseSong>)
+    fun insertAll(songs: List<DatabaseSong>)
 }
 
-@Database(entities = [DatabaseSong::class], version = 1)
+@Dao
+interface SpotifyTokenDao {
+    @Query("select token from databasespotifytoken")
+    fun getToken(): String
+
+    @Query("delete from databasespotifytoken")
+    fun deleteAll()
+
+    @Insert()
+    fun insert(token: DatabaseSpotifyToken)
+
+    @Transaction
+    fun refresh(token: DatabaseSpotifyToken) {
+        deleteAll()
+        insert(token)
+    }
+}
+
+
+@Database(entities = [DatabaseSong::class, DatabaseSpotifyToken::class], version = 1)
 abstract class SongsDatabase : RoomDatabase() {
     abstract val songDao: SongDao
+    abstract val spotifyTokenDao: SpotifyTokenDao
+
 }
 
 private lateinit var INSTANCE: SongsDatabase
@@ -32,7 +53,7 @@ fun getDatabase(context: Context): SongsDatabase {
             INSTANCE = Room.databaseBuilder(
                 context.applicationContext,
                 SongsDatabase::class.java,
-                "videos"
+                "songs"
             ).build()
         }
     }
