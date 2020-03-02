@@ -8,7 +8,7 @@ buildscript {
         roomVersion = '2.2.3'
         materialVersion = '1.1.0'
         coroutineVersion = '1.0.0'
-        gradleVersion = '3.5.3'
+        gradleVersion = '3.6.0'
         navigationVersion = '2.2.1'
         timberVersion = '4.7.1'
         workVersion = "2.3.1"
