@@ -1,14 +1,12 @@
 package com.ororo.auto.jigokumimi.network
 
+import com.ororo.auto.jigokumimi.database.DatabaseChartInfo
 import com.ororo.auto.jigokumimi.database.DatabaseSong
-import com.ororo.auto.jigokumimi.domain.Song
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 /**
  * アプリーバックエンド間のAPI通信で利用するDTO群を定義
- *
- * @see domain package for
  */
 
 @JsonClass(generateAdapter = true)
@@ -17,9 +15,9 @@ data class NetworkSongContainer(
     val total: Int,
     val limit: Int,
     val offset: Int,
-    val previous: Int?,
-    val href: String,
-    val next: String
+    val previous: String?,
+    val href: String?,
+    val next: String?
 )
 
 /**
@@ -87,27 +85,10 @@ data class NetworkImage(
     val width: Int
 )
 
-
-/**
- * Convert Network results to domain objects
- */
-fun NetworkSongContainer.asDomainModel(): List<Song> {
-    return items.map {
-        Song(
-            id = it.id,
-            album = it.album.name,
-            name = it.name,
-            artist = it.artists[0].name,
-            imageUrl = it.album.images[0].url,
-            previewUrl = it.previewUrl
-        )
-    }
-}
-
 /**
  * Convert Network results to database objects
  */
-fun NetworkSongContainer.asDatabaseModel(): List<DatabaseSong> {
+fun NetworkSongContainer.asDatabaseSongModel(): List<DatabaseSong> {
     return items.map {
         DatabaseSong(
             id = it.id,
@@ -118,4 +99,18 @@ fun NetworkSongContainer.asDatabaseModel(): List<DatabaseSong> {
             previewUrl = it.previewUrl
         )
     }
+}
+
+// TODO 周辺ユーザーの数、再生回数を設定する
+fun NetworkSongContainer.asDatabaseChartInfoModel(): List<DatabaseChartInfo> {
+    return items.mapIndexed { index, song ->
+        DatabaseChartInfo(
+            id = 0,
+            rank = offset + index + 1,
+            songId = song.id,
+            playbackUsersCount = 1,
+            playbackTimes = 1
+        )
+    }
+
 }

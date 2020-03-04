@@ -6,6 +6,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Query
 
 /**
  * Retrofitを用いてSpotifyとのAPI通信を行うサービスを定義
@@ -21,7 +22,11 @@ import retrofit2.http.Header
 // ・戻り地(エンティティ)
 interface SpotifyApiService {
     @GET("me/top/tracks")
-    suspend fun getTracks(@Header("Authorization") authorization: String?): NetworkSongContainer
+    suspend fun getTracks(
+        @Header("Authorization") authorization: String?,
+        @Query("limit") limit: Int?,
+        @Query("offset") offset: Int?
+    ): NetworkSongContainer
 }
 
 // シングルトンでインターフェースを実装する

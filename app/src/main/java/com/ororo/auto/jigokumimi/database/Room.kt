@@ -12,11 +12,22 @@ import androidx.room.*
 
 @Dao
 interface SongDao {
-    @Query("select * from databasesong")
-    fun getSongs(): LiveData<List<DatabaseSong>>
+    @Transaction
+    @Query("select * from databasesong s, databasechartinfo c where s.id = c.songId order by c.rank")
+    fun getSongs(): LiveData<List<DatabaseSongWithChartInfo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(songs: List<DatabaseSong>)
+    fun insertChartInfo(info: List<DatabaseChartInfo>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertSong(songs: List<DatabaseSong>)
+
+    @Transaction
+    fun insertAll(songs: List<DatabaseSong>, info: List<DatabaseChartInfo>) {
+        insertSong(songs)
+        insertChartInfo(info)
+    }
+
 }
 
 @Dao
@@ -38,7 +49,10 @@ interface SpotifyTokenDao {
 }
 
 
-@Database(entities = [DatabaseSong::class, DatabaseSpotifyToken::class], version = 1)
+@Database(
+    entities = [DatabaseSong::class, DatabaseSpotifyToken::class, DatabaseChartInfo::class],
+    version = 1
+)
 abstract class SongsDatabase : RoomDatabase() {
     abstract val songDao: SongDao
     abstract val spotifyTokenDao: SpotifyTokenDao
@@ -53,7 +67,7 @@ fun getDatabase(context: Context): SongsDatabase {
             INSTANCE = Room.databaseBuilder(
                 context.applicationContext,
                 SongsDatabase::class.java,
-                "songs"
+                "jikomumimi-db"
             ).build()
         }
     }

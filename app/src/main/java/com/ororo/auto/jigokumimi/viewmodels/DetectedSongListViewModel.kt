@@ -2,10 +2,7 @@ package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.repository.SongsRepository
 import com.ororo.auto.jigokumimi.util.Constants
@@ -32,13 +29,43 @@ class DetectedSongListViewModel(application: Application) : AndroidViewModel(app
     val songlist = songsRepository.songs
 
 
+    /**
+     * Event triggered for network error. This is private to avoid exposing a
+     * way to set this value to observers.
+     */
+    private var _eventNetworkError = MutableLiveData<Boolean>(false)
+
+    /**
+     * Event triggered for network error. Views should use this to get access
+     * to the data.
+     */
+    val eventNetworkError: LiveData<Boolean>
+        get() = _eventNetworkError
+
+    /**
+     * Flag to display the error message. This is private to avoid exposing a
+     * way to set this value to observers.
+     */
+    private var _isNetworkErrorShown = MutableLiveData<Boolean>(false)
+
+    /**
+     * Flag to display the error message. Views should use this to get access
+     * to the data.
+     */
+    val isNetworkErrorShown: LiveData<Boolean>
+        get() = _isNetworkErrorShown
+
     fun refreshSongsFromRepository() {
         viewModelScope.launch {
             try {
                 songsRepository.refreshSongs()
-
+                _eventNetworkError.value = false
+                _isNetworkErrorShown.value = false
             } catch (e: Exception) {
                 Timber.d(e.message)
+                // Show a Toast error message and hide the progress bar.
+                if (songlist.value.isNullOrEmpty())
+                    _eventNetworkError.value = true
             }
         }
     }
@@ -74,7 +101,14 @@ class DetectedSongListViewModel(application: Application) : AndroidViewModel(app
     }
 
     /**
-     * Factory for constructing DevByteViewModel with parameter
+     * Resets the network error flag.
+     */
+    fun onNetworkErrorShown() {
+        _isNetworkErrorShown.value = true
+    }
+
+    /**
+     * Factory for constructing DetectedSongListViewModel
      */
     class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {

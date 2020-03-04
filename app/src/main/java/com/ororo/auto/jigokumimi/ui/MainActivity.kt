@@ -1,6 +1,7 @@
 package com.ororo.auto.jigokumimi.ui
 
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.ororo.auto.jigokumimi.R
@@ -25,6 +26,10 @@ class MainActivity : AppCompatActivity() {
             Timber.d("token: ${token}")
         }
 
+        // 音量調整を端末のボタンに任せる
+        volumeControlStream = AudioManager.STREAM_MUSIC
+
+
     }
 
     override fun onActivityResult(
@@ -40,8 +45,13 @@ class MainActivity : AppCompatActivity() {
             val repo = SongsRepository(getDatabase(application))
 
             GlobalScope.launch(Dispatchers.Main) {
-                repo.refreshSpotifyAuthToken(response.accessToken)
-                repo.refreshSongs()
+
+                try {
+                    repo.refreshSpotifyAuthToken(response.accessToken)
+                    repo.refreshSongs()
+                } catch (e: Exception) {
+                    Timber.e(e.message)
+                }
             }
         }
     }
