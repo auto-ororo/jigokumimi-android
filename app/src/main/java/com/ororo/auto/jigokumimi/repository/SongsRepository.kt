@@ -7,7 +7,8 @@ import com.ororo.auto.jigokumimi.database.SongsDatabase
 import com.ororo.auto.jigokumimi.database.asDomainModel
 import com.ororo.auto.jigokumimi.domain.Song
 import com.ororo.auto.jigokumimi.network.SpotifyApi
-import com.ororo.auto.jigokumimi.network.asDatabaseModel
+import com.ororo.auto.jigokumimi.network.asDatabaseChartInfoModel
+import com.ororo.auto.jigokumimi.network.asDatabaseSongModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -23,28 +24,27 @@ class SongsRepository(private val database: SongsDatabase) {
         it.asDomainModel()
     }
 
-//    val authHeaderToken: LiveData<String> =
-//        Transformations.map(database.spotifyTokenDao.getToken()) {
-//            Timber.d("token changed: ${it}")
-//            "Bearer ${it}"
-//        }
+    var limit: Int = 20
+
+    var offset: Int = 0
+    var total: Int = Int.MAX_VALUE
 
     suspend fun refreshSongs() {
         withContext(Dispatchers.IO) {
             Timber.d("refresh songs is called")
-            runCatching {
-                val tmpToken = "Bearer ${database.spotifyTokenDao.getToken()}"
-                Timber.d("トークン: ${tmpToken}")
-                SpotifyApi.retrofitService.getTracks(tmpToken)
 
-                // 成功した時(itに戻り値が格納)
-            }.onSuccess {
-                database.songDao.insertAll(it.asDatabaseModel())
-                // 失敗した時(itに例外が格納)
-            }.onFailure {
-                Timber.e(it.message)
-            }
+            val tmpToken = "Bearer ${database.spotifyTokenDao.getToken()}"
+            Timber.d("トークン: ${tmpToken}")
 
+            val response = SpotifyApi.retrofitService.getTracks(
+                tmpToken,
+                limit,
+                offset
+            )
+            database.songDao.insertAll(
+                response.asDatabaseSongModel(),
+                response.asDatabaseChartInfoModel()
+            )
         }
     }
 
@@ -52,11 +52,7 @@ class SongsRepository(private val database: SongsDatabase) {
         withContext(Dispatchers.IO) {
             Timber.d("refresh spotify auth token is called")
 
-            try {
-                database.spotifyTokenDao.refresh(DatabaseSpotifyToken(token))
-            } catch (e: Exception) {
-                Timber.e(e.message)
-            }
+            database.spotifyTokenDao.refresh(DatabaseSpotifyToken(token))
         }
     }
 

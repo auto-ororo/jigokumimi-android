@@ -10,9 +10,9 @@
             name="song"
             type="com.ororo.auto.jigokumimi.domain.Song" />
 
-        <!--        <variable-->
-        <!--            name="videoCallback"-->
-        <!--            type="com.example.android.devbyteviewer.ui.VideoClick" />-->
+        <variable
+            name="playCallback"
+            type="com.ororo.auto.jigokumimi.ui.PlayClick" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -43,6 +43,20 @@
                 app:layout_constraintGuide_end="8dp" />
 
             <TextView
+                android:id="@+id/rank"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@{String.valueOf(song.rank)}"
+                android:textAlignment="center"
+                android:textSize="36sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/song_thumbnail"
+                app:layout_constraintStart_toStartOf="@+id/left_well"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="99" />
+
+            <TextView
                 android:id="@+id/name"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -54,7 +68,7 @@
                 android:textColor="@color/text_black"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/right_well"
+                app:layout_constraintEnd_toStartOf="@+id/playStopButton"
                 app:layout_constraintStart_toEndOf="@+id/song_thumbnail"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="song name" />
@@ -71,7 +85,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/text_light"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/right_well"
+                app:layout_constraintEnd_toStartOf="@+id/playStopButton"
                 app:layout_constraintStart_toEndOf="@+id/song_thumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/name"
                 tools:text="artist" />
@@ -87,7 +101,7 @@
                 android:textAllCaps="false"
                 android:textColor="@color/text_light"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/right_well"
+                app:layout_constraintEnd_toStartOf="@+id/playStopButton"
                 app:layout_constraintStart_toEndOf="@+id/song_thumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/artist"
                 tools:text="album" />
@@ -96,6 +110,7 @@
                 android:id="@+id/song_thumbnail"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:adjustViewBounds="false"
@@ -104,7 +119,7 @@
                 app:imageUrl="@{song.imageUrl}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio=""
-                app:layout_constraintStart_toStartOf="@id/left_well"
+                app:layout_constraintStart_toEndOf="@+id/rank"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@tools:sample/avatars" />
 
@@ -119,6 +134,19 @@
                 app:layout_constraintStart_toStartOf="@+id/left_well"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
+
+            <ImageButton
+                android:id="@+id/playStopButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/design_default_color_background"
+                android:onClick="@{() -> playCallback.onClick(song)}"
+                android:scaleType="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/right_well"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

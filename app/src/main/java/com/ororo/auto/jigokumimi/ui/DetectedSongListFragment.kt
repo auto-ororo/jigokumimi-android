@@ -1,6 +1,8 @@
 package com.ororo.auto.jigokumimi.ui
 
 
+import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +28,8 @@ import com.spotify.sdk.android.auth.AuthorizationResponse
  * A simple [Fragment] subclass.
  */
 class DetectedSongListFragment : Fragment() {
+
+    var mp: MediaPlayer? = null
 
     private val viewModel: DetectedSongListViewModel by lazy {
         val activity = requireNotNull(this.activity) {
@@ -75,12 +79,25 @@ class DetectedSongListFragment : Fragment() {
             false
         )
 
-//         Set the lifecycleOwner so DataBinding can observe LiveData
-        binding.setLifecycleOwner(viewLifecycleOwner)
+        binding.lifecycleOwner = viewLifecycleOwner
 
         binding.viewModel = viewModel
 
-        viewModelAdapter = DetectedSongListAdapter()
+        viewModelAdapter = DetectedSongListAdapter(PlayClick { song: Song ->
+
+            if (mp != null) {
+                if (mp?.isPlaying!!) {
+                    mp?.stop()
+                }
+            }
+
+            // 曲のプレビューを再生
+            mp = MediaPlayer.create(activity, Uri.parse(song.previewUrl))
+
+            mp?.start()
+            Toast.makeText(activity, "${song.name} Playing", Toast.LENGTH_SHORT).show()
+
+        })
 
         binding.recyclerView.adapter = viewModelAdapter
 
@@ -100,6 +117,12 @@ class DetectedSongListFragment : Fragment() {
             showSongCount()
         }
 
+        viewModel.eventNetworkError.observe(
+            viewLifecycleOwner,
+            Observer<Boolean> { isNetworkError ->
+                if (isNetworkError) onNetworkError()
+            })
+
         return binding.root
     }
 
@@ -110,15 +133,26 @@ class DetectedSongListFragment : Fragment() {
     fun showSongCount() {
         Toast.makeText(context, viewModelAdapter.itemCount.toString(), Toast.LENGTH_LONG).show()
     }
+
+    /**
+     * Method for displaying a Toast error message for network errors.
+     */
+    private fun onNetworkError() {
+        if (!viewModel.isNetworkErrorShown.value!!) {
+            Toast.makeText(activity, "Network Error", Toast.LENGTH_LONG).show()
+            viewModel.onNetworkErrorShown()
+        }
+    }
 }
 
 /**
  * RecyclerView Adapter for setting up data binding on the items in the list.
  */
-class DetectedSongListAdapter() : RecyclerView.Adapter<DetectedSongListViewHolder>() {
+class DetectedSongListAdapter(val callback: PlayClick) :
+    RecyclerView.Adapter<DetectedSongListViewHolder>() {
 
     /**
-     * The videos that our Adapter will show
+     * The songs that our Adapter will show
      */
     var songs: List<Song> = emptyList()
         set(value) {
@@ -154,10 +188,10 @@ class DetectedSongListAdapter() : RecyclerView.Adapter<DetectedSongListViewHolde
     override fun onBindViewHolder(holder: DetectedSongListViewHolder, position: Int) {
         holder.viewDataBinding.also {
             it.song = songs[position]
-//            it.videoCallback = callback
+
+            it.playCallback = callback
         }
     }
-
 }
 
 /**
@@ -169,4 +203,17 @@ class DetectedSongListViewHolder(val viewDataBinding: DetectedSongListItemBindin
         @LayoutRes
         val LAYOUT = R.layout.detected_song_list_item
     }
+}
+
+/**
+ * Click listener for Songs. By giving the block a name it helps a reader understand what it does.
+ *
+ */
+class PlayClick(val block: (Song) -> Unit) {
+    /**
+     * Called when a song is clicked
+     *
+     * @param song the song that was clicked
+     */
+    fun onClick(song: Song) = block(song)
 }

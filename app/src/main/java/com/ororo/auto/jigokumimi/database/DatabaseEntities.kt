@@ -1,7 +1,6 @@
 package com.ororo.auto.jigokumimi.database
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 import com.ororo.auto.jigokumimi.domain.Song
 
 
@@ -25,6 +24,37 @@ data class DatabaseSong constructor(
     val previewUrl: String
 )
 
+
+@Entity(
+    foreignKeys = [ForeignKey( // 外部キー制約
+        entity = DatabaseSong::class, // 親のEntityクラスを指定
+        parentColumns = arrayOf("id"), // 親Entityの対応するカラム
+        childColumns = arrayOf("songId"), // 自分の対応するカラム
+        onDelete = ForeignKey.CASCADE // 親EntityがDeleteされたときに子もDelete
+    )
+    ]
+)
+data class DatabaseChartInfo constructor(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
+
+    val rank: Int,
+
+    val songId: String,
+
+    val playbackTimes: Int,
+
+    val playbackUsersCount: Int
+)
+
+
+class DatabaseSongWithChartInfo {
+    @Embedded
+    lateinit var song: DatabaseSong
+    @Relation(parentColumn = "id", entityColumn = "songId")
+    lateinit var chartInfo: DatabaseChartInfo
+}
+
 @Entity
 data class DatabaseSpotifyToken constructor(
     @PrimaryKey
@@ -34,15 +64,18 @@ data class DatabaseSpotifyToken constructor(
 /**
  * Map DatabaseVideos to domain entities
  */
-fun List<DatabaseSong>.asDomainModel(): List<Song> {
+fun List<DatabaseSongWithChartInfo>.asDomainModel(): List<Song> {
     return map {
         Song(
-            id = it.id,
-            album = it.album,
-            name = it.name,
-            artist = it.artist,
-            imageUrl = it.imageUrl,
-            previewUrl = it.previewUrl
+            id = it.song.id,
+            album = it.song.album,
+            name = it.song.name,
+            artist = it.song.artist,
+            imageUrl = it.song.imageUrl,
+            previewUrl = it.song.previewUrl,
+            rank = it.chartInfo.rank,
+            playbackTimes = it.chartInfo.playbackTimes,
+            playbackUsersCount = it.chartInfo.playbackUsersCount
         )
     }
 }
