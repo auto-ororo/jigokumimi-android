@@ -37,7 +37,7 @@ class DetectedSongListFragment : Fragment() {
         }
 
         // ViewModelFactory作成
-        val viewModelFactory = DetectedSongListViewModel.Factory(activity.application)
+        val viewModelFactory = DetectedSongListViewModel.Factory(activity.application, activity)
 
         ViewModelProvider(
             viewModelStore,
@@ -117,6 +117,10 @@ class DetectedSongListFragment : Fragment() {
             showSongCount()
         }
 
+        binding.locationButton.setOnClickListener {
+            getLocation()
+        }
+
         viewModel.eventNetworkError.observe(
             viewLifecycleOwner,
             Observer<Boolean> { isNetworkError ->
@@ -128,6 +132,10 @@ class DetectedSongListFragment : Fragment() {
 
     fun refreshSongs() {
         viewModel.refreshSongsFromRepository()
+    }
+
+    fun getLocation() {
+        viewModel.postLocationAndMyFavoriteSongs()
     }
 
     fun showSongCount() {

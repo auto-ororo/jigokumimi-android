@@ -1,15 +1,18 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
+import android.app.Activity
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.database.getDatabase
+import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.SongsRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_HOST
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_SCHEME
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -19,9 +22,12 @@ import timber.log.Timber
  *
  */
 
-class DetectedSongListViewModel(application: Application) : AndroidViewModel(application) {
+class DetectedSongListViewModel(application: Application, activity: Activity) :
+    AndroidViewModel(application) {
 
     val songsRepository = SongsRepository(getDatabase(application))
+
+    val locationRepository = LocationRepository(activity)
 
     /**
      * A playlist of songs displayed on the screen.
@@ -70,6 +76,19 @@ class DetectedSongListViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
+    fun postLocationAndMyFavoriteSongs() {
+        viewModelScope.launch {
+            try {
+                val flow = locationRepository.getCurrentLocation()
+                flow.collect {
+                    Timber.d("緯度:${it.latitude}, 経度:${it.longitude}")
+                }
+            } catch (e: Exception) {
+                Timber.d(e.message)
+            }
+        }
+    }
+
     fun getAuthenticationRequest(type: AuthorizationResponse.Type): AuthorizationRequest {
         return AuthorizationRequest.Builder(
             Constants.CLIENT_ID,
@@ -107,14 +126,15 @@ class DetectedSongListViewModel(application: Application) : AndroidViewModel(app
         _isNetworkErrorShown.value = true
     }
 
+
     /**
      * Factory for constructing DetectedSongListViewModel
      */
-    class Factory(val app: Application) : ViewModelProvider.Factory {
+    class Factory(val app: Application, val activity: Activity) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(DetectedSongListViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return DetectedSongListViewModel(app) as T
+                return DetectedSongListViewModel(app, activity) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
