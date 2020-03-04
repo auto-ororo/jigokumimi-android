@@ -3,7 +3,13 @@ package com.ororo.auto.jigokumimi.ui
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Bundle
+import android.os.Looper
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.repository.SongsRepository
@@ -15,6 +21,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +36,6 @@ class MainActivity : AppCompatActivity() {
 
         // 音量調整を端末のボタンに任せる
         volumeControlStream = AudioManager.STREAM_MUSIC
-
 
     }
 
