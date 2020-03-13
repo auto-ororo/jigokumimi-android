@@ -1,8 +1,6 @@
 package com.ororo.auto.jigokumimi.ui
 
 
-import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,47 +18,28 @@ import com.ororo.auto.jigokumimi.databinding.DetectedSongListItemBinding
 import com.ororo.auto.jigokumimi.databinding.FragmentDetectedSongListBinding
 import com.ororo.auto.jigokumimi.domain.Song
 import com.ororo.auto.jigokumimi.util.Constants
-import com.ororo.auto.jigokumimi.viewmodels.DetectedSongListViewModel
+import com.ororo.auto.jigokumimi.viewmodels.SongListViewModel
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 
 /**
- * A simple [Fragment] subclass.
+ *  周辺曲情報表示画面
  */
 class DetectedSongListFragment : Fragment() {
 
-    var mp: MediaPlayer? = null
 
-    private val viewModel: DetectedSongListViewModel by lazy {
-        val activity = requireNotNull(this.activity) {
-            "You can only access the viewModel after onActivityCreated()"
-        }
-
-        // ViewModelFactory作成
-        val viewModelFactory = DetectedSongListViewModel.Factory(activity.application, activity)
-
-        ViewModelProvider(
-            viewModelStore,
-            viewModelFactory
-        ).get(DetectedSongListViewModel::class.java)
-    }
+    lateinit var viewModel: SongListViewModel
 
     /**
-     * RecyclerView Adapter for converting a list of Video to cards.
+     * RecyclerView Adapter
      */
     private lateinit var viewModelAdapter: DetectedSongListAdapter
 
-    /**
-     * Called when the fragment's activity has been created and this
-     * fragment's view hierarchy instantiated.  It can be used to do final
-     * initialization once these pieces are in place, such as retrieving
-     * views or restoring state.
-     */
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel.songlist.observe(viewLifecycleOwner, Observer<List<Song>> { songs ->
             songs?.apply {
-                viewModelAdapter?.songs = songs
+                viewModelAdapter.songs = songs
             }
         })
     }
@@ -70,7 +49,12 @@ class DetectedSongListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val request = viewModel.getAuthenticationRequest(AuthorizationResponse.Type.TOKEN)
+
+        activity?.run {
+            val viewModelFactory = SongListViewModel.Factory(this.application, this)
+
+            viewModel = ViewModelProvider(viewModelStore, viewModelFactory).get(SongListViewModel::class.java)
+        }
 
         val binding: FragmentDetectedSongListBinding = DataBindingUtil.inflate(
             inflater,
@@ -85,23 +69,15 @@ class DetectedSongListFragment : Fragment() {
 
         viewModelAdapter = DetectedSongListAdapter(PlayClick { song: Song ->
 
-            if (mp != null) {
-                if (mp?.isPlaying!!) {
-                    mp?.stop()
-                }
-            }
-
-            // 曲のプレビューを再生
-            mp = MediaPlayer.create(activity, Uri.parse(song.previewUrl))
-
-            mp?.start()
-            Toast.makeText(activity, "${song.name} Playing", Toast.LENGTH_SHORT).show()
-
+            viewModel.playingSong.value = song
+            viewModel.isPlaying.value = true
         })
 
         binding.recyclerView.adapter = viewModelAdapter
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
+
+        val request = viewModel.getAuthenticationRequest(AuthorizationResponse.Type.TOKEN)
 
         AuthorizationClient.openLoginActivity(
             activity,
@@ -111,10 +87,6 @@ class DetectedSongListFragment : Fragment() {
 
         binding.refreshButton.setOnClickListener {
             refreshSongs()
-        }
-
-        binding.songCountButton.setOnClickListener {
-            showSongCount()
         }
 
         binding.locationButton.setOnClickListener {
@@ -130,20 +102,22 @@ class DetectedSongListFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * 周辺曲情報を更新する
+     */
     fun refreshSongs() {
         viewModel.refreshSongsFromRepository()
     }
 
+    /**
+     * 位置情報を取得する
+     */
     fun getLocation() {
         viewModel.postLocationAndMyFavoriteSongs()
     }
 
-    fun showSongCount() {
-        Toast.makeText(context, viewModelAdapter.itemCount.toString(), Toast.LENGTH_LONG).show()
-    }
-
     /**
-     * Method for displaying a Toast error message for network errors.
+     * ネットワークエラー時にトーストでエラー表示
      */
     private fun onNetworkError() {
         if (!viewModel.isNetworkErrorShown.value!!) {
@@ -154,27 +128,24 @@ class DetectedSongListFragment : Fragment() {
 }
 
 /**
- * RecyclerView Adapter for setting up data binding on the items in the list.
+ * リストアイテムを設定､表示するアダプタ
  */
 class DetectedSongListAdapter(val callback: PlayClick) :
     RecyclerView.Adapter<DetectedSongListViewHolder>() {
 
     /**
-     * The songs that our Adapter will show
+     * リストに表示する曲情報
      */
     var songs: List<Song> = emptyList()
         set(value) {
             field = value
-            // For an extra challenge, update this to use the paging library.
 
-            // Notify any registered observers that the data set has changed. This will cause every
-            // element in our RecyclerView to be invalidated.
+            // リストが更新されたことを通知
             notifyDataSetChanged()
         }
 
     /**
-     * Called when RecyclerView needs a new {@link ViewHolder} of the given type to represent
-     * an item.
+     * リストアイテムが作られたときに呼ばれる
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetectedSongListViewHolder {
         val withDataBinding: DetectedSongListItemBinding = DataBindingUtil.inflate(
@@ -189,9 +160,7 @@ class DetectedSongListAdapter(val callback: PlayClick) :
     override fun getItemCount() = songs.size
 
     /**
-     * Called by RecyclerView to display the data at the specified position. This method should
-     * update the contents of the {@link ViewHolder#itemView} to reflect the item at the given
-     * position.
+     * リストアイテムが表示されたときに呼ばれる
      */
     override fun onBindViewHolder(holder: DetectedSongListViewHolder, position: Int) {
         holder.viewDataBinding.also {
@@ -203,7 +172,7 @@ class DetectedSongListAdapter(val callback: PlayClick) :
 }
 
 /**
- * ViewHolder for DevByte items. All work is done by data binding.
+ * 別ファイルで定義したレイアウトをつなげるViewHolder
  */
 class DetectedSongListViewHolder(val viewDataBinding: DetectedSongListItemBinding) :
     RecyclerView.ViewHolder(viewDataBinding.root) {
@@ -214,7 +183,7 @@ class DetectedSongListViewHolder(val viewDataBinding: DetectedSongListItemBindin
 }
 
 /**
- * Click listener for Songs. By giving the block a name it helps a reader understand what it does.
+ * リストアイテム内のキューアイコンをクリックしたときのイベントハンドラ
  *
  */
 class PlayClick(val block: (Song) -> Unit) {

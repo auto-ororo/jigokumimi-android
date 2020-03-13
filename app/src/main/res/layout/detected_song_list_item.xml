@@ -18,24 +18,24 @@
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="8dp"
         app:cardCornerRadius="0dp"
-        app:cardElevation="5dp">
+        app:cardElevation="2dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/left_well"
+                android:id="@+id/leftWell"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_begin="8dp" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/right_well"
+                android:id="@+id/rightWell"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -51,8 +51,8 @@
                 android:textAlignment="center"
                 android:textSize="36sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/song_thumbnail"
-                app:layout_constraintStart_toStartOf="@+id/left_well"
+                app:layout_constraintEnd_toStartOf="@+id/songThumbnail"
+                app:layout_constraintStart_toStartOf="@+id/leftWell"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="99" />
 
@@ -68,8 +68,8 @@
                 android:textColor="@color/text_black"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/playStopButton"
-                app:layout_constraintStart_toEndOf="@+id/song_thumbnail"
+                app:layout_constraintEnd_toStartOf="@+id/queueButton"
+                app:layout_constraintStart_toEndOf="@+id/songThumbnail"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="song name" />
 
@@ -85,8 +85,8 @@
                 android:textAllCaps="false"
                 android:textColor="@color/text_light"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/playStopButton"
-                app:layout_constraintStart_toEndOf="@+id/song_thumbnail"
+                app:layout_constraintEnd_toStartOf="@+id/queueButton"
+                app:layout_constraintStart_toEndOf="@+id/songThumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/name"
                 tools:text="artist" />
 
@@ -101,13 +101,13 @@
                 android:textAllCaps="false"
                 android:textColor="@color/text_light"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/playStopButton"
-                app:layout_constraintStart_toEndOf="@+id/song_thumbnail"
+                app:layout_constraintEnd_toStartOf="@+id/queueButton"
+                app:layout_constraintStart_toEndOf="@+id/songThumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/artist"
                 tools:text="album" />
 
             <ImageView
-                android:id="@+id/song_thumbnail"
+                android:id="@+id/songThumbnail"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="8dp"
@@ -131,21 +131,21 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="@+id/left_well"
+                app:layout_constraintStart_toStartOf="@+id/leftWell"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
 
             <ImageButton
-                android:id="@+id/playStopButton"
+                android:id="@+id/queueButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/design_default_color_background"
+                android:background="@color/colorTransparent"
                 android:onClick="@{() -> playCallback.onClick(song)}"
                 android:scaleType="center"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/right_well"
+                app:layout_constraintEnd_toEndOf="@+id/rightWell"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
+                app:srcCompat="@drawable/ic_queue_music" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

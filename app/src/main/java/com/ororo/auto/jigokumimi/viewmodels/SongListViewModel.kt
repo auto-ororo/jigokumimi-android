@@ -2,9 +2,11 @@ package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Activity
 import android.app.Application
+import android.media.MediaPlayer
 import android.net.Uri
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.database.getDatabase
+import com.ororo.auto.jigokumimi.domain.Song
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.SongsRepository
 import com.ororo.auto.jigokumimi.util.Constants
@@ -17,50 +19,74 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
- * 検知した曲の一覧を表示するDetectedSongListFragmentのViewModel
+ * 周辺曲情報に関するViewのViewModel
  *
  *
  */
 
-class DetectedSongListViewModel(application: Application, activity: Activity) :
+class SongListViewModel(application: Application, private val activity: Activity) :
     AndroidViewModel(application) {
 
-    val songsRepository = SongsRepository(getDatabase(application))
+    /*
+     * 曲情報を取得､管理するRepository
+     */
+    private  val songsRepository = SongsRepository(getDatabase(application))
 
-    val locationRepository = LocationRepository(activity)
+    /*
+     * 位置情報を取得､管理するRepository
+     */
+    private val locationRepository = LocationRepository(activity)
+
+    /*
+     * 音楽再生クラス
+     */
+    var mp: MediaPlayer? = null
 
     /**
-     * A playlist of songs displayed on the screen.
+     * 取得した周辺曲情報の一覧
      */
     val songlist = songsRepository.songs
 
-
     /**
-     * Event triggered for network error. This is private to avoid exposing a
-     * way to set this value to observers.
+     * ネットワークエラー状態
      */
     private var _eventNetworkError = MutableLiveData<Boolean>(false)
 
     /**
-     * Event triggered for network error. Views should use this to get access
-     * to the data.
+     * ネットワークエラー状態
      */
     val eventNetworkError: LiveData<Boolean>
         get() = _eventNetworkError
 
     /**
-     * Flag to display the error message. This is private to avoid exposing a
-     * way to set this value to observers.
+     * ネットワークエラーメッセージの表示状態(Private)
      */
     private var _isNetworkErrorShown = MutableLiveData<Boolean>(false)
 
     /**
-     * Flag to display the error message. Views should use this to get access
-     * to the data.
+     * ネットワークエラーメッセージの表示状態
      */
     val isNetworkErrorShown: LiveData<Boolean>
         get() = _isNetworkErrorShown
 
+    /*
+     * 再生中の曲情報
+     */
+    var playingSong = MutableLiveData<Song>()
+
+    /*
+     * 再生状態
+     */
+    var isPlaying =  MutableLiveData<Boolean>(false)
+
+    /*
+     * 再生プレーヤーの表示状態
+     */
+    var isMiniPlayerShown = MutableLiveData<Boolean>(false)
+
+    /**
+     * 周辺曲情報を更新する
+     */
     fun refreshSongsFromRepository() {
         viewModelScope.launch {
             try {
@@ -76,6 +102,9 @@ class DetectedSongListViewModel(application: Application, activity: Activity) :
         }
     }
 
+    /**
+     * 位置情報取得後､APサーバーに位置情報､及びSpotifyから取得したお気に入りの曲リストを送信する
+     */
     fun postLocationAndMyFavoriteSongs() {
         viewModelScope.launch {
             try {
@@ -89,11 +118,14 @@ class DetectedSongListViewModel(application: Application, activity: Activity) :
         }
     }
 
+    /**
+     * Spotifyに対して認証リクエストを行う
+     */
     fun getAuthenticationRequest(type: AuthorizationResponse.Type): AuthorizationRequest {
         return AuthorizationRequest.Builder(
             Constants.CLIENT_ID,
             type,
-            getRedirectUri().toString()
+            Uri.Builder().scheme(SPOTIFY_SDK_REDIRECT_SCHEME).authority(SPOTIFY_SDK_REDIRECT_HOST).build().toString()
         )
             .setShowDialog(false)
             .setScopes(
@@ -111,30 +143,79 @@ class DetectedSongListViewModel(application: Application, activity: Activity) :
             .build()
     }
 
-    private fun getRedirectUri(): Uri {
-
-        return Uri.Builder()
-            .scheme(SPOTIFY_SDK_REDIRECT_SCHEME)
-            .authority(SPOTIFY_SDK_REDIRECT_HOST)
-            .build()
-    }
-
     /**
-     * Resets the network error flag.
+     * ネットワークフラグをリセット
      */
     fun onNetworkErrorShown() {
         _isNetworkErrorShown.value = true
     }
 
+    /*
+     * 再生する曲を指定数だけ進めるor戻す
+     */
+    private fun movePlayingSong(moveIndex : Int) {
+        val song : List<Song>? = songlist.value?.filter {
+            it.rank == (playingSong.value?.rank!! + moveIndex)
+        }
+
+        if (song?.size!! > 0) {
+            playingSong.value = song[0]
+        } else {
+            if (moveIndex > 0) {
+                playingSong.value = songlist.value?.get(0)
+            } else {
+                playingSong.value = songlist.value?.get(songlist.value!!.lastIndex)
+            }
+        }
+    }
+
+    /*
+     * 再生する曲を一つ進める
+     */
+    fun skipNextSong() {
+        movePlayingSong(1)
+        isPlaying.value = true
+    }
+
+    /*
+     * 再生する曲を一つ戻す
+     */
+    fun skipPreviousSong() {
+        movePlayingSong(-1)
+        isPlaying.value = true
+    }
+
+    /*
+     * 曲を再生する
+     */
+    fun playSong() {
+
+        stopSong()
+
+        // 曲のプレビューを再生
+        mp = MediaPlayer.create(activity, Uri.parse(playingSong.value?.previewUrl))
+        mp?.start()
+    }
+
+    /*
+     * 曲を停止する
+     */
+    fun stopSong() {
+        if (mp != null) {
+            if (mp?.isPlaying!!) {
+                mp?.stop()
+            }
+        }
+    }
 
     /**
-     * Factory for constructing DetectedSongListViewModel
+     * Factoryクラス
      */
     class Factory(val app: Application, val activity: Activity) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(DetectedSongListViewModel::class.java)) {
+            if (modelClass.isAssignableFrom(SongListViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return DetectedSongListViewModel(app, activity) as T
+                return SongListViewModel(app, activity) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
