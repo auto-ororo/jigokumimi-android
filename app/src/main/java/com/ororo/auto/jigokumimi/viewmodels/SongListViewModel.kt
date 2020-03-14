@@ -2,13 +2,18 @@ package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Activity
 import android.app.Application
+import android.location.Location
 import android.media.MediaPlayer
 import android.net.Uri
+import android.widget.Toast
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Song
+import com.ororo.auto.jigokumimi.network.NetworkSongContainer
+import com.ororo.auto.jigokumimi.network.PostNetworkSongRequest
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.SongsRepository
+import com.ororo.auto.jigokumimi.repository.SpotifyRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_HOST
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_SCHEME
@@ -37,6 +42,9 @@ class SongListViewModel(application: Application, private val activity: Activity
      * 位置情報を取得､管理するRepository
      */
     private val locationRepository = LocationRepository(activity)
+
+
+    private val spotifyRepository = SpotifyRepository(getDatabase(application))
 
     /*
      * 音楽再生クラス
@@ -86,7 +94,7 @@ class SongListViewModel(application: Application, private val activity: Activity
     var isMiniPlayerShown = MutableLiveData<Boolean>(false)
 
 
-    private var playingSongId : String = ""
+    private var playingSongId: String = ""
 
     /**
      * 周辺曲情報を更新する
@@ -112,9 +120,32 @@ class SongListViewModel(application: Application, private val activity: Activity
     fun postLocationAndMyFavoriteSongs() {
         viewModelScope.launch {
             try {
+                // 位置情報を取得する
                 val flow = locationRepository.getCurrentLocation()
-                flow.collect {
-                    Timber.d("緯度:${it.latitude}, 経度:${it.longitude}")
+                flow.collect { location: Location ->
+                    Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
+
+                    // SpotifyのユーザーIDを取得する
+                    val spotifyUserId = spotifyRepository.getUserProfile().id
+
+                    // ユーザーのお気に入り曲一覧を取得する
+                    val networkSongContainer = songsRepository.getMyFavoriteSongs()
+
+                    // 取得した位置情報､及びお気に入り曲一覧を元にリクエストを作成
+                    val postSongs =
+                        networkSongContainer.items.map {
+                            PostNetworkSongRequest(
+                                spotifyArtistId = spotifyUserId,
+                                spotifySongId = it.id,
+                                longitude = location.longitude,
+                                latitude = location.latitude,
+                                popularity = it.popularity
+                            )
+                        }
+
+                    // Jigokumimiにお気に入り曲リストを登録
+                    songsRepository.postMyFavoriteSongs(postSongs)
+                    Timber.d("Post Fav Songs Succeeded")
                 }
             } catch (e: Exception) {
                 Timber.d(e.message)

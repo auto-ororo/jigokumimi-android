@@ -16,7 +16,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
         val repository = SongsRepository(database)
 
         try {
-//            repository.refreshSongs()
+          repository.refreshSongs()
         } catch (e: HttpException) {
             return Result.retry()
         }

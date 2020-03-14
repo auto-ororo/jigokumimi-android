@@ -1,5 +1,6 @@
 package com.ororo.auto.jigokumimi.network
 
+import android.provider.ContactsContract
 import com.ororo.auto.jigokumimi.database.DatabaseChartInfo
 import com.ororo.auto.jigokumimi.database.DatabaseSong
 import com.squareup.moshi.Json
@@ -18,6 +19,21 @@ data class NetworkSongContainer(
     val previous: String?,
     val href: String?,
     val next: String?
+)
+
+@JsonClass(generateAdapter = true)
+data class PostNetworkSongRequest(
+    @Json(name = "spotify_song_id") val spotifySongId: String,
+    @Json(name = "spotify_user_id") val spotifyArtistId: String,
+    val longitude: Double,
+    val latitude: Double,
+    val popularity: Int
+)
+
+@JsonClass(generateAdapter = true)
+data class PostNetworkSongResponse(
+    val message: String,
+    val data: List<String>?
 )
 
 /**
@@ -85,6 +101,33 @@ data class NetworkImage(
     val width: Int
 )
 
+/**
+ * spotify follower
+ */
+@JsonClass(generateAdapter = true)
+data class SpotifyFollower(
+    val href: String?,
+    val total: Int
+)
+
+
+/**
+ * network spotify user
+ */
+@JsonClass(generateAdapter = true)
+data class SpotifyUserResponse(
+    val country: String?,
+    @Json(name = "display_name") val displayName: String?,
+    val email: String,
+    @Json(name = "external_urls") val externalUrls: Map<String, String>,
+    val followers: SpotifyFollower,
+    val href: String,
+    val id: String,
+    val images: List<NetworkImage>?,
+    val product: String?,
+    val type: String,
+    val uri: String
+)
 /**
  * Convert Network results to database objects
  */
