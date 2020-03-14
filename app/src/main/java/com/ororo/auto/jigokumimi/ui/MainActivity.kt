@@ -3,15 +3,13 @@ package com.ororo.auto.jigokumimi.ui
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Bundle
-import android.os.Looper
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
+import com.ororo.auto.jigokumimi.databinding.ActivityMainBinding
 import com.ororo.auto.jigokumimi.repository.SongsRepository
 import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
 import com.spotify.sdk.android.auth.AuthorizationClient
@@ -20,13 +18,15 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+
 class MainActivity : AppCompatActivity() {
+
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+//        setContentView(R.layout.activity_main)
 
         GlobalScope.launch(Dispatchers.IO) {
             val database = getDatabase(application)
@@ -37,7 +37,13 @@ class MainActivity : AppCompatActivity() {
         // 音量調整を端末のボタンに任せる
         volumeControlStream = AudioManager.STREAM_MUSIC
 
+
+        val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        binding.lifecycleOwner = this
+
     }
+
 
     override fun onActivityResult(
         requestCode: Int,
