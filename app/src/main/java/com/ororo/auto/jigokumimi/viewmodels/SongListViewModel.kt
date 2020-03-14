@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+
 /**
  * 周辺曲情報に関するViewのViewModel
  *
@@ -25,12 +26,12 @@ import timber.log.Timber
  */
 
 class SongListViewModel(application: Application, private val activity: Activity) :
-    AndroidViewModel(application) {
+    AndroidViewModel(application), MediaPlayer.OnCompletionListener {
 
     /*
      * 曲情報を取得､管理するRepository
      */
-    private  val songsRepository = SongsRepository(getDatabase(application))
+    private val songsRepository = SongsRepository(getDatabase(application))
 
     /*
      * 位置情報を取得､管理するRepository
@@ -77,12 +78,15 @@ class SongListViewModel(application: Application, private val activity: Activity
     /*
      * 再生状態
      */
-    var isPlaying =  MutableLiveData<Boolean>(false)
+    var isPlaying = MutableLiveData<Boolean>(false)
 
     /*
      * 再生プレーヤーの表示状態
      */
     var isMiniPlayerShown = MutableLiveData<Boolean>(false)
+
+
+    private var playingSongId : String = ""
 
     /**
      * 周辺曲情報を更新する
@@ -153,8 +157,8 @@ class SongListViewModel(application: Application, private val activity: Activity
     /*
      * 再生する曲を指定数だけ進めるor戻す
      */
-    private fun movePlayingSong(moveIndex : Int) {
-        val song : List<Song>? = songlist.value?.filter {
+    private fun movePlayingSong(moveIndex: Int) {
+        val song: List<Song>? = songlist.value?.filter {
             it.rank == (playingSong.value?.rank!! + moveIndex)
         }
 
@@ -178,11 +182,17 @@ class SongListViewModel(application: Application, private val activity: Activity
     }
 
     /*
-     * 再生する曲を一つ戻す
+     * 再生する曲を一つ戻すor開始位置に戻す
      */
     fun skipPreviousSong() {
-        movePlayingSong(-1)
-        isPlaying.value = true
+        mp?.let {
+            if (it.currentPosition > 1500) {
+                it.seekTo(0)
+            } else {
+                movePlayingSong(-1)
+            }
+            isPlaying.value = true
+        }
     }
 
     /*
@@ -192,20 +202,53 @@ class SongListViewModel(application: Application, private val activity: Activity
 
         stopSong()
 
-        // 曲のプレビューを再生
-        mp = MediaPlayer.create(activity, Uri.parse(playingSong.value?.previewUrl))
-        mp?.start()
+        // 再生する曲が変わった場合はMediaPlayerを初期化
+        if (playingSongId != playingSong.value?.id) {
+            mp = MediaPlayer.create(activity, Uri.parse(playingSong.value?.previewUrl))
+            playingSongId = playingSong.value?.id!!
+        }
+
+        mp?.let {
+            it.start()
+        }
+
     }
 
     /*
      * 曲を停止する
      */
     fun stopSong() {
-        if (mp != null) {
-            if (mp?.isPlaying!!) {
-                mp?.stop()
+        mp?.let {
+            if (it.isPlaying) {
+                it.pause()
             }
         }
+    }
+
+    /**
+     * シークバーを動かす
+     */
+    fun moveSeekBar(progress: Int) {
+        mp?.seekTo(progress)
+    }
+
+
+    fun createTimeLabel(time: Int): String? {
+        var timeLabel: String? = ""
+        val min = time / 1000 / 60
+        val sec = time / 1000 % 60
+        timeLabel = "$min:"
+        if (sec < 10) timeLabel += "0"
+        timeLabel += sec
+        return timeLabel
+    }
+
+
+    /**
+     * 再生が完了したとき､次の曲を流す
+     */
+    override fun onCompletion(mp: MediaPlayer?) {
+        skipNextSong()
     }
 
     /**
