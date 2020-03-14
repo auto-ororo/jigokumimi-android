@@ -27,6 +27,11 @@ interface SpotifyApiService {
         @Query("limit") limit: Int?,
         @Query("offset") offset: Int?
     ): NetworkSongContainer
+
+    @GET("me")
+    suspend fun getUserProfile(
+        @Header("Authorization") authorization: String?
+    ): SpotifyUserResponse
 }
 
 // シングルトンでインターフェースを実装する

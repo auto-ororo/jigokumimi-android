@@ -74,7 +74,7 @@ fun List<DatabaseSongWithChartInfo>.asDomainModel(): List<Song> {
             imageUrl = it.song.imageUrl,
             previewUrl = it.song.previewUrl,
             rank = it.chartInfo.rank,
-            playbackTimes = it.chartInfo.playbackTimes,
+            popularity = it.chartInfo.playbackTimes,
             playbackUsersCount = it.chartInfo.playbackUsersCount
         )
     }
