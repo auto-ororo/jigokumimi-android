@@ -2,7 +2,6 @@ package com.ororo.auto.jigokumimi.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
-import com.ororo.auto.jigokumimi.database.DatabaseSpotifyToken
 import com.ororo.auto.jigokumimi.database.SongsDatabase
 import com.ororo.auto.jigokumimi.database.asDomainModel
 import com.ororo.auto.jigokumimi.domain.Song
@@ -46,7 +45,7 @@ class SongsRepository(private val database: SongsDatabase) {
         }
 
 
-    suspend fun getMyFavoriteSongs(): NetworkSongContainer =
+    suspend fun getMyFavoriteSongs(): GetMyFavoriteSpotifySongsResponse =
         withContext(Dispatchers.IO) {
             Timber.d("get my favorite songs is called")
 
@@ -60,7 +59,7 @@ class SongsRepository(private val database: SongsDatabase) {
             )
         }
 
-    suspend fun postMyFavoriteSongs(songs: List<PostNetworkSongRequest>): PostNetworkSongResponse =
+    suspend fun postMyFavoriteSongs(songs: List<PostMyFavoriteSongsRequest>): PostMyFavoriteSongsResponse =
         withContext(Dispatchers.IO) {
             Timber.d("post my favorite songs is called")
 

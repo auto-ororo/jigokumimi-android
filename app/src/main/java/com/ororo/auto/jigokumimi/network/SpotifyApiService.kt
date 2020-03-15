@@ -26,7 +26,7 @@ interface SpotifyApiService {
         @Header("Authorization") authorization: String?,
         @Query("limit") limit: Int?,
         @Query("offset") offset: Int?
-    ): NetworkSongContainer
+    ): GetMyFavoriteSpotifySongsResponse
 
     @GET("me")
     suspend fun getUserProfile(

@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.network
 
-import android.provider.ContactsContract
 import com.ororo.auto.jigokumimi.database.DatabaseChartInfo
 import com.ororo.auto.jigokumimi.database.DatabaseSong
 import com.squareup.moshi.Json
@@ -10,9 +9,15 @@ import com.squareup.moshi.JsonClass
  * アプリーバックエンド間のAPI通信で利用するDTO群を定義
  */
 
+
+/*** Spotify ***/
+
+/**
+ * Get for [/me/tracks] response
+ */
 @JsonClass(generateAdapter = true)
-data class NetworkSongContainer(
-    val items: List<NetworkSong>,
+data class GetMyFavoriteSpotifySongsResponse(
+    val items: List<SpotifySong>,
     val total: Int,
     val limit: Int,
     val offset: Int,
@@ -21,28 +26,45 @@ data class NetworkSongContainer(
     val next: String?
 )
 
-@JsonClass(generateAdapter = true)
-data class PostNetworkSongRequest(
-    @Json(name = "spotify_song_id") val spotifySongId: String,
-    @Json(name = "spotify_user_id") val spotifyArtistId: String,
-    val longitude: Double,
-    val latitude: Double,
-    val popularity: Int
-)
+/**
+ * Convert my favorite songs results to database objects
+ */
+fun GetMyFavoriteSpotifySongsResponse.asDatabaseSongModel(): List<DatabaseSong> {
+    return items.map {
+        DatabaseSong(
+            id = it.id,
+            album = it.album.name,
+            name = it.name,
+            artist = it.artists[0].name,
+            imageUrl = it.album.images[0].url,
+            previewUrl = it.previewUrl
+        )
+    }
+}
 
-@JsonClass(generateAdapter = true)
-data class PostNetworkSongResponse(
-    val message: String,
-    val data: List<String>?
-)
+// TODO 周辺ユーザーの数、再生回数を設定する
+/**
+ * Convert my favorite songs results to models
+ */
+fun GetMyFavoriteSpotifySongsResponse.asDatabaseChartInfoModel(): List<DatabaseChartInfo> {
+    return items.mapIndexed { index, song ->
+        DatabaseChartInfo(
+            id = 0,
+            rank = offset + index + 1,
+            songId = song.id,
+            playbackUsersCount = 1,
+            playbackTimes = 1
+        )
+    }
+}
 
 /**
- * network song
+ * Spotify song
  */
 @JsonClass(generateAdapter = true)
-data class NetworkSong(
-    val album: NetworkAlbum,
-    val artists: List<NetworkArtist>,
+data class SpotifySong(
+    val album: SpotifyAlbum,
+    val artists: List<SpotifyArtist>,
     @Json(name = "available_markets") val availableMarkets: List<String>,
     @Json(name = "disc_number") val discNumber: Int,
     @Json(name = "duration_ms") val durationMs: Int,
@@ -57,19 +79,18 @@ data class NetworkSong(
     @Json(name = "preview_url") val previewUrl: String
 )
 
-
 /**
- * network album
+ * Spotify album
  */
 @JsonClass(generateAdapter = true)
-data class NetworkAlbum(
+data class SpotifyAlbum(
     @Json(name = "album_type") val albumType: String,
-    val artists: List<NetworkArtist>,
+    val artists: List<SpotifyArtist>,
     @Json(name = "available_markets") val availableMarkets: List<String>,
     @Json(name = "external_urls") val externalUrls: Map<String, String>,
     val href: String,
     val id: String,
-    val images: List<NetworkImage>,
+    val images: List<SpotifyImage>,
     val name: String,
     @Json(name = "release_date") val releaseDate: String,
     @Json(name = "release_date_precision") val releaseDatePrecision: String,
@@ -79,10 +100,10 @@ data class NetworkAlbum(
 )
 
 /**
- * network artist
+ * Spotify artist
  */
 @JsonClass(generateAdapter = true)
-data class NetworkArtist(
+data class SpotifyArtist(
     @Json(name = "external_urls") val externalUrls: Map<String, String>,
     val href: String,
     val id: String,
@@ -92,17 +113,17 @@ data class NetworkArtist(
 )
 
 /**
- * network image
+ * Spotify image
  */
 @JsonClass(generateAdapter = true)
-data class NetworkImage(
+data class SpotifyImage(
     val height: Int,
     val url: String,
     val width: Int
 )
 
 /**
- * spotify follower
+ * Spotify follower
  */
 @JsonClass(generateAdapter = true)
 data class SpotifyFollower(
@@ -110,9 +131,8 @@ data class SpotifyFollower(
     val total: Int
 )
 
-
 /**
- * network spotify user
+ * Spotify user
  */
 @JsonClass(generateAdapter = true)
 data class SpotifyUserResponse(
@@ -123,37 +143,32 @@ data class SpotifyUserResponse(
     val followers: SpotifyFollower,
     val href: String,
     val id: String,
-    val images: List<NetworkImage>?,
+    val images: List<SpotifyImage>?,
     val product: String?,
     val type: String,
     val uri: String
 )
+
+/*** Jigokumimi ***/
+
 /**
- * Convert Network results to database objects
+ * Post for [/songs] request
  */
-fun NetworkSongContainer.asDatabaseSongModel(): List<DatabaseSong> {
-    return items.map {
-        DatabaseSong(
-            id = it.id,
-            album = it.album.name,
-            name = it.name,
-            artist = it.artists[0].name,
-            imageUrl = it.album.images[0].url,
-            previewUrl = it.previewUrl
-        )
-    }
-}
+@JsonClass(generateAdapter = true)
+data class PostMyFavoriteSongsRequest(
+    @Json(name = "spotify_song_id") val spotifySongId: String,
+    @Json(name = "spotify_user_id") val spotifyArtistId: String,
+    val longitude: Double,
+    val latitude: Double,
+    val popularity: Int
+)
 
-// TODO 周辺ユーザーの数、再生回数を設定する
-fun NetworkSongContainer.asDatabaseChartInfoModel(): List<DatabaseChartInfo> {
-    return items.mapIndexed { index, song ->
-        DatabaseChartInfo(
-            id = 0,
-            rank = offset + index + 1,
-            songId = song.id,
-            playbackUsersCount = 1,
-            playbackTimes = 1
-        )
-    }
+/**
+ * Post for [/songs] response
+ */
+@JsonClass(generateAdapter = true)
+data class PostMyFavoriteSongsResponse(
+    val message: String,
+    val data: List<String>?
+)
 
-}
