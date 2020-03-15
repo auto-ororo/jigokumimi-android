@@ -5,12 +5,10 @@ import android.app.Application
 import android.location.Location
 import android.media.MediaPlayer
 import android.net.Uri
-import android.widget.Toast
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Song
-import com.ororo.auto.jigokumimi.network.NetworkSongContainer
-import com.ororo.auto.jigokumimi.network.PostNetworkSongRequest
+import com.ororo.auto.jigokumimi.network.PostMyFavoriteSongsRequest
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.SongsRepository
 import com.ororo.auto.jigokumimi.repository.SpotifyRepository
@@ -134,7 +132,7 @@ class SongListViewModel(application: Application, private val activity: Activity
                     // 取得した位置情報､及びお気に入り曲一覧を元にリクエストを作成
                     val postSongs =
                         networkSongContainer.items.map {
-                            PostNetworkSongRequest(
+                            PostMyFavoriteSongsRequest(
                                 spotifyArtistId = spotifyUserId,
                                 spotifySongId = it.id,
                                 longitude = location.longitude,

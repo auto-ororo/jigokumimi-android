@@ -27,8 +27,8 @@ interface JigokumimiApiService {
     @POST("songs")
     suspend fun postSongs(
         @Header("Authorization") authorization: String?,
-        @Body songs: List<PostNetworkSongRequest>
-    ): PostNetworkSongResponse
+        @Body songs: List<PostMyFavoriteSongsRequest>
+    ): PostMyFavoriteSongsResponse
 }
 
 // シングルトンでインターフェースを実装する
