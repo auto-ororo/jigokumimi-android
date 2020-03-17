@@ -9,7 +9,7 @@ import com.ororo.auto.jigokumimi.R
 import kotlinx.android.synthetic.main.fragment_ok_dialog.view.*
 
 
-class ErrorDialogFragment(private val title:String,private val message:String) : DialogFragment() {
+class MessageDialogFragment(private val title:String, private val message:String) : DialogFragment() {
 
     private lateinit var okClickListener : View.OnClickListener
 

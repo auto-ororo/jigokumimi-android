@@ -19,7 +19,10 @@ import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
+import java.net.ConnectException
+import java.net.UnknownHostException
 
 
 /**
@@ -97,7 +100,18 @@ class SongListViewModel(application: Application, private val activity: Activity
                 songsRepository.refreshSongs()
             } catch (e: Exception) {
                 Timber.d(e.message)
-                _errorMessage.value = e.message
+                e.stackTrace
+                errorMessage.value = when (e) {
+                    is HttpException -> {
+                        "HTTPが200以外を返却"
+                    }
+                    is UnknownHostException -> {
+                        "インターネットに接続されていません"
+                    }
+                    else -> {
+                        "エラーが発生しました。${e.javaClass}"
+                    }
+                }
                 isErrorDialogShown.value = true
             }
         }
@@ -114,7 +128,6 @@ class SongListViewModel(application: Application, private val activity: Activity
                 val flow = locationRepository.getCurrentLocation()
                 flow.collect { location: Location ->
                     Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
-
 
                     // SpotifyのユーザーIDを取得する
                     val spotifyUserId = spotifyRepository.getUserProfile().id

@@ -96,7 +96,7 @@ class DetectedSongListFragment : Fragment() {
             viewLifecycleOwner,
             Observer<Boolean> { isErrorDialogShown ->
                 if (isErrorDialogShown) {
-                    val dialog = ErrorDialogFragment("ERROR", viewModel.errorMessage.value!!)
+                    val dialog = MessageDialogFragment("ERROR", viewModel.errorMessage.value!!)
                     dialog.setOnOkButtonClickListener(
                         View.OnClickListener {
                             viewModel.isErrorDialogShown.value = false
