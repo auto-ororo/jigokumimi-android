@@ -55,26 +55,20 @@ class SongListViewModel(application: Application, private val activity: Activity
     val songlist = songsRepository.songs
 
     /**
-     * ネットワークエラー状態
+     * エラーメッセージダイアログの表示状態
      */
-    private var _eventNetworkError = MutableLiveData<Boolean>(false)
+    var isErrorDialogShown = MutableLiveData<Boolean>(false)
 
     /**
-     * ネットワークエラー状態
+     * エラーメッセージの内容(Private)
      */
-    val eventNetworkError: LiveData<Boolean>
-        get() = _eventNetworkError
+    private var _errorMessage = MutableLiveData<String>()
 
     /**
-     * ネットワークエラーメッセージの表示状態(Private)
+     * エラーメッセージの内容
      */
-    private var _isNetworkErrorShown = MutableLiveData<Boolean>(false)
-
-    /**
-     * ネットワークエラーメッセージの表示状態
-     */
-    val isNetworkErrorShown: LiveData<Boolean>
-        get() = _isNetworkErrorShown
+    val errorMessage: MutableLiveData<String>
+        get() = _errorMessage
 
     /*
      * 再生中の曲情報
@@ -101,13 +95,10 @@ class SongListViewModel(application: Application, private val activity: Activity
         viewModelScope.launch {
             try {
                 songsRepository.refreshSongs()
-                _eventNetworkError.value = false
-                _isNetworkErrorShown.value = false
             } catch (e: Exception) {
                 Timber.d(e.message)
-                // Show a Toast error message and hide the progress bar.
-                if (songlist.value.isNullOrEmpty())
-                    _eventNetworkError.value = true
+                _errorMessage.value = e.message
+                isErrorDialogShown.value = true
             }
         }
     }
@@ -116,6 +107,7 @@ class SongListViewModel(application: Application, private val activity: Activity
      * 位置情報取得後､APサーバーに位置情報､及びSpotifyから取得したお気に入りの曲リストを送信する
      */
     fun postLocationAndMyFavoriteSongs() {
+        Timber.d("Post Location And Fav Songs Called")
         viewModelScope.launch {
             try {
                 // 位置情報を取得する
@@ -123,12 +115,12 @@ class SongListViewModel(application: Application, private val activity: Activity
                 flow.collect { location: Location ->
                     Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
 
+
                     // SpotifyのユーザーIDを取得する
                     val spotifyUserId = spotifyRepository.getUserProfile().id
 
                     // ユーザーのお気に入り曲一覧を取得する
                     val networkSongContainer = songsRepository.getMyFavoriteSongs()
-
                     // 取得した位置情報､及びお気に入り曲一覧を元にリクエストを作成
                     val postSongs =
                         networkSongContainer.items.map {
@@ -147,6 +139,8 @@ class SongListViewModel(application: Application, private val activity: Activity
                 }
             } catch (e: Exception) {
                 Timber.d(e.message)
+                isErrorDialogShown.value = true
+                errorMessage.value = e.message
             }
         }
     }
@@ -174,13 +168,6 @@ class SongListViewModel(application: Application, private val activity: Activity
             )
             .setCampaign("your-campaign-token")
             .build()
-    }
-
-    /**
-     * ネットワークフラグをリセット
-     */
-    fun onNetworkErrorShown() {
-        _isNetworkErrorShown.value = true
     }
 
     /*

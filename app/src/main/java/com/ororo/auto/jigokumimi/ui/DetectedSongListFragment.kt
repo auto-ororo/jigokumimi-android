@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -27,7 +26,6 @@ import com.spotify.sdk.android.auth.AuthorizationResponse
  */
 class DetectedSongListFragment : Fragment() {
 
-
     lateinit var viewModel: SongListViewModel
 
     /**
@@ -48,7 +46,6 @@ class DetectedSongListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
 
         activity?.run {
             val viewModelFactory = SongListViewModel.Factory(this.application, this)
@@ -93,11 +90,23 @@ class DetectedSongListFragment : Fragment() {
             getLocation()
         }
 
-        viewModel.eventNetworkError.observe(
+        // エラー時にメッセージダイアログを表示
+        // 表示時に｢OK｣タップ時の処理を併せて設定する
+        viewModel.isErrorDialogShown.observe(
             viewLifecycleOwner,
-            Observer<Boolean> { isNetworkError ->
-                if (isNetworkError) onNetworkError()
-            })
+            Observer<Boolean> { isErrorDialogShown ->
+                if (isErrorDialogShown) {
+                    val dialog = ErrorDialogFragment("ERROR", viewModel.errorMessage.value!!)
+                    dialog.setOnOkButtonClickListener(
+                        View.OnClickListener {
+                            viewModel.isErrorDialogShown.value = false
+                            dialog.dismiss()
+                        }
+                    )
+                    dialog.show(parentFragmentManager, "test")
+                }
+            }
+        )
 
         return binding.root
     }
@@ -114,16 +123,6 @@ class DetectedSongListFragment : Fragment() {
      */
     fun getLocation() {
         viewModel.postLocationAndMyFavoriteSongs()
-    }
-
-    /**
-     * ネットワークエラー時にトーストでエラー表示
-     */
-    private fun onNetworkError() {
-        if (!viewModel.isNetworkErrorShown.value!!) {
-            Toast.makeText(activity, "Network Error", Toast.LENGTH_LONG).show()
-            viewModel.onNetworkErrorShown()
-        }
     }
 }
 

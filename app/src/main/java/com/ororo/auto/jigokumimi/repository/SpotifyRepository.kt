@@ -6,6 +6,7 @@ import com.ororo.auto.jigokumimi.network.SpotifyApi
 import com.ororo.auto.jigokumimi.network.SpotifyUserResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import timber.log.Timber
 
 class SpotifyRepository(private val database: SongsDatabase) {
@@ -17,7 +18,7 @@ class SpotifyRepository(private val database: SongsDatabase) {
             database.spotifyTokenDao.refresh(DatabaseSpotifyToken(token))
         }
 
-    suspend fun getUserProfile(): SpotifyUserResponse =
+    suspend fun getUserProfile(): SpotifyUserResponse  =
         withContext(Dispatchers.IO) {
             Timber.d("get my spotify is called")
 
