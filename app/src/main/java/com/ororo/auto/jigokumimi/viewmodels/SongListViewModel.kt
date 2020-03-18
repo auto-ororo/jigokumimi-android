@@ -3,8 +3,11 @@ package com.ororo.auto.jigokumimi.viewmodels
 import android.app.Activity
 import android.app.Application
 import android.location.Location
+import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Build
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Song
@@ -21,7 +24,10 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
+import java.io.IOException
+import java.io.InterruptedIOException
 import java.net.ConnectException
+import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 
@@ -101,18 +107,7 @@ class SongListViewModel(application: Application, private val activity: Activity
             } catch (e: Exception) {
                 Timber.d(e.message)
                 e.stackTrace
-                errorMessage.value = when (e) {
-                    is HttpException -> {
-                        "HTTPが200以外を返却"
-                    }
-                    is UnknownHostException -> {
-                        "インターネットに接続されていません"
-                    }
-                    else -> {
-                        "エラーが発生しました。${e.javaClass}"
-                    }
-                }
-                isErrorDialogShown.value = true
+                showMessageFromException(e)
             }
         }
     }
@@ -151,9 +146,8 @@ class SongListViewModel(application: Application, private val activity: Activity
                     Timber.d("Post Fav Songs Succeeded")
                 }
             } catch (e: Exception) {
-                Timber.d(e.message)
-                isErrorDialogShown.value = true
-                errorMessage.value = e.message
+                e.stackTrace
+                showMessageFromException(e)
             }
         }
     }
@@ -229,18 +223,33 @@ class SongListViewModel(application: Application, private val activity: Activity
      */
     fun playSong() {
 
-        stopSong()
+        try {
+            stopSong()
 
-        // 再生する曲が変わった場合はMediaPlayerを初期化
-        if (playingSongId != playingSong.value?.id) {
-            mp = MediaPlayer.create(activity, Uri.parse(playingSong.value?.previewUrl))
-            playingSongId = playingSong.value?.id!!
+            // 再生する曲が変わった場合はMediaPlayerを初期化
+            if (playingSongId != playingSong.value?.id) {
+                mp = MediaPlayer().apply {
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        setAudioAttributes(
+                            AudioAttributes
+                                .Builder()
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                .build()
+                        )
+                    } else {
+                        setAudioStreamType(AudioManager.STREAM_MUSIC)
+                    }
+                    setDataSource(playingSong.value?.previewUrl!!)
+                    prepare() // might take long! (for buffering, etc)
+                    start()
+                    playingSongId = playingSong.value?.id!!
+                }
+            }
+
+        } catch (e: Exception) {
+            e.stackTrace
+            showMessageFromException(e)
         }
-
-        mp?.let {
-            it.start()
-        }
-
     }
 
     /*
@@ -261,7 +270,9 @@ class SongListViewModel(application: Application, private val activity: Activity
         mp?.seekTo(progress)
     }
 
-
+    /**
+     * 再生中の曲の経過時間を取得する
+     */
     fun createTimeLabel(time: Int): String? {
         var timeLabel: String? = ""
         val min = time / 1000 / 60
@@ -271,7 +282,6 @@ class SongListViewModel(application: Application, private val activity: Activity
         timeLabel += sec
         return timeLabel
     }
-
 
     /**
      * 再生が完了したとき､次の曲を流す
@@ -291,6 +301,26 @@ class SongListViewModel(application: Application, private val activity: Activity
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
+    }
+
+    /**
+     * 例外を元にエラーメッセージを表示する
+     */
+    private fun showMessageFromException(e: Exception) {
+        errorMessage.value = when (e) {
+            is HttpException -> {
+                e.response().toString()
+            }
+            is IOException -> {
+                """サーバーとの通信に失敗しました｡
+                    |サーバーがメンテナンス中か､インターネットに繋がっていない可能性があります｡""".trimMargin()
+            }
+            else -> {
+                "エラーが発生しました。${e.javaClass}"
+            }
+        }
+        isErrorDialogShown.value = true
+
     }
 
 }

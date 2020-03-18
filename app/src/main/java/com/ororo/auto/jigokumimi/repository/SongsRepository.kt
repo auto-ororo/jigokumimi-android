@@ -34,11 +34,13 @@ class SongsRepository(private val database: SongsDatabase) {
             val tmpToken = "Bearer ${database.spotifyTokenDao.getToken()}"
             Timber.d("トークン: $tmpToken")
 
-            return@withContext SpotifyApi.retrofitService.getTracks(
+            val response = SpotifyApi.retrofitService.getTracks(
                 tmpToken,
                 limit,
                 offset
             )
+
+            database.songDao.insertSong(response.asDatabaseSongModel())
         }
 
     suspend fun getMyFavoriteSongs(): GetMyFavoriteSpotifySongsResponse =
