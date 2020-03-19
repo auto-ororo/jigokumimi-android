@@ -12,7 +12,7 @@ import androidx.room.*
 @Dao
 interface SongDao {
     @Transaction
-    @Query("select * from databasesong")
+    @Query("select * from databasesong order by rank")
     fun getSongs(): LiveData<List<DatabaseSong>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

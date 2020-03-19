@@ -26,6 +26,8 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.database.DatabaseSong
+import com.ororo.auto.jigokumimi.network.asPostMyFavoriteSongsRequest
 import java.io.InterruptedIOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -107,12 +109,23 @@ class SongListViewModel(application: Application) :
     fun refreshSongsFromRepository() {
         viewModelScope.launch {
             try {
-                songsRepository.refreshSongs()
+                // 位置情報を取得する
+                val flow = locationRepository.getCurrentLocation()
+                flow.collect { location: Location ->
+                    Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
+
+                    // SpotifyのユーザーIDを取得する
+                    val spotifyUserId = spotifyRepository.getUserProfile().id
+
+                    songsRepository.refreshSongs(spotifyUserId, location)
+
+                    Timber.d("Refresh Songs Succeeded")
+                }
+
             } catch (e: Exception) {
-                e.stackTrace
-                val msg = when(e) {
+                val msg = when (e) {
                     is HttpException -> {
-                       e.response().toString()
+                        e.response().toString()
                     }
                     is IOException -> {
                         getApplication<Application>().getString(R.string.no_connection_error_message)
@@ -141,27 +154,16 @@ class SongListViewModel(application: Application) :
                     // SpotifyのユーザーIDを取得する
                     val spotifyUserId = spotifyRepository.getUserProfile().id
 
-                    // ユーザーのお気に入り曲一覧を取得する
-                    val networkSongContainer = songsRepository.getMyFavoriteSongs()
-                    // 取得した位置情報､及びお気に入り曲一覧を元にリクエストを作成
-                    val postSongs =
-                        networkSongContainer.items.map {
-                            PostMyFavoriteSongsRequest(
-                                spotifyArtistId = spotifyUserId,
-                                spotifySongId = it.id,
-                                longitude = location.longitude,
-                                latitude = location.latitude,
-                                popularity = it.popularity
-                            )
-                        }
+                    // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
+                    val postSongs = songsRepository.getMyFavoriteSongs()
+                        .asPostMyFavoriteSongsRequest(spotifyUserId, location)
 
                     // Jigokumimiにお気に入り曲リストを登録
                     songsRepository.postMyFavoriteSongs(postSongs)
                     Timber.d("Post Fav Songs Succeeded")
                 }
             } catch (e: Exception) {
-                e.stackTrace
-                val msg = when(e) {
+                val msg = when (e) {
                     is HttpException -> {
                         e.response().toString()
                     }
@@ -169,7 +171,10 @@ class SongListViewModel(application: Application) :
                         getApplication<Application>().getString(R.string.no_connection_error_message)
                     }
                     else -> {
-                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                        getApplication<Application>().getString(
+                            R.string.general_error_message,
+                            e.javaClass
+                        )
                     }
                 }
                 showMessageDialog(msg)
@@ -272,8 +277,8 @@ class SongListViewModel(application: Application) :
             }
 
         } catch (e: Exception) {
-            e.stackTrace
-            val msg = getApplication<Application>().getString(R.string.general_error_message, e.javaClass)
+            val msg =
+                getApplication<Application>().getString(R.string.general_error_message, e.javaClass)
             showMessageDialog(msg)
         }
     }
@@ -315,11 +320,11 @@ class SongListViewModel(application: Application) :
     override fun onCompletion(mp: MediaPlayer?) {
         skipNextSong()
     }
-    
+
     /**
      * 例外を元にエラーメッセージを表示する
      */
-    private fun showMessageDialog(message:String){
+    private fun showMessageDialog(message: String) {
         errorMessage.value = message
         isErrorDialogShown.value = true
     }
@@ -336,6 +341,5 @@ class SongListViewModel(application: Application) :
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
-
 
 }

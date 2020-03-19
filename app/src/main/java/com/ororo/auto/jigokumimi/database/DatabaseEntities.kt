@@ -10,24 +10,21 @@ import com.ororo.auto.jigokumimi.domain.Song
 
 
 /**
- * DatabaseVideo represents a video entity in the database.
+ * DatabaseSong represents a song entity in the database.
  *
  */
-
-
 
 @Entity
 data class DatabaseSong(
     @PrimaryKey
     val id: String,
+    val rank: Int,
     val album: String,
     val name: String,
     val artist: String,
     val imageUrl: String,
     val previewUrl: String,
-    val rank: Int,
-    val playbackTimes: Int,
-    val playbackUsersCount: Int
+    val popularity: Int
 )
 
 @Entity
@@ -37,7 +34,7 @@ data class DatabaseSpotifyToken constructor(
 )
 
 /**
- * Map DatabaseVideos to domain entities
+ * Map DatabaseSongs to domain entities
  */
 fun List<DatabaseSong>.asDomainModel(): List<Song> {
     return map {
@@ -49,8 +46,7 @@ fun List<DatabaseSong>.asDomainModel(): List<Song> {
             imageUrl = it.imageUrl,
             previewUrl = it.previewUrl,
             rank = it.rank,
-            popularity = it.playbackTimes,
-            playbackUsersCount = it.playbackUsersCount
+            popularity = it.popularity
         )
     }
 }

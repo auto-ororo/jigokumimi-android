@@ -1,6 +1,8 @@
 package com.ororo.auto.jigokumimi.network
 
+import android.location.Location
 import com.ororo.auto.jigokumimi.database.DatabaseSong
+import com.ororo.auto.jigokumimi.domain.Song
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -12,10 +14,34 @@ import com.squareup.moshi.JsonClass
 /*** Spotify ***/
 
 /**
+ * Get for [/tracks/{id}] response
+ */
+@JsonClass(generateAdapter = true)
+data class GetTrackDetailResponse(
+    val album: SpotifyAlbum,
+    val artists: List<SpotifyArtist>,
+    @Json(name = "available_markets") val availableMarkets: List<String>,
+    @Json(name = "disc_number") val discNumber: Int,
+    @Json(name = "duration_ms") val durationMs: Int,
+    val explicit: Boolean,
+    @Json(name = "external_ids") val externalIds: Map<String, String>,
+    @Json(name = "external_urls") val externalUrls: Map<String, String>,
+    val href: String,
+    val id: String,
+    @Json(name = "is_local") val isLocal: Boolean,
+    val name: String,
+    val popularity: Int,
+    @Json(name = "preview_url") val previewUrl: String,
+    @Json(name = "track_number") val trackNumber: Int,
+    val type: String,
+    val uri: String
+)
+
+/**
  * Get for [/me/tracks] response
  */
 @JsonClass(generateAdapter = true)
-data class GetMyFavoriteSpotifySongsResponse(
+data class GetMyFavoriteSongsResponse(
     val items: List<SpotifySong>,
     val total: Int,
     val limit: Int,
@@ -28,19 +54,32 @@ data class GetMyFavoriteSpotifySongsResponse(
 /**
  * Convert my favorite songs results to database objects
  */
-// TODO 周辺ユーザーの数、再生回数を設定する
-fun GetMyFavoriteSpotifySongsResponse.asDatabaseSongModel(): List<DatabaseSong> {
-    return items.mapIndexed{ index, song ->
-        DatabaseSong(
-            id = song.id,
-            album = song.album.name,
-            name = song.name,
-            artist = song.artists[0].name,
-            imageUrl = song.album.images[0].url,
-            previewUrl = song.previewUrl,
-            rank = offset + index + 1,
-            playbackUsersCount = 1,
-            playbackTimes = 1
+//fun GetTrackDetailResponse.asDatabaseSongModel(popularity: Int): DatabaseSong {
+//    return
+//        DatabaseSong(
+//            id = id,
+//            album = song.album.name,
+//            name = song.name,
+//            artist = song.artists[0].name,
+//            imageUrl = song.album.images[0].url,
+//            previewUrl = song.previewUrl,
+//            rank = ,
+//            popularity = popularity
+//        )
+//    }
+//}
+
+/**
+ * Spotifyから取得したお気に入り曲リストを元にJigokumimiへ送信するリクエストBodyを作成する
+ */
+fun GetMyFavoriteSongsResponse.asPostMyFavoriteSongsRequest(spotifyUserId: String, location: Location): List<PostMyFavoriteSongsRequest> {
+    return items.map {
+        PostMyFavoriteSongsRequest(
+            spotifyArtistId = spotifyUserId,
+            spotifySongId = it.id,
+            longitude = location.longitude,
+            latitude = location.latitude,
+            popularity = it.popularity
         )
     }
 }
@@ -139,6 +178,15 @@ data class SpotifyUserResponse(
 /*** Jigokumimi ***/
 
 /**
+ * Get for [/songs] response
+ */
+@JsonClass(generateAdapter = true)
+data class GetSongsAroundResponse(
+    val message: String,
+    val data: List<SongAround>?
+)
+
+/**
  * Post for [/songs] request
  */
 @JsonClass(generateAdapter = true)
@@ -159,3 +207,12 @@ data class PostMyFavoriteSongsResponse(
     val data: List<String>?
 )
 
+/**
+ * Song Around
+ */
+@JsonClass(generateAdapter = true)
+data class SongAround(
+    val rank: Int,
+    @Json(name = "spotify_song_id") val spotifySongId: String,
+    val popularity: Int
+)

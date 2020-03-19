@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 /**
@@ -27,12 +28,18 @@ interface SpotifyApiService {
         @Header("Authorization") authorization: String?,
         @Query("limit") limit: Int?,
         @Query("offset") offset: Int?
-    ): GetMyFavoriteSpotifySongsResponse
+    ): GetMyFavoriteSongsResponse
 
     @GET("me")
     suspend fun getUserProfile(
         @Header("Authorization") authorization: String?
     ): SpotifyUserResponse
+
+    @GET("tracks/{id}")
+    suspend fun getTrackDetail(
+        @Header("Authorization") authorization: String?,
+        @Path("id") id : String
+    ): GetTrackDetailResponse
 }
 
 // シングルトンでインターフェースを実装する
