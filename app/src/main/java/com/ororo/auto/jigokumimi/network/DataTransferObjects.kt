@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.network
 
-import com.ororo.auto.jigokumimi.database.DatabaseChartInfo
 import com.ororo.auto.jigokumimi.database.DatabaseSong
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
@@ -29,29 +28,17 @@ data class GetMyFavoriteSpotifySongsResponse(
 /**
  * Convert my favorite songs results to database objects
  */
-fun GetMyFavoriteSpotifySongsResponse.asDatabaseSongModel(): List<DatabaseSong> {
-    return items.map {
-        DatabaseSong(
-            id = it.id,
-            album = it.album.name,
-            name = it.name,
-            artist = it.artists[0].name,
-            imageUrl = it.album.images[0].url,
-            previewUrl = it.previewUrl
-        )
-    }
-}
-
 // TODO 周辺ユーザーの数、再生回数を設定する
-/**
- * Convert my favorite songs results to models
- */
-fun GetMyFavoriteSpotifySongsResponse.asDatabaseChartInfoModel(): List<DatabaseChartInfo> {
-    return items.mapIndexed { index, song ->
-        DatabaseChartInfo(
-            id = 0,
+fun GetMyFavoriteSpotifySongsResponse.asDatabaseSongModel(): List<DatabaseSong> {
+    return items.mapIndexed{ index, song ->
+        DatabaseSong(
+            id = song.id,
+            album = song.album.name,
+            name = song.name,
+            artist = song.artists[0].name,
+            imageUrl = song.album.images[0].url,
+            previewUrl = song.previewUrl,
             rank = offset + index + 1,
-            songId = song.id,
             playbackUsersCount = 1,
             playbackTimes = 1
         )

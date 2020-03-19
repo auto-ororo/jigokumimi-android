@@ -3,11 +3,9 @@ package com.ororo.auto.jigokumimi.ui
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.util.Log
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.View.GONE
-import android.view.View.OnTouchListener
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -17,8 +15,6 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
 import com.ororo.auto.jigokumimi.viewmodels.SongListViewModel
 import kotlinx.android.synthetic.main.fragment_mini_player.*
-import timber.log.Timber
-import kotlin.math.abs
 
 
 /**
@@ -37,7 +33,7 @@ class MiniPlayerFragment : Fragment() {
         // Inflate the layout for this fragment
 
         activity?.run {
-            val viewModelFactory = SongListViewModel.Factory(this.application, this)
+            val viewModelFactory = SongListViewModel.Factory(this.application)
 
             viewModel = ViewModelProvider(
                 viewModelStore,
@@ -51,7 +47,6 @@ class MiniPlayerFragment : Fragment() {
             container,
             false
         )
-
 
         binding.lifecycleOwner = viewLifecycleOwner
 
@@ -138,7 +133,7 @@ class MiniPlayerFragment : Fragment() {
      * 上から下にスワイプした際にプレーヤーを隠すジェスチャクラス
      * OnCreateViewで作らないと動作しない可能性
      */
-    val gesture = GestureDetector(
+    private val gesture = GestureDetector(
         activity,
         object : SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean {

@@ -1,6 +1,7 @@
 package com.ororo.auto.jigokumimi.repository
 
 import android.app.Activity
+import android.app.Application
 import android.location.Location
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -12,9 +13,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 
-class LocationRepository(acivity: Activity) {
+class LocationRepository(context: Application) {
 
-    val fusedLocationClient: FusedLocationProviderClient = FusedLocationProviderClient(acivity)
+    val fusedLocationClient: FusedLocationProviderClient = FusedLocationProviderClient(context)
 
     fun getCurrentLocation(): Flow<Location> = callbackFlow {
         val request = LocationRequest().also {

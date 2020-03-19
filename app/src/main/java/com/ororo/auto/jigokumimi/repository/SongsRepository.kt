@@ -8,6 +8,7 @@ import com.ororo.auto.jigokumimi.domain.Song
 import com.ororo.auto.jigokumimi.network.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import timber.log.Timber
 
 /**
@@ -38,12 +39,9 @@ class SongsRepository(private val database: SongsDatabase) {
                 limit,
                 offset
             )
-            database.songDao.insertAll(
-                response.asDatabaseSongModel(),
-                response.asDatabaseChartInfoModel()
-            )
-        }
 
+            database.songDao.insertSong(response.asDatabaseSongModel())
+        }
 
     suspend fun getMyFavoriteSongs(): GetMyFavoriteSpotifySongsResponse =
         withContext(Dispatchers.IO) {
@@ -70,9 +68,5 @@ class SongsRepository(private val database: SongsDatabase) {
                 tmpToken,
                 songs
             )
-
         }
-
-
-
 }

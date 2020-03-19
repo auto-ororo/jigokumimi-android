@@ -3,8 +3,11 @@ package com.ororo.auto.jigokumimi.viewmodels
 import android.app.Activity
 import android.app.Application
 import android.location.Location
+import android.media.AudioAttributes
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Build
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Song
@@ -19,7 +22,14 @@ import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import timber.log.Timber
+import java.io.IOException
+import com.ororo.auto.jigokumimi.R
+import java.io.InterruptedIOException
+import java.net.ConnectException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 
 /**
@@ -27,8 +37,7 @@ import timber.log.Timber
  *
  *
  */
-
-class SongListViewModel(application: Application, private val activity: Activity) :
+class SongListViewModel(application: Application) :
     AndroidViewModel(application), MediaPlayer.OnCompletionListener {
 
     /*
@@ -39,9 +48,11 @@ class SongListViewModel(application: Application, private val activity: Activity
     /*
      * 位置情報を取得､管理するRepository
      */
-    private val locationRepository = LocationRepository(activity)
+    private val locationRepository = LocationRepository(application)
 
-
+    /**
+     * spotifyデータにアクセスするRepository
+     */
     private val spotifyRepository = SpotifyRepository(getDatabase(application))
 
     /*
@@ -55,26 +66,20 @@ class SongListViewModel(application: Application, private val activity: Activity
     val songlist = songsRepository.songs
 
     /**
-     * ネットワークエラー状態
+     * エラーメッセージダイアログの表示状態
      */
-    private var _eventNetworkError = MutableLiveData<Boolean>(false)
+    var isErrorDialogShown = MutableLiveData<Boolean>(false)
 
     /**
-     * ネットワークエラー状態
+     * エラーメッセージの内容(Private)
      */
-    val eventNetworkError: LiveData<Boolean>
-        get() = _eventNetworkError
+    private var _errorMessage = MutableLiveData<String>()
 
     /**
-     * ネットワークエラーメッセージの表示状態(Private)
+     * エラーメッセージの内容
      */
-    private var _isNetworkErrorShown = MutableLiveData<Boolean>(false)
-
-    /**
-     * ネットワークエラーメッセージの表示状態
-     */
-    val isNetworkErrorShown: LiveData<Boolean>
-        get() = _isNetworkErrorShown
+    val errorMessage: MutableLiveData<String>
+        get() = _errorMessage
 
     /*
      * 再生中の曲情報
@@ -91,7 +96,9 @@ class SongListViewModel(application: Application, private val activity: Activity
      */
     var isMiniPlayerShown = MutableLiveData<Boolean>(false)
 
-
+    /**
+     * 再生中の曲ID
+     */
     private var playingSongId: String = ""
 
     /**
@@ -101,13 +108,20 @@ class SongListViewModel(application: Application, private val activity: Activity
         viewModelScope.launch {
             try {
                 songsRepository.refreshSongs()
-                _eventNetworkError.value = false
-                _isNetworkErrorShown.value = false
             } catch (e: Exception) {
-                Timber.d(e.message)
-                // Show a Toast error message and hide the progress bar.
-                if (songlist.value.isNullOrEmpty())
-                    _eventNetworkError.value = true
+                e.stackTrace
+                val msg = when(e) {
+                    is HttpException -> {
+                       e.response().toString()
+                    }
+                    is IOException -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                    else -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                }
+                showMessageDialog(msg)
             }
         }
     }
@@ -116,6 +130,7 @@ class SongListViewModel(application: Application, private val activity: Activity
      * 位置情報取得後､APサーバーに位置情報､及びSpotifyから取得したお気に入りの曲リストを送信する
      */
     fun postLocationAndMyFavoriteSongs() {
+        Timber.d("Post Location And Fav Songs Called")
         viewModelScope.launch {
             try {
                 // 位置情報を取得する
@@ -128,7 +143,6 @@ class SongListViewModel(application: Application, private val activity: Activity
 
                     // ユーザーのお気に入り曲一覧を取得する
                     val networkSongContainer = songsRepository.getMyFavoriteSongs()
-
                     // 取得した位置情報､及びお気に入り曲一覧を元にリクエストを作成
                     val postSongs =
                         networkSongContainer.items.map {
@@ -146,7 +160,19 @@ class SongListViewModel(application: Application, private val activity: Activity
                     Timber.d("Post Fav Songs Succeeded")
                 }
             } catch (e: Exception) {
-                Timber.d(e.message)
+                e.stackTrace
+                val msg = when(e) {
+                    is HttpException -> {
+                        e.response().toString()
+                    }
+                    is IOException -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                    else -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                }
+                showMessageDialog(msg)
             }
         }
     }
@@ -174,13 +200,6 @@ class SongListViewModel(application: Application, private val activity: Activity
             )
             .setCampaign("your-campaign-token")
             .build()
-    }
-
-    /**
-     * ネットワークフラグをリセット
-     */
-    fun onNetworkErrorShown() {
-        _isNetworkErrorShown.value = true
     }
 
     /*
@@ -229,18 +248,34 @@ class SongListViewModel(application: Application, private val activity: Activity
      */
     fun playSong() {
 
-        stopSong()
+        try {
+            stopSong()
 
-        // 再生する曲が変わった場合はMediaPlayerを初期化
-        if (playingSongId != playingSong.value?.id) {
-            mp = MediaPlayer.create(activity, Uri.parse(playingSong.value?.previewUrl))
-            playingSongId = playingSong.value?.id!!
+            // 再生する曲が変わった場合はMediaPlayerを初期化
+            if (playingSongId != playingSong.value?.id) {
+                mp = MediaPlayer().apply {
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        setAudioAttributes(
+                            AudioAttributes
+                                .Builder()
+                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                .build()
+                        )
+                    } else {
+                        setAudioStreamType(AudioManager.STREAM_MUSIC)
+                    }
+                    setDataSource(playingSong.value?.previewUrl!!)
+                    prepare()
+                    start()
+                    playingSongId = playingSong.value?.id!!
+                }
+            }
+
+        } catch (e: Exception) {
+            e.stackTrace
+            val msg = getApplication<Application>().getString(R.string.general_error_message, e.javaClass)
+            showMessageDialog(msg)
         }
-
-        mp?.let {
-            it.start()
-        }
-
     }
 
     /*
@@ -261,7 +296,9 @@ class SongListViewModel(application: Application, private val activity: Activity
         mp?.seekTo(progress)
     }
 
-
+    /**
+     * 再生中の曲の経過時間を取得する
+     */
     fun createTimeLabel(time: Int): String? {
         var timeLabel: String? = ""
         val min = time / 1000 / 60
@@ -272,25 +309,33 @@ class SongListViewModel(application: Application, private val activity: Activity
         return timeLabel
     }
 
-
     /**
      * 再生が完了したとき､次の曲を流す
      */
     override fun onCompletion(mp: MediaPlayer?) {
         skipNextSong()
     }
+    
+    /**
+     * 例外を元にエラーメッセージを表示する
+     */
+    private fun showMessageDialog(message:String){
+        errorMessage.value = message
+        isErrorDialogShown.value = true
+    }
 
     /**
      * Factoryクラス
      */
-    class Factory(val app: Application, val activity: Activity) : ViewModelProvider.Factory {
+    class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SongListViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SongListViewModel(app, activity) as T
+                return SongListViewModel(app) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
+
 
 }
