@@ -24,27 +24,27 @@ import retrofit2.http.*
 // ・HTTPメソッド
 // ・戻り地(エンティティ)
 interface JigokumimiApiService {
-    @POST("songs")
-    suspend fun postSongs(
+    @POST("tracks")
+    suspend fun postTracks(
         @Header("Authorization") authorization: String?,
-        @Body songs: List<PostMyFavoriteSongsRequest>
-    ): PostMyFavoriteSongsResponse
+        @Body songs: List<PostMyFavoriteTracksRequest>
+    ): PostMyFavoriteTracksResponse
 
-    @GET("songs")
-    suspend fun getSongsAround(
+    @GET("tracks")
+    suspend fun getTracksAround(
         @Header("Authorization") authorization: String?,
         @Query("userId") userId: String?,
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
         @Query("distance") distance: Int?
-    ): GetSongsAroundResponse
+    ): GetTracksAroundResponse
 }
 
 // シングルトンでインターフェースを実装する
 object JigokumimiApi {
 
     // 通信先ホストのURL
-    private const val BASE_URL = "http://192.168.0.4:10080/api/"
+    private const val BASE_URL = "http://10.229.72.152:10080/api/"
 
     // Moshi(レスポンスJSONをエンティティに詰め込むライブラリ)を初期化
     private val moshi = Moshi.Builder()

@@ -6,9 +6,9 @@ package com.ororo.auto.jigokumimi.domain
  */
 
 /**
- * domain song
+ * domain track
  */
-data class Song(
+data class Track(
     val id: String,
     val album: String,
     val name: String,

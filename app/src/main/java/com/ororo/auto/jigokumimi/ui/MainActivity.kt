@@ -9,10 +9,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
-import com.ororo.auto.jigokumimi.repository.SongsRepository
 import com.ororo.auto.jigokumimi.repository.SpotifyRepository
 import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
 import com.spotify.sdk.android.auth.AuthorizationClient

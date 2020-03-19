@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.SongListViewModel" />
+            type="com.ororo.auto.jigokumimi.viewmodels.TrackListViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -31,29 +31,29 @@
             tools:text="3:00" />
 
         <TextView
-            android:id="@+id/rankSongNameText"
+            android:id="@+id/rankTrackNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{String.valueOf(viewModel.playingSong.rank) + '.' + viewModel.playingSong.name }"
+            android:text="@{String.valueOf(viewModel.playingTrack.rank) + '.' + viewModel.playingTrack.name }"
             android:textColor="@color/colorWhite"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="99 . Song Name" />
+            tools:text="99 . Track Name" />
 
         <TextView
             android:id="@+id/artistAlbumText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{viewModel.playingSong.artist + '-' + viewModel.playingSong.album }"
+            android:text="@{viewModel.playingTrack.artist + '-' + viewModel.playingTrack.album }"
             android:textColor="@color/colorWhite"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rankSongNameText"
+            app:layout_constraintTop_toBottomOf="@+id/rankTrackNameText"
             tools:text="Artist - Album" />
 
         <ImageButton
@@ -113,7 +113,4 @@
             tools:text="0:00" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 </layout>
