@@ -13,7 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
-import com.ororo.auto.jigokumimi.viewmodels.SongListViewModel
+import com.ororo.auto.jigokumimi.viewmodels.TrackListViewModel
 import kotlinx.android.synthetic.main.fragment_mini_player.*
 
 
@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_mini_player.*
  */
 class MiniPlayerFragment : Fragment() {
 
-    lateinit var viewModel: SongListViewModel
+    lateinit var viewModel: TrackListViewModel
 
     lateinit var binding: FragmentMiniPlayerBinding
 
@@ -33,12 +33,12 @@ class MiniPlayerFragment : Fragment() {
         // Inflate the layout for this fragment
 
         activity?.run {
-            val viewModelFactory = SongListViewModel.Factory(this.application)
+            val viewModelFactory = TrackListViewModel.Factory(this.application)
 
             viewModel = ViewModelProvider(
                 viewModelStore,
                 viewModelFactory
-            ).get(SongListViewModel::class.java)
+            ).get(TrackListViewModel::class.java)
         }
 
         binding = DataBindingUtil.inflate(
@@ -57,12 +57,12 @@ class MiniPlayerFragment : Fragment() {
             Observer<Boolean> { isPlaying ->
                 if (isPlaying) {
                     viewModel.isMiniPlayerShown.value = true
-                    viewModel.playSong()
+                    viewModel.playTrack()
                     seekBar.max = viewModel.mp?.duration!!
                     viewModel.mp?.setOnCompletionListener(viewModel)
                     binding.queueButton.setImageResource(R.drawable.ic_pause)
                 } else {
-                    viewModel.stopSong()
+                    viewModel.stopTrack()
                     binding.queueButton.setImageResource(R.drawable.ic_play_arrow)
                 }
             })
@@ -83,11 +83,11 @@ class MiniPlayerFragment : Fragment() {
         }
 
         binding.nextButton.setOnClickListener {
-            viewModel.skipNextSong()
+            viewModel.skipNextTrack()
         }
 
         binding.previousButton.setOnClickListener {
-            viewModel.skipPreviousSong()
+            viewModel.skipPreviousTrack()
         }
 
         binding.seekBar.setOnSeekBarChangeListener(

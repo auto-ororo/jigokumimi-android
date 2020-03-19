@@ -9,7 +9,7 @@
     <string name="auth_button">Spotify</string>
     <string name="spotify_client_id">664aaf9b8611444ba447fd77e2faa0fc</string>
     <string name="refresh_button_text">Refresh</string>
-    <string name="song_count_button_text">Count</string>
+    <string name="track_count_button_text">Count</string>
     <string name="location_button_text">Location</string>
 
     <!--  message-->

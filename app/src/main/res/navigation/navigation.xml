@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/detectedSongListFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.DetectedSongListFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.DetectedTrackListFragment"
         android:label="fragment_detected_song_list"
-        tools:layout="@layout/fragment_detected_song_list" />
+        tools:layout="@layout/fragment_detected_track_list" />
 </navigation>

@@ -1,7 +1,7 @@
 package com.ororo.auto.jigokumimi.database
 
 import androidx.room.*
-import com.ororo.auto.jigokumimi.domain.Song
+import com.ororo.auto.jigokumimi.domain.Track
 
 
 /**
@@ -15,7 +15,7 @@ import com.ororo.auto.jigokumimi.domain.Song
  */
 
 @Entity
-data class DatabaseSong(
+data class TracksAround(
     @PrimaryKey
     val id: String,
     val rank: Int,
@@ -36,9 +36,9 @@ data class DatabaseSpotifyToken constructor(
 /**
  * Map DatabaseSongs to domain entities
  */
-fun List<DatabaseSong>.asDomainModel(): List<Song> {
+fun List<TracksAround>.asDomainModel(): List<Track> {
     return map {
-        Song(
+        Track(
             id = it.id,
             album = it.album,
             name = it.name,

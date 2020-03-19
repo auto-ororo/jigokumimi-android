@@ -13,31 +13,31 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.databinding.DetectedSongListItemBinding
-import com.ororo.auto.jigokumimi.databinding.FragmentDetectedSongListBinding
-import com.ororo.auto.jigokumimi.domain.Song
+import com.ororo.auto.jigokumimi.databinding.DetectedTrackListItemBinding
+import com.ororo.auto.jigokumimi.databinding.FragmentDetectedTrackListBinding
+import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.util.Constants
-import com.ororo.auto.jigokumimi.viewmodels.SongListViewModel
+import com.ororo.auto.jigokumimi.viewmodels.TrackListViewModel
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 
 /**
  *  周辺曲情報表示画面
  */
-class DetectedSongListFragment : Fragment() {
+class DetectedTrackListFragment : Fragment() {
 
-    lateinit var viewModel: SongListViewModel
+    lateinit var viewModel: TrackListViewModel
 
     /**
      * RecyclerView Adapter
      */
-    private lateinit var viewModelAdapter: DetectedSongListAdapter
+    private lateinit var viewModelAdapter: DetectedTrackListAdapter
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.songlist.observe(viewLifecycleOwner, Observer<List<Song>> { songs ->
-            songs?.apply {
-                viewModelAdapter.songs = songs
+        viewModel.tracklist.observe(viewLifecycleOwner, Observer<List<Track>> { tracks ->
+            tracks?.apply {
+                viewModelAdapter.tracks = tracks
             }
         })
     }
@@ -48,14 +48,14 @@ class DetectedSongListFragment : Fragment() {
     ): View? {
 
         activity?.run {
-            val viewModelFactory = SongListViewModel.Factory(this.application)
+            val viewModelFactory = TrackListViewModel.Factory(this.application)
 
-            viewModel = ViewModelProvider(viewModelStore, viewModelFactory).get(SongListViewModel::class.java)
+            viewModel = ViewModelProvider(viewModelStore, viewModelFactory).get(TrackListViewModel::class.java)
         }
 
-        val binding: FragmentDetectedSongListBinding = DataBindingUtil.inflate(
+        val binding: FragmentDetectedTrackListBinding = DataBindingUtil.inflate(
             inflater,
-            R.layout.fragment_detected_song_list,
+            R.layout.fragment_detected_track_list,
             container,
             false
         )
@@ -64,9 +64,9 @@ class DetectedSongListFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        viewModelAdapter = DetectedSongListAdapter(PlayClick { song: Song ->
+        viewModelAdapter = DetectedTrackListAdapter(PlayClick { track: Track ->
 
-            viewModel.playingSong.value = song
+            viewModel.playingTrack.value = track
             viewModel.isPlaying.value = true
         })
 
@@ -83,7 +83,7 @@ class DetectedSongListFragment : Fragment() {
         )
 
         binding.refreshButton.setOnClickListener {
-            refreshSongs()
+            refreshTracks()
         }
 
         binding.locationButton.setOnClickListener {
@@ -114,28 +114,28 @@ class DetectedSongListFragment : Fragment() {
     /**
      * 周辺曲情報を更新する
      */
-    fun refreshSongs() {
-        viewModel.refreshSongsFromRepository()
+    fun refreshTracks() {
+        viewModel.refreshTracksFromRepository()
     }
 
     /**
      * 位置情報を取得する
      */
     fun getLocation() {
-        viewModel.postLocationAndMyFavoriteSongs()
+        viewModel.postLocationAndMyFavoriteTracks()
     }
 }
 
 /**
  * リストアイテムを設定､表示するアダプタ
  */
-class DetectedSongListAdapter(val callback: PlayClick) :
-    RecyclerView.Adapter<DetectedSongListViewHolder>() {
+class DetectedTrackListAdapter(val callback: PlayClick) :
+    RecyclerView.Adapter<DetectedTrackListViewHolder>() {
 
     /**
      * リストに表示する曲情報
      */
-    var songs: List<Song> = emptyList()
+    var tracks: List<Track> = emptyList()
         set(value) {
             field = value
 
@@ -146,24 +146,24 @@ class DetectedSongListAdapter(val callback: PlayClick) :
     /**
      * リストアイテムが作られたときに呼ばれる
      */
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetectedSongListViewHolder {
-        val withDataBinding: DetectedSongListItemBinding = DataBindingUtil.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetectedTrackListViewHolder {
+        val withDataBinding: DetectedTrackListItemBinding = DataBindingUtil.inflate(
             LayoutInflater.from(parent.context),
-            DetectedSongListViewHolder.LAYOUT,
+            DetectedTrackListViewHolder.LAYOUT,
             parent,
             false
         )
-        return DetectedSongListViewHolder(withDataBinding)
+        return DetectedTrackListViewHolder(withDataBinding)
     }
 
-    override fun getItemCount() = songs.size
+    override fun getItemCount() = tracks.size
 
     /**
      * リストアイテムが表示されたときに呼ばれる
      */
-    override fun onBindViewHolder(holder: DetectedSongListViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: DetectedTrackListViewHolder, position: Int) {
         holder.viewDataBinding.also {
-            it.song = songs[position]
+            it.track = tracks[position]
 
             it.playCallback = callback
         }
@@ -173,11 +173,11 @@ class DetectedSongListAdapter(val callback: PlayClick) :
 /**
  * 別ファイルで定義したレイアウトをつなげるViewHolder
  */
-class DetectedSongListViewHolder(val viewDataBinding: DetectedSongListItemBinding) :
+class DetectedTrackListViewHolder(val viewDataBinding: DetectedTrackListItemBinding) :
     RecyclerView.ViewHolder(viewDataBinding.root) {
     companion object {
         @LayoutRes
-        val LAYOUT = R.layout.detected_song_list_item
+        val LAYOUT = R.layout.detected_track_list_item
     }
 }
 
@@ -185,11 +185,11 @@ class DetectedSongListViewHolder(val viewDataBinding: DetectedSongListItemBindin
  * リストアイテム内のキューアイコンをクリックしたときのイベントハンドラ
  *
  */
-class PlayClick(val block: (Song) -> Unit) {
+class PlayClick(val block: (Track) -> Unit) {
     /**
      * Called when a song is clicked
      *
-     * @param song the song that was clicked
+     * @param track the song that was clicked
      */
-    fun onClick(song: Song) = block(song)
+    fun onClick(track: Track) = block(track)
 }

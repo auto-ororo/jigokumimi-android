@@ -1,8 +1,6 @@
 package com.ororo.auto.jigokumimi.network
 
 import android.location.Location
-import com.ororo.auto.jigokumimi.database.DatabaseSong
-import com.ororo.auto.jigokumimi.domain.Song
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -41,8 +39,8 @@ data class GetTrackDetailResponse(
  * Get for [/me/tracks] response
  */
 @JsonClass(generateAdapter = true)
-data class GetMyFavoriteSongsResponse(
-    val items: List<SpotifySong>,
+data class GetMyFavoriteTracksResponse(
+    val items: List<SpotifyTrack>,
     val total: Int,
     val limit: Int,
     val offset: Int,
@@ -52,31 +50,13 @@ data class GetMyFavoriteSongsResponse(
 )
 
 /**
- * Convert my favorite songs results to database objects
- */
-//fun GetTrackDetailResponse.asDatabaseSongModel(popularity: Int): DatabaseSong {
-//    return
-//        DatabaseSong(
-//            id = id,
-//            album = song.album.name,
-//            name = song.name,
-//            artist = song.artists[0].name,
-//            imageUrl = song.album.images[0].url,
-//            previewUrl = song.previewUrl,
-//            rank = ,
-//            popularity = popularity
-//        )
-//    }
-//}
-
-/**
  * Spotifyから取得したお気に入り曲リストを元にJigokumimiへ送信するリクエストBodyを作成する
  */
-fun GetMyFavoriteSongsResponse.asPostMyFavoriteSongsRequest(spotifyUserId: String, location: Location): List<PostMyFavoriteSongsRequest> {
+fun GetMyFavoriteTracksResponse.asPostMyFavoriteTracksRequest(spotifyUserId: String, location: Location): List<PostMyFavoriteTracksRequest> {
     return items.map {
-        PostMyFavoriteSongsRequest(
+        PostMyFavoriteTracksRequest(
             spotifyArtistId = spotifyUserId,
-            spotifySongId = it.id,
+            spotifyTrackId = it.id,
             longitude = location.longitude,
             latitude = location.latitude,
             popularity = it.popularity
@@ -88,7 +68,7 @@ fun GetMyFavoriteSongsResponse.asPostMyFavoriteSongsRequest(spotifyUserId: Strin
  * Spotify song
  */
 @JsonClass(generateAdapter = true)
-data class SpotifySong(
+data class SpotifyTrack(
     val album: SpotifyAlbum,
     val artists: List<SpotifyArtist>,
     @Json(name = "available_markets") val availableMarkets: List<String>,
@@ -181,17 +161,17 @@ data class SpotifyUserResponse(
  * Get for [/songs] response
  */
 @JsonClass(generateAdapter = true)
-data class GetSongsAroundResponse(
+data class GetTracksAroundResponse(
     val message: String,
-    val data: List<SongAround>?
+    val data: List<TrackAround>?
 )
 
 /**
  * Post for [/songs] request
  */
 @JsonClass(generateAdapter = true)
-data class PostMyFavoriteSongsRequest(
-    @Json(name = "spotify_song_id") val spotifySongId: String,
+data class PostMyFavoriteTracksRequest(
+    @Json(name = "spotify_track_id") val spotifyTrackId: String,
     @Json(name = "spotify_user_id") val spotifyArtistId: String,
     val longitude: Double,
     val latitude: Double,
@@ -202,7 +182,7 @@ data class PostMyFavoriteSongsRequest(
  * Post for [/songs] response
  */
 @JsonClass(generateAdapter = true)
-data class PostMyFavoriteSongsResponse(
+data class PostMyFavoriteTracksResponse(
     val message: String,
     val data: List<String>?
 )
@@ -211,8 +191,8 @@ data class PostMyFavoriteSongsResponse(
  * Song Around
  */
 @JsonClass(generateAdapter = true)
-data class SongAround(
+data class TrackAround(
     val rank: Int,
-    @Json(name = "spotify_song_id") val spotifySongId: String,
+    @Json(name = "spotify_track_id") val spotifyTrackId: String,
     val popularity: Int
 )

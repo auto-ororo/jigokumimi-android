@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.DetectedSongListFragment">
+    tools:context=".ui.DetectedTrackListFragment">
 
     <data>
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.SongListViewModel" />
+            type="com.ororo.auto.jigokumimi.viewmodels.TrackListViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,7 +46,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            tools:listitem="@layout/detected_song_list_item" />
+            tools:listitem="@layout/detected_track_list_item" />
 
         <Button
             android:id="@+id/location_button"

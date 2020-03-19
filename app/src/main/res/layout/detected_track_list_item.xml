@@ -7,8 +7,8 @@
     <data>
 
         <variable
-            name="song"
-            type="com.ororo.auto.jigokumimi.domain.Song" />
+            name="track"
+            type="com.ororo.auto.jigokumimi.domain.Track" />
 
         <variable
             name="playCallback"
@@ -47,11 +47,11 @@
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="@{String.valueOf(song.rank)}"
+                android:text="@{String.valueOf(track.rank)}"
                 android:textAlignment="center"
                 android:textSize="36sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/songThumbnail"
+                app:layout_constraintEnd_toStartOf="@+id/trackThumbnail"
                 app:layout_constraintStart_toStartOf="@+id/leftWell"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="99" />
@@ -62,16 +62,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@{song.name}"
+                android:text="@{track.name}"
                 android:textAlignment="viewStart"
                 android:textAllCaps="false"
                 android:textColor="@color/text_black"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@+id/queueButton"
-                app:layout_constraintStart_toEndOf="@+id/songThumbnail"
+                app:layout_constraintStart_toEndOf="@+id/trackThumbnail"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="song name" />
+                tools:text="track name" />
 
 
             <TextView
@@ -80,13 +80,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@{song.artist}"
+                android:text="@{track.artist}"
                 android:textAlignment="viewStart"
                 android:textAllCaps="false"
                 android:textColor="@color/text_light"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toStartOf="@+id/queueButton"
-                app:layout_constraintStart_toEndOf="@+id/songThumbnail"
+                app:layout_constraintStart_toEndOf="@+id/trackThumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/name"
                 tools:text="artist" />
 
@@ -96,18 +96,18 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@{song.album}"
+                android:text="@{track.album}"
                 android:textAlignment="viewStart"
                 android:textAllCaps="false"
                 android:textColor="@color/text_light"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toStartOf="@+id/queueButton"
-                app:layout_constraintStart_toEndOf="@+id/songThumbnail"
+                app:layout_constraintStart_toEndOf="@+id/trackThumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/artist"
                 tools:text="album" />
 
             <ImageView
-                android:id="@+id/songThumbnail"
+                android:id="@+id/trackThumbnail"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="8dp"
@@ -116,7 +116,7 @@
                 android:adjustViewBounds="false"
                 android:cropToPadding="false"
                 android:scaleType="centerCrop"
-                app:imageUrl="@{song.imageUrl}"
+                app:imageUrl="@{track.imageUrl}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio=""
                 app:layout_constraintStart_toEndOf="@+id/rank"
@@ -140,7 +140,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@color/colorTransparent"
-                android:onClick="@{() -> playCallback.onClick(song)}"
+                android:onClick="@{() -> playCallback.onClick(track)}"
                 android:scaleType="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/rightWell"

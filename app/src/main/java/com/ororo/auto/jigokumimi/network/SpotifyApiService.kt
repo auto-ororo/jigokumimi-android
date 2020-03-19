@@ -2,7 +2,6 @@ package com.ororo.auto.jigokumimi.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
@@ -28,7 +27,7 @@ interface SpotifyApiService {
         @Header("Authorization") authorization: String?,
         @Query("limit") limit: Int?,
         @Query("offset") offset: Int?
-    ): GetMyFavoriteSongsResponse
+    ): GetMyFavoriteTracksResponse
 
     @GET("me")
     suspend fun getUserProfile(
