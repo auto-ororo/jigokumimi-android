@@ -84,13 +84,11 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == AUTH_TOKEN_REQUEST_CODE) {
             val spotifyRepository = SpotifyRepository(getDatabase(application))
-            val songRepository = SongsRepository(getDatabase(application))
 
             GlobalScope.launch(Dispatchers.Main) {
 
                 try {
                     spotifyRepository.refreshSpotifyAuthToken(response.accessToken)
-                    songRepository.refreshSongs()
                 } catch (e: Exception) {
                     Timber.e(e.message)
                 }

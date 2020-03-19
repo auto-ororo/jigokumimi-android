@@ -16,6 +16,5 @@ data class Song(
     val imageUrl: String,
     val previewUrl: String,
     val rank: Int,
-    val popularity: Int,
-    val playbackUsersCount: Int
+    val popularity: Int
 )

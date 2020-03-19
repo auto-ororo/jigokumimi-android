@@ -29,6 +29,15 @@ interface JigokumimiApiService {
         @Header("Authorization") authorization: String?,
         @Body songs: List<PostMyFavoriteSongsRequest>
     ): PostMyFavoriteSongsResponse
+
+    @GET("songs")
+    suspend fun getSongsAround(
+        @Header("Authorization") authorization: String?,
+        @Query("userId") userId: String?,
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+        @Query("distance") distance: Int?
+    ): GetSongsAroundResponse
 }
 
 // シングルトンでインターフェースを実装する
