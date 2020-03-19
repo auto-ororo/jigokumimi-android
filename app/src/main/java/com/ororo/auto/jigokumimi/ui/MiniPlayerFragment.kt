@@ -33,7 +33,7 @@ class MiniPlayerFragment : Fragment() {
         // Inflate the layout for this fragment
 
         activity?.run {
-            val viewModelFactory = SongListViewModel.Factory(this.application, this)
+            val viewModelFactory = SongListViewModel.Factory(this.application)
 
             viewModel = ViewModelProvider(
                 viewModelStore,
@@ -133,7 +133,7 @@ class MiniPlayerFragment : Fragment() {
      * 上から下にスワイプした際にプレーヤーを隠すジェスチャクラス
      * OnCreateViewで作らないと動作しない可能性
      */
-    val gesture = GestureDetector(
+    private val gesture = GestureDetector(
         activity,
         object : SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean {

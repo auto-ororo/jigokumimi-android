@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
+import com.ororo.auto.jigokumimi.R
 import java.io.InterruptedIOException
 import java.net.ConnectException
 import java.net.SocketTimeoutException
@@ -36,8 +37,7 @@ import java.net.UnknownHostException
  *
  *
  */
-
-class SongListViewModel(application: Application, private val activity: Activity) :
+class SongListViewModel(application: Application) :
     AndroidViewModel(application), MediaPlayer.OnCompletionListener {
 
     /*
@@ -48,9 +48,11 @@ class SongListViewModel(application: Application, private val activity: Activity
     /*
      * 位置情報を取得､管理するRepository
      */
-    private val locationRepository = LocationRepository(activity)
+    private val locationRepository = LocationRepository(application)
 
-
+    /**
+     * spotifyデータにアクセスするRepository
+     */
     private val spotifyRepository = SpotifyRepository(getDatabase(application))
 
     /*
@@ -94,7 +96,9 @@ class SongListViewModel(application: Application, private val activity: Activity
      */
     var isMiniPlayerShown = MutableLiveData<Boolean>(false)
 
-
+    /**
+     * 再生中の曲ID
+     */
     private var playingSongId: String = ""
 
     /**
@@ -105,9 +109,19 @@ class SongListViewModel(application: Application, private val activity: Activity
             try {
                 songsRepository.refreshSongs()
             } catch (e: Exception) {
-                Timber.d(e.message)
                 e.stackTrace
-                showMessageFromException(e)
+                val msg = when(e) {
+                    is HttpException -> {
+                       e.response().toString()
+                    }
+                    is IOException -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                    else -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                }
+                showMessageDialog(msg)
             }
         }
     }
@@ -147,7 +161,18 @@ class SongListViewModel(application: Application, private val activity: Activity
                 }
             } catch (e: Exception) {
                 e.stackTrace
-                showMessageFromException(e)
+                val msg = when(e) {
+                    is HttpException -> {
+                        e.response().toString()
+                    }
+                    is IOException -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                    else -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                }
+                showMessageDialog(msg)
             }
         }
     }
@@ -240,7 +265,7 @@ class SongListViewModel(application: Application, private val activity: Activity
                         setAudioStreamType(AudioManager.STREAM_MUSIC)
                     }
                     setDataSource(playingSong.value?.previewUrl!!)
-                    prepare() // might take long! (for buffering, etc)
+                    prepare()
                     start()
                     playingSongId = playingSong.value?.id!!
                 }
@@ -248,7 +273,8 @@ class SongListViewModel(application: Application, private val activity: Activity
 
         } catch (e: Exception) {
             e.stackTrace
-            showMessageFromException(e)
+            val msg = getApplication<Application>().getString(R.string.general_error_message, e.javaClass)
+            showMessageDialog(msg)
         }
     }
 
@@ -289,38 +315,27 @@ class SongListViewModel(application: Application, private val activity: Activity
     override fun onCompletion(mp: MediaPlayer?) {
         skipNextSong()
     }
+    
+    /**
+     * 例外を元にエラーメッセージを表示する
+     */
+    private fun showMessageDialog(message:String){
+        errorMessage.value = message
+        isErrorDialogShown.value = true
+    }
 
     /**
      * Factoryクラス
      */
-    class Factory(val app: Application, val activity: Activity) : ViewModelProvider.Factory {
+    class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SongListViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SongListViewModel(app, activity) as T
+                return SongListViewModel(app) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
 
-    /**
-     * 例外を元にエラーメッセージを表示する
-     */
-    private fun showMessageFromException(e: Exception) {
-        errorMessage.value = when (e) {
-            is HttpException -> {
-                e.response().toString()
-            }
-            is IOException -> {
-                """サーバーとの通信に失敗しました｡
-                    |サーバーがメンテナンス中か､インターネットに繋がっていない可能性があります｡""".trimMargin()
-            }
-            else -> {
-                "エラーが発生しました。${e.javaClass}"
-            }
-        }
-        isErrorDialogShown.value = true
-
-    }
 
 }

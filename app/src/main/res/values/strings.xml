@@ -11,4 +11,12 @@
     <string name="refresh_button_text">Refresh</string>
     <string name="song_count_button_text">Count</string>
     <string name="location_button_text">Location</string>
+
+    <!--  message-->
+    <string name="general_error_message">エラーが発生しました｡:%1$s</string>
+    <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nお使いの端末がインターネットに繋がっていない可能性があります｡</string>
+
 </resources>
+
+
+

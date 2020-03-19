@@ -48,7 +48,7 @@ class DetectedSongListFragment : Fragment() {
     ): View? {
 
         activity?.run {
-            val viewModelFactory = SongListViewModel.Factory(this.application, this)
+            val viewModelFactory = SongListViewModel.Factory(this.application)
 
             viewModel = ViewModelProvider(viewModelStore, viewModelFactory).get(SongListViewModel::class.java)
         }
