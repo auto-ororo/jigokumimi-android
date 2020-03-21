@@ -122,7 +122,7 @@ class MiniPlayerFragment : Fragment() {
             }
         }).start();
 
-        binding.miniPlayerLayout.setOnTouchListener { v, event ->
+        binding.miniPlayerLayout.setOnTouchListener { _, event ->
             gesture.onTouchEvent(event)
         }
 

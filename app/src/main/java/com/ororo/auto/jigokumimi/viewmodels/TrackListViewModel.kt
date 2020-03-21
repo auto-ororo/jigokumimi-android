@@ -8,11 +8,11 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.*
+import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.TracksRepository
-import com.ororo.auto.jigokumimi.repository.SpotifyRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_HOST
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_SCHEME
@@ -25,6 +25,8 @@ import timber.log.Timber
 import java.io.IOException
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
+import com.ororo.auto.jigokumimi.repository.AuthRepository
+import kotlinx.coroutines.Dispatchers
 
 
 /**
@@ -33,12 +35,15 @@ import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
  *
  */
 class TrackListViewModel(application: Application) :
-    AndroidViewModel(application), MediaPlayer.OnCompletionListener {
+    BaseAndroidViewModel(application), MediaPlayer.OnCompletionListener {
 
     /*
      * 曲情報を取得､管理するRepository
      */
-    private val tracksRepository = TracksRepository(getDatabase(application))
+    private val tracksRepository = TracksRepository(
+        getDatabase(application),
+        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
+    )
 
     /*
      * 位置情報を取得､管理するRepository
@@ -46,9 +51,10 @@ class TrackListViewModel(application: Application) :
     private val locationRepository = LocationRepository(application)
 
     /**
-     * spotifyデータにアクセスするRepository
+     * 認証系にアクセスするRepository
      */
-    private val spotifyRepository = SpotifyRepository(getDatabase(application))
+    private val authRepository =
+        AuthRepository(PreferenceManager.getDefaultSharedPreferences(application.applicationContext))
 
     /*
      * 音楽再生クラス
@@ -59,22 +65,6 @@ class TrackListViewModel(application: Application) :
      * 取得した周辺曲情報の一覧
      */
     val tracklist = tracksRepository.tracks
-
-    /**
-     * エラーメッセージダイアログの表示状態
-     */
-    var isErrorDialogShown = MutableLiveData<Boolean>(false)
-
-    /**
-     * エラーメッセージの内容(Private)
-     */
-    private var _errorMessage = MutableLiveData<String>()
-
-    /**
-     * エラーメッセージの内容
-     */
-    val errorMessage: MutableLiveData<String>
-        get() = _errorMessage
 
     /*
      * 再生中の曲情報
@@ -100,7 +90,7 @@ class TrackListViewModel(application: Application) :
      * 周辺曲情報を更新する
      */
     fun refreshTracksFromRepository() {
-        viewModelScope.launch {
+        viewModelScope.launch() {
             try {
                 // 位置情報を取得する
                 val flow = locationRepository.getCurrentLocation()
@@ -108,7 +98,7 @@ class TrackListViewModel(application: Application) :
                     Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
 
                     // SpotifyのユーザーIDを取得する
-                    val spotifyUserId = spotifyRepository.getUserProfile().id
+                    val spotifyUserId = authRepository.getSpotifyUserProfile().id
 
                     tracksRepository.refreshTracks(spotifyUserId, location)
 
@@ -124,7 +114,7 @@ class TrackListViewModel(application: Application) :
                         getApplication<Application>().getString(R.string.no_connection_error_message)
                     }
                     else -> {
-                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                        getApplication<Application>().getString(R.string.general_error_message, e.javaClass)
                     }
                 }
                 showMessageDialog(msg)
@@ -137,7 +127,7 @@ class TrackListViewModel(application: Application) :
      */
     fun postLocationAndMyFavoriteTracks() {
         Timber.d("Post Location And Fav Tracks Called")
-        viewModelScope.launch {
+        viewModelScope.launch() {
             try {
                 // 位置情報を取得する
                 val flow = locationRepository.getCurrentLocation()
@@ -145,7 +135,7 @@ class TrackListViewModel(application: Application) :
                     Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
 
                     // SpotifyのユーザーIDを取得する
-                    val spotifyUserId = spotifyRepository.getUserProfile().id
+                    val spotifyUserId = authRepository.getSpotifyUserProfile().id
 
                     // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
                     val postTracks = tracksRepository.getMyFavoriteTracks()
@@ -180,10 +170,11 @@ class TrackListViewModel(application: Application) :
      */
     fun getAuthenticationRequest(type: AuthorizationResponse.Type): AuthorizationRequest {
         return AuthorizationRequest.Builder(
-            Constants.CLIENT_ID,
-            type,
-            Uri.Builder().scheme(SPOTIFY_SDK_REDIRECT_SCHEME).authority(SPOTIFY_SDK_REDIRECT_HOST).build().toString()
-        )
+                Constants.CLIENT_ID,
+                type,
+                Uri.Builder().scheme(SPOTIFY_SDK_REDIRECT_SCHEME)
+                    .authority(SPOTIFY_SDK_REDIRECT_HOST).build().toString()
+            )
             .setShowDialog(false)
             .setScopes(
                 arrayOf(
@@ -312,14 +303,6 @@ class TrackListViewModel(application: Application) :
      */
     override fun onCompletion(mp: MediaPlayer?) {
         skipNextTrack()
-    }
-
-    /**
-     * 例外を元にエラーメッセージを表示する
-     */
-    private fun showMessageDialog(message: String) {
-        errorMessage.value = message
-        isErrorDialogShown.value = true
     }
 
     /**

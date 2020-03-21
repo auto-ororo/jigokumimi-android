@@ -27,12 +27,6 @@ data class TracksAround(
     val popularity: Int
 )
 
-@Entity
-data class DatabaseSpotifyToken constructor(
-    @PrimaryKey
-    val token: String
-)
-
 /**
  * Map DatabaseSongs to domain entities
  */

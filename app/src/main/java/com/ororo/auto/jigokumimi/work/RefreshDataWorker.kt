@@ -1,6 +1,7 @@
 package com.ororo.auto.jigokumimi.work
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.ororo.auto.jigokumimi.database.getDatabase
@@ -13,7 +14,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         val database = getDatabase(applicationContext)
-        val repository = TracksRepository(database)
+        val repository = TracksRepository(database, PreferenceManager.getDefaultSharedPreferences(applicationContext))
 
         try {
 //          repository.refreshTracks()

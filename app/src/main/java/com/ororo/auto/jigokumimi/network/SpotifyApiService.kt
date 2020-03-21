@@ -24,19 +24,19 @@ import retrofit2.http.Query
 interface SpotifyApiService {
     @GET("me/top/tracks")
     suspend fun getTracks(
-        @Header("Authorization") authorization: String?,
+        @Header("Authorization") authorization: String,
         @Query("limit") limit: Int?,
         @Query("offset") offset: Int?
     ): GetMyFavoriteTracksResponse
 
     @GET("me")
     suspend fun getUserProfile(
-        @Header("Authorization") authorization: String?
+        @Header("Authorization") authorization: String
     ): SpotifyUserResponse
 
     @GET("tracks/{id}")
     suspend fun getTrackDetail(
-        @Header("Authorization") authorization: String?,
+        @Header("Authorization") authorization: String,
         @Path("id") id : String
     ): GetTrackDetailResponse
 }
