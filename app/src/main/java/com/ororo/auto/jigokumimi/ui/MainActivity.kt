@@ -9,9 +9,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
-import com.ororo.auto.jigokumimi.repository.SpotifyRepository
+import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
 import com.spotify.sdk.android.auth.AuthorizationClient
 import kotlinx.coroutines.Dispatchers
@@ -30,12 +31,6 @@ class MainActivity : AppCompatActivity() {
         // Android 6, API 23以上でパーミッションの確認
         if (Build.VERSION.SDK_INT >= 23) {
             requestPermission()
-        }
-
-        GlobalScope.launch(Dispatchers.IO) {
-            val database = getDatabase(application)
-            val token = database.spotifyTokenDao.getToken()
-            Timber.d("token: ${token}")
         }
 
         // 音量調整を端末のボタンに任せる
@@ -81,12 +76,12 @@ class MainActivity : AppCompatActivity() {
         val response = AuthorizationClient.getResponse(resultCode, data)
 
         if (requestCode == AUTH_TOKEN_REQUEST_CODE) {
-            val spotifyRepository = SpotifyRepository(getDatabase(application))
+            val authRepository = AuthRepository(PreferenceManager.getDefaultSharedPreferences(this))
 
             GlobalScope.launch(Dispatchers.Main) {
 
                 try {
-                    spotifyRepository.refreshSpotifyAuthToken(response.accessToken)
+                    authRepository.refreshSpotifyAuthToken(response.accessToken)
                 } catch (e: Exception) {
                     Timber.e(e.message)
                 }

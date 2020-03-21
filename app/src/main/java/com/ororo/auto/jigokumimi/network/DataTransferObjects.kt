@@ -3,6 +3,8 @@ package com.ororo.auto.jigokumimi.network
 import android.location.Location
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * アプリーバックエンド間のAPI通信で利用するDTO群を定義
@@ -156,6 +158,57 @@ data class SpotifyUserResponse(
 )
 
 /*** Jigokumimi ***/
+
+/**
+ * Post for [/login] Request
+ */
+@JsonClass(generateAdapter = true)
+data class LoginRequest(
+    val email: String,
+    val password: String
+)
+
+/**
+ * Post for [/login] Response
+ */
+@JsonClass(generateAdapter = true)
+data class LoginResponse(
+    @Json(name = "access_token") val accessToken: String,
+    @Json(name = "token_type") val tokenType: String,
+    @Json(name = "expires_in")val expiresIn: Int
+)
+
+/**
+ * Post for [/login] Response
+ */
+@JsonClass(generateAdapter = true)
+data class LogoutResponse(
+    val message: String
+)
+
+/**
+ * Post for [/refresh] Response
+ */
+@JsonClass(generateAdapter = true)
+data class RefreshResponse(
+    @Json(name = "access_token") val accessToken: String,
+    @Json(name = "token_type") val tokenType: String,
+    @Json(name = "expires_in")val expiresIn: Int
+)
+
+/**
+ * Get for [/me] Response
+ */
+@JsonClass(generateAdapter = true)
+data class GetMeResponse(
+    val id: Int,
+    val name: String?,
+    val email: String,
+    @Json(name = "email_verified_at") val emailVerifiedAt: String?,
+    @Json(name = "created_at") val createdAt: String?,
+    @Json(name = "updated_at")val updatedAt: String?
+
+)
 
 /**
  * Get for [/songs] response

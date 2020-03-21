@@ -100,7 +100,8 @@ dependencies {
     // Location
     implementation "com.google.android.gms:play-services-location:17.0.0"
 
-    implementation "com.google.android.exoplayer:exoplayer:2.11.3"
+    // Shared Preferences
+    implementation 'androidx.preference:preference:1.1.0'
 }
 
 // AndroidStudio上のFlowの警告を抑止

@@ -19,32 +19,12 @@ interface TrackDao {
     fun insertTrack(tracks: List<TracksAround>)
 }
 
-@Dao
-interface SpotifyTokenDao {
-    @Query("select token from databasespotifytoken")
-    fun getToken(): String
-
-    @Query("delete from databasespotifytoken")
-    fun deleteAll()
-
-    @Insert()
-    fun insert(token: DatabaseSpotifyToken)
-
-    @Transaction
-    fun refresh(token: DatabaseSpotifyToken) {
-        deleteAll()
-        insert(token)
-    }
-}
-
-
 @Database(
-    entities = [TracksAround::class, DatabaseSpotifyToken::class],
+    entities = [TracksAround::class],
     version = 1
 )
 abstract class TracksDatabase : RoomDatabase() {
     abstract val trackDao: TrackDao
-    abstract val spotifyTokenDao: SpotifyTokenDao
 }
 
 private lateinit var INSTANCE: TracksDatabase

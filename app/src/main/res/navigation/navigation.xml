@@ -3,11 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/detectedSongListFragment">
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/detectedSongListFragment"
         android:name="com.ororo.auto.jigokumimi.ui.DetectedTrackListFragment"
         android:label="fragment_detected_song_list"
         tools:layout="@layout/fragment_detected_track_list" />
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.LoginFragment"
+        android:label="LoginFragment" >
+        <action
+            android:id="@+id/action_loginFragment_to_detectedSongListFragment"
+            app:destination="@id/detectedSongListFragment" />
+    </fragment>
 </navigation>

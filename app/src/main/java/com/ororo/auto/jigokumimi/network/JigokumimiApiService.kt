@@ -7,9 +7,11 @@ package com.ororo.auto.jigokumimi.network
  */
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Retrofitを用いてSpotifyとのAPI通信を行うサービスを定義
@@ -24,15 +26,35 @@ import retrofit2.http.*
 // ・HTTPメソッド
 // ・戻り地(エンティティ)
 interface JigokumimiApiService {
+    @POST("auth/login")
+    suspend fun login(
+        @Body info: LoginRequest
+    ): LoginResponse
+
+    @POST("auth/logout")
+    suspend fun logout(
+        @Header("Authorization") authorization: String
+    ): LogoutResponse
+
+    @GET("auth/me")
+    suspend fun getProfile(
+        @Header("Authorization") authorization: String
+    ): GetMeResponse
+
+    @POST("auth/refresh")
+    suspend fun refreshToken(
+        @Header("Authorization") authorization: String
+    ): RefreshResponse
+
     @POST("tracks")
     suspend fun postTracks(
-        @Header("Authorization") authorization: String?,
+        @Header("Authorization") authorization: String,
         @Body songs: List<PostMyFavoriteTracksRequest>
     ): PostMyFavoriteTracksResponse
 
     @GET("tracks")
     suspend fun getTracksAround(
-        @Header("Authorization") authorization: String?,
+        @Header("Authorization") authorization: String,
         @Query("userId") userId: String?,
         @Query("latitude") latitude: Double,
         @Query("longitude") longitude: Double,
@@ -44,7 +66,7 @@ interface JigokumimiApiService {
 object JigokumimiApi {
 
     // 通信先ホストのURL
-    private const val BASE_URL = "http://10.229.72.152:10080/api/"
+    private const val BASE_URL = "http://192.168.0.3:10080/api/"
 
     // Moshi(レスポンスJSONをエンティティに詰め込むライブラリ)を初期化
     private val moshi = Moshi.Builder()
@@ -56,6 +78,13 @@ object JigokumimiApi {
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .baseUrl(BASE_URL)
+        .client(
+            // タイムアウトを60秒に設定(開発用)
+            // TODO リリース時に外す
+            OkHttpClient.Builder()
+                .readTimeout(60, TimeUnit.SECONDS)
+                .connectTimeout(60, TimeUnit.SECONDS).build()
+        )
         .build()
 
     val retrofitService: JigokumimiApiService by lazy {
