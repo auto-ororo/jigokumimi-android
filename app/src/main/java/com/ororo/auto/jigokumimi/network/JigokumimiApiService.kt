@@ -26,6 +26,11 @@ import java.util.concurrent.TimeUnit
 // ・HTTPメソッド
 // ・戻り地(エンティティ)
 interface JigokumimiApiService {
+    @POST("auth/create")
+    suspend fun signUp(
+        @Body info: SignUpRequest
+    ): SignUpResponse
+
     @POST("auth/login")
     suspend fun login(
         @Body info: LoginRequest
@@ -66,7 +71,7 @@ interface JigokumimiApiService {
 object JigokumimiApi {
 
     // 通信先ホストのURL
-    private const val BASE_URL = "http://10.1.62.28:10080/api/"
+    private const val BASE_URL = "http://192.168.0.3:10080/api/"
 
     // Moshi(レスポンスJSONをエンティティに詰め込むライブラリ)を初期化
     private val moshi = Moshi.Builder()

@@ -3,8 +3,6 @@ package com.ororo.auto.jigokumimi.network
 import android.location.Location
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * アプリーバックエンド間のAPI通信で利用するDTO群を定義
@@ -54,7 +52,10 @@ data class GetMyFavoriteTracksResponse(
 /**
  * Spotifyから取得したお気に入り曲リストを元にJigokumimiへ送信するリクエストBodyを作成する
  */
-fun GetMyFavoriteTracksResponse.asPostMyFavoriteTracksRequest(spotifyUserId: String, location: Location): List<PostMyFavoriteTracksRequest> {
+fun GetMyFavoriteTracksResponse.asPostMyFavoriteTracksRequest(
+    spotifyUserId: String,
+    location: Location
+): List<PostMyFavoriteTracksRequest> {
     return items.map {
         PostMyFavoriteTracksRequest(
             spotifyArtistId = spotifyUserId,
@@ -159,8 +160,29 @@ data class SpotifyUserResponse(
 
 /*** Jigokumimi ***/
 
+
 /**
- * Post for [/login] Request
+ * Post for [auth/create] Request
+ */
+@JsonClass(generateAdapter = true)
+data class SignUpRequest(
+    val name: String,
+    val email: String,
+    val password: String,
+    @Json(name = "password_confirmation") val passwordConfirmation: String
+)
+
+/**
+ * Post for [auth/create] Response
+ */
+@JsonClass(generateAdapter = true)
+data class SignUpResponse(
+    val message: String,
+    val data: Map<String, String>?
+)
+
+/**
+ * Post for [auth/login] Request
  */
 @JsonClass(generateAdapter = true)
 data class LoginRequest(
@@ -169,7 +191,7 @@ data class LoginRequest(
 )
 
 /**
- * Post for [/login] Response
+ * Post for [auth/login] Response
  */
 @JsonClass(generateAdapter = true)
 data class LoginResponse(
@@ -178,7 +200,7 @@ data class LoginResponse(
 )
 
 /**
- * Post for [/login] Response
+ * Post for [auth/login] Response
  */
 @JsonClass(generateAdapter = true)
 data class LogoutResponse(
@@ -187,7 +209,7 @@ data class LogoutResponse(
 )
 
 /**
- * Post for [/refresh] Response
+ * Post for [auth/refresh] Response
  */
 @JsonClass(generateAdapter = true)
 data class RefreshResponse(
@@ -197,7 +219,7 @@ data class RefreshResponse(
 
 
 /**
- * Get for [/me] Response
+ * Get for [auth/me] Response
  */
 @JsonClass(generateAdapter = true)
 data class GetMeResponse(
@@ -252,7 +274,7 @@ data class TrackAround(
 data class Token(
     @Json(name = "access_token") val accessToken: String,
     @Json(name = "token_type") val tokenType: String,
-    @Json(name = "expires_in")val expiresIn: Int
+    @Json(name = "expires_in") val expiresIn: Int
 )
 
 /**
@@ -265,5 +287,5 @@ data class JigokumimiUserProfile(
     val email: String,
     @Json(name = "email_verified_at") val emailVerifiedAt: String?,
     @Json(name = "created_at") val createdAt: String?,
-    @Json(name = "updated_at")val updatedAt: String?
+    @Json(name = "updated_at") val updatedAt: String?
 )

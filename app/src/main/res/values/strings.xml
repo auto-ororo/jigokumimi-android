@@ -11,18 +11,26 @@
     <string name="refresh_button_text">Refresh</string>
     <string name="track_count_button_text">Count</string>
     <string name="location_button_text">Location</string>
-
-    <!--  message-->
-    <string name="general_error_message">エラーが発生しました｡:%1$s</string>
-    <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nお使いの端末がインターネットに繋がっていない可能性があります｡</string>
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
     <string name="login_button">Login</string>
     <string name="signup_button">Sign Up</string>
+    <string name="sign_up_button">SignUp</string>
+    <string name="name_hint">おなまえ</string>
+    <string name="sign_up_text">新規登録</string>
+    <string name="password_retype_hint">Retype Password</string>
+
+    <!--  message-->
+    <string name="general_error_message">エラーが発生しました｡:%1$s</string>
+    <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nお使いの端末がインターネットに繋がっていない可能性があります｡</string>
     <string name="request_success_message">通信に成功しました</string>
     <string name="request_fail_message">サーバー側に予期せぬエラーが発生しました。\nしばらく時間を置いて再度お試しください。</string>
+    <string name="success_sign_up">新規登録が完了しました。</string>
 
 
+    <!--  title-->
+    <string name="title_dialog_error">ERROR</string>
+    <string name="title_dialog_info">INFO</string>
 
 </resources>
 

@@ -5,16 +5,16 @@ import android.util.Patterns
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.network.JigokumimiApi
-import com.ororo.auto.jigokumimi.network.JigokumimiApiService
 import com.ororo.auto.jigokumimi.repository.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.regex.Pattern
 
+/**
+ * ログイン画面のViewModel
+ */
 class LoginViewModel(application: Application) : BaseAndroidViewModel(application) {
 
     /**
@@ -45,8 +45,14 @@ class LoginViewModel(application: Application) : BaseAndroidViewModel(applicatio
      */
     val password = MutableLiveData<String>()
 
+    /**
+     * ログインボタンの活性・非活性(Private)
+     */
     private val _loginButtonEnabledState = MediatorLiveData<Boolean>()
 
+    /**
+     * ログインボタンの活性・非活性
+     */
     val loginButtonEnabledState: LiveData<Boolean>
         get() = _loginButtonEnabledState
 
@@ -56,6 +62,9 @@ class LoginViewModel(application: Application) : BaseAndroidViewModel(applicatio
         _loginButtonEnabledState.addSource(password) { validateLogin() }
     }
 
+    /**
+     * 画面全体のバリデーション
+     */
     private fun validateLogin() {
         _loginButtonEnabledState.value = validateEmail() && validatePassword()
     }
@@ -92,7 +101,10 @@ class LoginViewModel(application: Application) : BaseAndroidViewModel(applicatio
                         getApplication<Application>().getString(R.string.no_connection_error_message)
                     }
                     else -> {
-                        getApplication<Application>().getString(R.string.general_error_message, e.javaClass)
+                        getApplication<Application>().getString(
+                            R.string.general_error_message,
+                            e.javaClass
+                        )
                     }
                 }
                 showMessageDialog(msg)
@@ -100,7 +112,16 @@ class LoginViewModel(application: Application) : BaseAndroidViewModel(applicatio
         }
     }
 
-    // Vidwmodel破棄時にリソース開放
+    /**
+     * ログイン後にフラグリセット
+     */
+    fun doneLogin() {
+        _isLogin.postValue(false)
+    }
+
+    /**
+     * Vidwmodel破棄時にリソース開放
+     */
     override fun onCleared() {
         super.onCleared()
         _loginButtonEnabledState.removeSource(email)
