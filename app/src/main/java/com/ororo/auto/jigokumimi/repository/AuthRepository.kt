@@ -30,9 +30,9 @@ class AuthRepository(private val prefData: SharedPreferences) {
                 it.putString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY, password)
                 it.putString(
                     Constants.SP_JIGOKUMIMI_TOKEN_KEY,
-                    "Bearer ${loginResponse.accessToken}"
+                    "Bearer ${loginResponse.data.accessToken}"
                 )
-                it.putInt(Constants.SP_JIGOKUMIMI_TOKEN_EXPIRE_KEY, loginResponse.expiresIn)
+                it.putInt(Constants.SP_JIGOKUMIMI_TOKEN_EXPIRE_KEY, loginResponse.data.expiresIn)
                 it.apply()
             }
 

@@ -5,9 +5,12 @@ import android.util.Patterns
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.network.JigokumimiApi
+import com.ororo.auto.jigokumimi.network.JigokumimiApiService
 import com.ororo.auto.jigokumimi.repository.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
 import java.util.regex.Pattern
@@ -83,7 +86,7 @@ class LoginViewModel(application: Application) : BaseAndroidViewModel(applicatio
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {
-                        e.response().toString()
+                        getMessageFromHttpException(e)
                     }
                     is IOException -> {
                         getApplication<Application>().getString(R.string.no_connection_error_message)
