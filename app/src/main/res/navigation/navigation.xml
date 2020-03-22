@@ -17,5 +17,16 @@
         <action
             android:id="@+id/action_loginFragment_to_detectedSongListFragment"
             app:destination="@id/detectedSongListFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.SignUpFragment"
+        android:label="SignUpFragment" >
+        <action
+            android:id="@+id/action_signUpFragment_to_detectedSongListFragment"
+            app:destination="@id/detectedSongListFragment" />
     </fragment>
 </navigation>

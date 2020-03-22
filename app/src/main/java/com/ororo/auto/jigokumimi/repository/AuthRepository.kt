@@ -1,10 +1,7 @@
 package com.ororo.auto.jigokumimi.repository
 
 import android.content.SharedPreferences
-import com.ororo.auto.jigokumimi.network.JigokumimiApi
-import com.ororo.auto.jigokumimi.network.LoginRequest
-import com.ororo.auto.jigokumimi.network.SpotifyApi
-import com.ororo.auto.jigokumimi.network.SpotifyUserResponse
+import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,6 +9,20 @@ import timber.log.Timber
 
 
 class AuthRepository(private val prefData: SharedPreferences) {
+
+    /**
+     * Jigokumiminiに対して新規登録リクエストを行う
+     */
+    suspend fun signUpJigokumimi(signUpRequest: SignUpRequest) =
+        withContext(Dispatchers.IO) {
+            Timber.d("sign up jigokumimi is called")
+
+            // 新規登録リクエストを実施
+            return@withContext JigokumimiApi.retrofitService.signUp(
+                signUpRequest
+            )
+
+        }
 
     /**
      * Jigokumiminiに対してログインリクエストを行う
@@ -51,6 +62,16 @@ class AuthRepository(private val prefData: SharedPreferences) {
             JigokumimiApi.retrofitService.logout(
                 token!!
             )
+
+            prefData.edit().let {
+                it.putString(Constants.SP_JIGOKUMIMI_EMAIL_KEY, "")
+                it.putString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY, "")
+                it.putString(
+                    Constants.SP_JIGOKUMIMI_TOKEN_KEY, ""
+                )
+                it.putInt(Constants.SP_JIGOKUMIMI_TOKEN_EXPIRE_KEY, 0)
+                it.apply()
+            }
         }
 
     /**

@@ -96,7 +96,7 @@ class DetectedTrackListFragment : Fragment() {
             viewLifecycleOwner,
             Observer<Boolean> { isErrorDialogShown ->
                 if (isErrorDialogShown) {
-                    val dialog = MessageDialogFragment("ERROR", viewModel.errorMessage.value!!)
+                    val dialog = MessageDialogFragment(getString(R.string.title_dialog_error), viewModel.errorMessage.value!!)
                     dialog.setOnOkButtonClickListener(
                         View.OnClickListener {
                             viewModel.isErrorDialogShown.value = false

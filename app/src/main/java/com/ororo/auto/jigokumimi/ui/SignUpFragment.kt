@@ -10,17 +10,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.databinding.FragmentLoginBinding
-import com.ororo.auto.jigokumimi.viewmodels.LoginViewModel
+import com.ororo.auto.jigokumimi.databinding.FragmentSignUpBinding
+import com.ororo.auto.jigokumimi.viewmodels.SignUpViewModel
 
 /**
- * ログイン画面
+ * 新規登録画面
  */
-class LoginFragment : Fragment() {
+class SignUpFragment : Fragment() {
 
-    lateinit var viewModel: LoginViewModel
+    lateinit var viewModel: SignUpViewModel
 
-    lateinit var binding: FragmentLoginBinding
+    lateinit var binding: FragmentSignUpBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,17 +29,17 @@ class LoginFragment : Fragment() {
         // Inflate the layout for this fragment
 
         activity?.run {
-            val viewModelFactory = LoginViewModel.Factory(this.application)
+            val viewModelFactory = SignUpViewModel.Factory(this.application)
 
             viewModel = ViewModelProvider(
                 viewModelStore,
                 viewModelFactory
-            ).get(LoginViewModel::class.java)
+            ).get(SignUpViewModel::class.java)
         }
 
         binding = DataBindingUtil.inflate(
             inflater,
-            R.layout.fragment_login,
+            R.layout.fragment_sign_up,
             container,
             false
         )
@@ -48,12 +48,21 @@ class LoginFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        viewModel.loginButtonEnabledState.observe(this) {
-            binding.loginButton.isEnabled = it
+        viewModel.signUpButtonEnabledState.observe(this) {
+            binding.signUpButton.isEnabled = it
+        }
+
+        binding.signUpButton.setOnClickListener {
+            viewModel.signUp()
         }
 
         viewModel.isLogin.observe(this) {
             if (it) onLoginSucceed()
+        }
+
+        // 新規登録完了後、完了メッセージを表示し、ログインを試みる
+        viewModel.isSignUp.observe(this) {
+            if (it) onSignUpSucceed()
         }
 
         // エラー時にメッセージダイアログを表示
@@ -74,23 +83,34 @@ class LoginFragment : Fragment() {
             }
         }
 
-        binding.loginButton.setOnClickListener {
-            viewModel.login()
-        }
-
-        binding.signupButton.setOnClickListener {
-            this.findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
-        }
-
         return binding.root
     }
 
     /**
-     *  ログイン成功時の処理
+     * 新規登録が完了した際の処理
+     * 完了メッセージ表示後、ログインを試みる
+     */
+    private fun onSignUpSucceed() {
+        val dialog = MessageDialogFragment(
+            getString(R.string.title_dialog_info),
+            getString(R.string.success_sign_up)
+        )
+        dialog.setOnOkButtonClickListener(
+            View.OnClickListener {
+                dialog.dismiss()
+                viewModel.doneSignUp()
+                viewModel.login()
+            }
+        )
+        dialog.show(parentFragmentManager, getString(R.string.title_dialog_info))
+    }
+
+    /**
+     * ログイン成功時の処理
+     * 周辺局情報画面に遷移する
      */
     private fun onLoginSucceed() {
         viewModel.doneLogin()
-        this.findNavController().navigate(R.id.action_loginFragment_to_detectedSongListFragment)
+        this.findNavController().navigate(R.id.action_signUpFragment_to_detectedSongListFragment)
     }
-
 }

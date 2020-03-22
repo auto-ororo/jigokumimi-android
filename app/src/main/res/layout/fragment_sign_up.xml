@@ -7,42 +7,49 @@
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.LoginViewModel" />
+            type="com.ororo.auto.jigokumimi.viewmodels.SignUpViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/consdtraintLayout"
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.LoginFragment">
+        tools:context=".ui.SignUpFragment">
 
         <TextView
-            android:id="@+id/loginText"
+            android:id="@+id/signUpText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/app_name"
-            android:textSize="30sp"
+            android:text="@string/sign_up_text"
+            android:textSize="36sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="wrap_content"
+
+        <EditText
+            android:id="@+id/nameEdit"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:src="@android:mipmap/sym_def_app_icon"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:ems="10"
+            android:hint="@string/name_hint"
+            android:inputType="textEmailAddress"
+            android:text="@={viewModel.name}"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/loginText" />
+            app:layout_constraintTop_toBottomOf="@+id/signUpText" />
 
         <EditText
             android:id="@+id/emailEdit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="@string/email_hint"
@@ -51,7 +58,7 @@
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            app:layout_constraintTop_toBottomOf="@+id/nameEdit" />
 
         <EditText
             android:id="@+id/passwordEdit"
@@ -69,32 +76,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/emailEdit" />
 
-        <Button
-            android:id="@+id/login_button"
+        <EditText
+            android:id="@+id/passwordConfirmationEdit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:enabled="@{viewModel.loginButtonEnabledState}"
-            android:text="@string/login_button"
+            android:ems="10"
+            android:hint="@string/password_retype_hint"
+            android:inputType="textPassword"
+            android:text="@={viewModel.passwordConfirmation}"
             android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/signup_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passwordEdit" />
 
         <Button
-            android:id="@+id/signup_button"
+            android:id="@+id/sign_up_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/signup_button"
+            android:enabled="@{viewModel.signUpButtonEnabledState}"
+            android:text="@string/sign_up_button"
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
