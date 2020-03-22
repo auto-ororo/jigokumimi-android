@@ -66,7 +66,7 @@ interface JigokumimiApiService {
 object JigokumimiApi {
 
     // 通信先ホストのURL
-    private const val BASE_URL = "http://192.168.0.3:10080/api/"
+    private const val BASE_URL = "http://10.1.62.28:10080/api/"
 
     // Moshi(レスポンスJSONをエンティティに詰め込むライブラリ)を初期化
     private val moshi = Moshi.Builder()

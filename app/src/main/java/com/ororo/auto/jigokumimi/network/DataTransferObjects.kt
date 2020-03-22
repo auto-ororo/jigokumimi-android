@@ -173,9 +173,8 @@ data class LoginRequest(
  */
 @JsonClass(generateAdapter = true)
 data class LoginResponse(
-    @Json(name = "access_token") val accessToken: String,
-    @Json(name = "token_type") val tokenType: String,
-    @Json(name = "expires_in")val expiresIn: Int
+    val message: String,
+    val data: Token
 )
 
 /**
@@ -183,7 +182,8 @@ data class LoginResponse(
  */
 @JsonClass(generateAdapter = true)
 data class LogoutResponse(
-    val message: String
+    val message: String,
+    val data: Map<String, String>?
 )
 
 /**
@@ -191,23 +191,18 @@ data class LogoutResponse(
  */
 @JsonClass(generateAdapter = true)
 data class RefreshResponse(
-    @Json(name = "access_token") val accessToken: String,
-    @Json(name = "token_type") val tokenType: String,
-    @Json(name = "expires_in")val expiresIn: Int
+    val message: String,
+    val data: Token
 )
+
 
 /**
  * Get for [/me] Response
  */
 @JsonClass(generateAdapter = true)
 data class GetMeResponse(
-    val id: Int,
-    val name: String?,
-    val email: String,
-    @Json(name = "email_verified_at") val emailVerifiedAt: String?,
-    @Json(name = "created_at") val createdAt: String?,
-    @Json(name = "updated_at")val updatedAt: String?
-
+    val message: String,
+    val data: JigokumimiUserProfile
 )
 
 /**
@@ -248,4 +243,27 @@ data class TrackAround(
     val rank: Int,
     @Json(name = "spotify_track_id") val spotifyTrackId: String,
     val popularity: Int
+)
+
+/**
+ * Token Response
+ */
+@JsonClass(generateAdapter = true)
+data class Token(
+    @Json(name = "access_token") val accessToken: String,
+    @Json(name = "token_type") val tokenType: String,
+    @Json(name = "expires_in")val expiresIn: Int
+)
+
+/**
+ * Get for [/me] Response
+ */
+@JsonClass(generateAdapter = true)
+data class JigokumimiUserProfile(
+    val id: Int,
+    val name: String?,
+    val email: String,
+    @Json(name = "email_verified_at") val emailVerifiedAt: String?,
+    @Json(name = "created_at") val createdAt: String?,
+    @Json(name = "updated_at")val updatedAt: String?
 )

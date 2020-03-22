@@ -26,7 +26,6 @@ import java.io.IOException
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
 import com.ororo.auto.jigokumimi.repository.AuthRepository
-import kotlinx.coroutines.Dispatchers
 
 
 /**
@@ -108,7 +107,7 @@ class TrackListViewModel(application: Application) :
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {
-                        e.response().toString()
+                        getMessageFromHttpException(e)
                     }
                     is IOException -> {
                         getApplication<Application>().getString(R.string.no_connection_error_message)
@@ -148,7 +147,7 @@ class TrackListViewModel(application: Application) :
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {
-                        e.response().toString()
+                        getMessageFromHttpException(e)
                     }
                     is IOException -> {
                         getApplication<Application>().getString(R.string.no_connection_error_message)

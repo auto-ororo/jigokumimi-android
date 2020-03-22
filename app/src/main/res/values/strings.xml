@@ -19,6 +19,10 @@
     <string name="password_hint">Password</string>
     <string name="login_button">Login</string>
     <string name="signup_button">Sign Up</string>
+    <string name="request_success_message">通信に成功しました</string>
+    <string name="request_fail_message">サーバー側に予期せぬエラーが発生しました。\nしばらく時間を置いて再度お試しください。</string>
+
+
 
 </resources>
 
