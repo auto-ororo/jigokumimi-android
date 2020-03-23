@@ -50,6 +50,16 @@ class AuthRepository(private val prefData: SharedPreferences) {
         }
 
     /**
+     * SharedPreferencesからログイン情報を取得する
+     */
+    fun getSavedLoginInfo() : Pair<String, String> {
+        val email = prefData.getString(Constants.SP_JIGOKUMIMI_EMAIL_KEY,"")!!
+        val password = prefData.getString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY,"")!!
+
+        return Pair(email, password)
+    }
+
+    /**
      * Jigokumiminiに対してログアウトリクエストを行う
      */
     suspend fun logoutJigokumimi() =
