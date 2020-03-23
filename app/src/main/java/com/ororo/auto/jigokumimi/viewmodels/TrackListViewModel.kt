@@ -5,27 +5,24 @@ import android.location.Location
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Build
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
+import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Track
+import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
+import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.TracksRepository
-import com.ororo.auto.jigokumimi.util.Constants
-import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_HOST
-import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_SCHEME
-import com.spotify.sdk.android.auth.AuthorizationRequest
-import com.spotify.sdk.android.auth.AuthorizationResponse
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
-import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 
 
 /**
@@ -86,6 +83,17 @@ class TrackListViewModel(application: Application) :
     private var playingTrackId: String = ""
 
     /**
+     *  トークン認証切れ状態(Private)
+     */
+    private var _isTokenExpired = MutableLiveData(false)
+
+    /**
+     *  トークン認証切れ状態
+     */
+    val isTokenExpired: MutableLiveData<Boolean>
+        get() = _isTokenExpired
+
+    /**
      * 周辺曲情報を更新する
      */
     fun refreshTracksFromRepository() {
@@ -107,13 +115,21 @@ class TrackListViewModel(application: Application) :
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {
-                        getMessageFromHttpException(e)
+                        if (e.code() == 401) {
+                            isTokenExpired.postValue(true)
+                           getApplication<Application>().getString(R.string.token_expired_error_message)
+                        } else {
+                            getMessageFromHttpException(e)
+                        }
                     }
                     is IOException -> {
                         getApplication<Application>().getString(R.string.no_connection_error_message)
                     }
                     else -> {
-                        getApplication<Application>().getString(R.string.general_error_message, e.javaClass)
+                        getApplication<Application>().getString(
+                            R.string.general_error_message,
+                            e.javaClass
+                        )
                     }
                 }
                 showMessageDialog(msg)
@@ -147,7 +163,13 @@ class TrackListViewModel(application: Application) :
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {
-                        getMessageFromHttpException(e)
+                        // トークン認証切れの場合ログイン画面に遷移
+                        if (e.code() == 401) {
+                            isTokenExpired.postValue(true)
+                            getApplication<Application>().getString(R.string.token_expired_error_message)
+                        } else {
+                            getMessageFromHttpException(e)
+                        }
                     }
                     is IOException -> {
                         getApplication<Application>().getString(R.string.no_connection_error_message)
@@ -164,30 +186,8 @@ class TrackListViewModel(application: Application) :
         }
     }
 
-    /**
-     * Spotifyに対して認証リクエストを行う
-     */
-    fun getAuthenticationRequest(type: AuthorizationResponse.Type): AuthorizationRequest {
-        return AuthorizationRequest.Builder(
-                Constants.CLIENT_ID,
-                type,
-                Uri.Builder().scheme(SPOTIFY_SDK_REDIRECT_SCHEME)
-                    .authority(SPOTIFY_SDK_REDIRECT_HOST).build().toString()
-            )
-            .setShowDialog(false)
-            .setScopes(
-                arrayOf(
-                    "user-read-email",
-                    "user-top-read",
-                    "user-read-recently-played",
-                    "user-library-modify",
-                    "user-follow-modify",
-                    "user-follow-read",
-                    "user-library-read"
-                )
-            )
-            .setCampaign("your-campaign-token")
-            .build()
+    fun moveLoginDone() {
+        _isTokenExpired.postValue(false)
     }
 
     /*

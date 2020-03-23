@@ -84,9 +84,17 @@ object JigokumimiApi {
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .baseUrl(BASE_URL)
         .client(
-            // タイムアウトを60秒に設定(開発用)
-            // TODO リリース時に外す
             OkHttpClient.Builder()
+                .addInterceptor {
+                    // Header追加
+                    val original = it.request()
+                    val request = original.newBuilder().header("Accept", "application/json")
+                        .method(original.method(), original.body())
+                        .build();
+                    it.proceed(request)
+                }
+                // タイムアウトを60秒に設定(開発用)
+                // TODO リリース時に外す
                 .readTimeout(60, TimeUnit.SECONDS)
                 .connectTimeout(60, TimeUnit.SECONDS).build()
         )
