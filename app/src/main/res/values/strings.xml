@@ -23,6 +23,7 @@
     <!--  message-->
     <string name="general_error_message">エラーが発生しました｡:%1$s</string>
     <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nお使いの端末がインターネットに繋がっていない可能性があります｡</string>
+    <string name="token_expired_error_message">しばらく操作されていなかったため、認証期限が切れました。\n再ログインを行って下さい</string>
     <string name="request_success_message">通信に成功しました</string>
     <string name="request_fail_message">サーバー側に予期せぬエラーが発生しました。\nしばらく時間を置いて再度お試しください。</string>
     <string name="success_sign_up">新規登録が完了しました。</string>

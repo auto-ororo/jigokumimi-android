@@ -1,12 +1,17 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.util.Constants
+import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_HOST
+import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_SCHEME
+import com.spotify.sdk.android.auth.AuthorizationRequest
+import com.spotify.sdk.android.auth.AuthorizationResponse
 import org.json.JSONObject
 import retrofit2.HttpException
-import java.lang.Exception
 
 /**
  * AndroidViewModelベースクラス
@@ -53,4 +58,30 @@ open class BaseAndroidViewModel(application: Application) : AndroidViewModel(app
         }
     }
 
+    /**
+     * Spotifyに対して認証リクエストを行う
+     *
+     */
+    fun getAuthenticationRequest(type: AuthorizationResponse.Type): AuthorizationRequest {
+        return AuthorizationRequest.Builder(
+                Constants.CLIENT_ID,
+                type,
+                Uri.Builder().scheme(SPOTIFY_SDK_REDIRECT_SCHEME)
+                    .authority(SPOTIFY_SDK_REDIRECT_HOST).build().toString()
+            )
+            .setShowDialog(false)
+            .setScopes(
+                arrayOf(
+                    "user-read-email",
+                    "user-top-read",
+                    "user-read-recently-played",
+                    "user-library-modify",
+                    "user-follow-modify",
+                    "user-follow-read",
+                    "user-library-read"
+                )
+            )
+            .setCampaign("your-campaign-token")
+            .build()
+    }
 }

@@ -9,7 +9,11 @@
         android:id="@+id/detectedSongListFragment"
         android:name="com.ororo.auto.jigokumimi.ui.DetectedTrackListFragment"
         android:label="fragment_detected_song_list"
-        tools:layout="@layout/fragment_detected_track_list" />
+        tools:layout="@layout/fragment_detected_track_list" >
+        <action
+            android:id="@+id/action_detectedSongListFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.ororo.auto.jigokumimi.ui.LoginFragment"
