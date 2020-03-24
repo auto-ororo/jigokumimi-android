@@ -150,7 +150,7 @@ class MiniPlayerFragment : Fragment() {
                 try {
                     // 上から下のスワイプを判断
                     if (e2.y - e1.y > swipeMinDistance && Math.abs(velocityY) > swipeThresholdVelocity) {
-                       binding.miniPlayerLayout.visibility  = GONE
+                        binding.miniPlayerLayout.visibility = GONE
                     }
                 } catch (e: Exception) { // nothing
                 }

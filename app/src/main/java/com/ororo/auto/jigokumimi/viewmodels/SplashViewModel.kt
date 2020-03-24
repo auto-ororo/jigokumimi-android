@@ -5,19 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class SplashViewModel(application: Application) : BaseAndroidViewModel(application) {
-
-    /**
-     * 認証系リポジトリ
-     */
-    val authRepository = AuthRepository(
-        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
-    )
 
     /**
      *  初期化状態(Private)
@@ -29,6 +20,7 @@ class SplashViewModel(application: Application) : BaseAndroidViewModel(applicati
      */
     val isReady: MutableLiveData<Boolean>
         get() = _isReady
+
     /**
      *  ログイン状態(Private)
      */

@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -16,7 +15,7 @@ import com.ororo.auto.jigokumimi.viewmodels.SignUpViewModel
 /**
  * 新規登録画面
  */
-class SignUpFragment : Fragment() {
+class SignUpFragment : BaseFragment() {
 
     lateinit var viewModel: SignUpViewModel
 
@@ -48,7 +47,7 @@ class SignUpFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        viewModel.signUpButtonEnabledState.observe(this) {
+        viewModel.signUpButtonEnabledState.observe(viewLifecycleOwner) {
             binding.signUpButton.isEnabled = it
         }
 
@@ -56,32 +55,16 @@ class SignUpFragment : Fragment() {
             viewModel.signUp()
         }
 
-        viewModel.isLogin.observe(this) {
+        viewModel.isLogin.observe(viewLifecycleOwner) {
             if (it) onLoginSucceed()
         }
 
         // 新規登録完了後、完了メッセージを表示し、ログインを試みる
-        viewModel.isSignUp.observe(this) {
+        viewModel.isSignUp.observe(viewLifecycleOwner) {
             if (it) onSignUpSucceed()
         }
 
-        // エラー時にメッセージダイアログを表示
-        // 表示時に｢OK｣タップ時の処理を併せて設定する
-        viewModel.isErrorDialogShown.observe(this) { isErrorDialogShown ->
-            if (isErrorDialogShown) {
-                val dialog = MessageDialogFragment(
-                    getString(R.string.title_dialog_error),
-                    viewModel.errorMessage.value!!
-                )
-                dialog.setOnOkButtonClickListener(
-                    View.OnClickListener {
-                        viewModel.isErrorDialogShown.value = false
-                        dialog.dismiss()
-                    }
-                )
-                dialog.show(parentFragmentManager, getString(R.string.title_dialog_error))
-            }
-        }
+        baseInit(viewModel)
 
         return binding.root
     }
@@ -110,7 +93,10 @@ class SignUpFragment : Fragment() {
      * 周辺局情報画面に遷移する
      */
     private fun onLoginSucceed() {
+        authenticateSpotify(viewModel)
         viewModel.doneLogin()
-        this.findNavController().navigate(R.id.action_signUpFragment_to_detectedSongListFragment)
+        this.findNavController()
+            .navigate(SignUpFragmentDirections.actionSignUpFragmentToSearchTracksFragment())
     }
+
 }

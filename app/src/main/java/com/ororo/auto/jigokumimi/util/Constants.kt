@@ -18,4 +18,9 @@ class Constants {
         const val SP_SPOTIFY_TOKEN_KEY = "spotifyToken"
 
     }
+
+    enum class SearchType {
+        TRACK,
+        ARTIST
+    }
 }

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -20,7 +19,7 @@ import com.ororo.auto.jigokumimi.viewmodels.SplashViewModel
 /**
  * スプラッシュ画面
  */
-class SplashFragment : Fragment() {
+class SplashFragment : BaseFragment() {
 
     private val REQUEST_PERMISSION = 1000
 
@@ -54,7 +53,7 @@ class SplashFragment : Fragment() {
 
         binding.viewModel = viewModel
 
-        viewModel.isReady.observe(this) {
+        viewModel.isReady.observe(viewLifecycleOwner) {
             if (it) {
                 when (viewModel.isLogin.value) {
                     true -> onLoginSucceed()
@@ -69,6 +68,8 @@ class SplashFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= 23) {
             requestPermission()
         }
+
+        baseInit(viewModel)
 
         return binding.root
     }
@@ -109,14 +110,16 @@ class SplashFragment : Fragment() {
      * ログインに成功した場合周辺曲情報画面に遷移
      */
     private fun onLoginSucceed() {
-        this.findNavController().navigate(R.id.action_splashFragment_to_detectedSongListFragment)
+        authenticateSpotify(viewModel)
+        this.findNavController()
+            .navigate(SplashFragmentDirections.actionSplashFragmentToSearchTracksFragment())
     }
 
     /**
      * ログインに失敗した場合ログイン画面に遷移
      */
     private fun onLoginFailed() {
-        this.findNavController().navigate(R.id.action_splashFragment_to_loginFragment)
+        this.findNavController()
+            .navigate(SplashFragmentDirections.actionSplashFragmentToLoginFragment())
     }
-
 }

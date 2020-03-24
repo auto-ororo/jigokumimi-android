@@ -7,26 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.DetectedTrackListItemBinding
 import com.ororo.auto.jigokumimi.databinding.FragmentDetectedTrackListBinding
 import com.ororo.auto.jigokumimi.domain.Track
-import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.viewmodels.TrackListViewModel
-import com.spotify.sdk.android.auth.AuthorizationClient
-import com.spotify.sdk.android.auth.AuthorizationResponse
 
 /**
  *  周辺曲情報表示画面
  */
-class DetectedTrackListFragment : Fragment() {
+class DetectedTrackListFragment : BaseFragment() {
 
     lateinit var viewModel: TrackListViewModel
 
@@ -79,40 +73,7 @@ class DetectedTrackListFragment : Fragment() {
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
-        authenticateSpotify()
-
-        binding.refreshButton.setOnClickListener {
-            refreshTracks()
-        }
-
-        binding.locationButton.setOnClickListener {
-            postFavoriteTracks()
-        }
-
-        // エラー時にメッセージダイアログを表示
-        // 表示時に｢OK｣タップ時の処理を併せて設定する
-        viewModel.isErrorDialogShown.observe(
-            viewLifecycleOwner,
-            Observer<Boolean> { isErrorDialogShown ->
-                if (isErrorDialogShown) {
-                    val dialog = MessageDialogFragment(
-                        getString(R.string.title_dialog_error),
-                        viewModel.errorMessage.value!!
-                    )
-                    dialog.setOnOkButtonClickListener(
-                        View.OnClickListener {
-                            viewModel.isErrorDialogShown.value = false
-                            dialog.dismiss()
-                        }
-                    )
-                    dialog.show(parentFragmentManager, "test")
-                }
-            }
-        )
-
-        viewModel.isTokenExpired.observe(this) {
-            if (it) onTokenExpired()
-        }
+        baseInit(viewModel)
 
         return binding.root
     }
@@ -122,34 +83,6 @@ class DetectedTrackListFragment : Fragment() {
      */
     private fun refreshTracks() {
         viewModel.refreshTracksFromRepository()
-    }
-
-    /**
-     * 位置情報を取得する
-     */
-    private fun postFavoriteTracks() {
-        viewModel.postLocationAndMyFavoriteTracks()
-    }
-
-    /**
-     * Spotifyに対して認証リクエストを投げる
-     */
-    fun authenticateSpotify() {
-        val request = viewModel.getAuthenticationRequest(AuthorizationResponse.Type.TOKEN)
-
-        AuthorizationClient.openLoginActivity(
-            activity,
-            Constants.AUTH_TOKEN_REQUEST_CODE,
-            request
-        )
-    }
-
-    /**
-     * トークンの認証期限が切れた際、ログイン画面に遷移する
-     */
-    private fun onTokenExpired() {
-        this.findNavController().navigate(R.id.action_detectedSongListFragment_to_loginFragment)
-        viewModel.moveLoginDone()
     }
 
 }
