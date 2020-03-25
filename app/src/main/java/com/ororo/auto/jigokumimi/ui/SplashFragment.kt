@@ -112,7 +112,7 @@ class SplashFragment : BaseFragment() {
     private fun onLoginSucceed() {
         authenticateSpotify(viewModel)
         this.findNavController()
-            .navigate(SplashFragmentDirections.actionSplashFragmentToSearchTracksFragment())
+            .navigate(SplashFragmentDirections.actionSplashFragmentToSearchFragment())
     }
 
     /**

@@ -55,7 +55,13 @@ interface JigokumimiApiService {
     suspend fun postTracks(
         @Header("Authorization") authorization: String,
         @Body songs: List<PostMyFavoriteTracksRequest>
-    ): PostMyFavoriteTracksResponse
+    ): PostResponse
+
+    @POST("artists")
+    suspend fun postArtists(
+        @Header("Authorization") authorization: String,
+        @Body songs: List<PostMyFavoriteArtistsRequest>
+    ): PostResponse
 
     @GET("tracks")
     suspend fun getTracksAround(
@@ -65,13 +71,22 @@ interface JigokumimiApiService {
         @Query("longitude") longitude: Double,
         @Query("distance") distance: Int?
     ): GetTracksAroundResponse
+
+    @GET("artists")
+    suspend fun getArtistsAround(
+        @Header("Authorization") authorization: String,
+        @Query("userId") userId: String?,
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double,
+        @Query("distance") distance: Int?
+    ): GetArtistsAroundResponse
 }
 
 // シングルトンでインターフェースを実装する
 object JigokumimiApi {
 
     // 通信先ホストのURL
-    private const val BASE_URL = "http://192.168.0.3:10080/api/"
+    private const val BASE_URL = "http://172.20.10.6:10080/api/"
 
     // Moshi(レスポンスJSONをエンティティに詰め込むライブラリ)を初期化
     private val moshi = Moshi.Builder()

@@ -7,12 +7,9 @@
     <data>
 
         <variable
-            name="track"
-            type="com.ororo.auto.jigokumimi.domain.Track" />
+            name="artist"
+            type="com.ororo.auto.jigokumimi.domain.Artist" />
 
-        <variable
-            name="playCallback"
-            type="com.ororo.auto.jigokumimi.ui.PlayClick" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -47,11 +44,11 @@
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="@{String.valueOf(track.rank)}"
+                android:text="@{String.valueOf(artist.rank)}"
                 android:textAlignment="center"
                 android:textSize="36sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/trackThumbnail"
+                app:layout_constraintEnd_toStartOf="@+id/artistThumbnail"
                 app:layout_constraintStart_toStartOf="@+id/leftWell"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="99" />
@@ -62,52 +59,38 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@{track.name}"
+                android:text="@{artist.name}"
                 android:textAlignment="viewStart"
                 android:textAllCaps="false"
                 android:textColor="@color/text_black"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/queueButton"
-                app:layout_constraintStart_toEndOf="@+id/trackThumbnail"
+                app:layout_constraintStart_toEndOf="@+id/artistThumbnail"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="track name" />
+                tools:text="artist name" />
 
 
             <TextView
-                android:id="@+id/artist"
+                android:id="@+id/genres"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@{track.artist}"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@{artist.genres}"
                 android:textAlignment="viewStart"
                 android:textAllCaps="false"
                 android:textColor="@color/text_light"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/queueButton"
-                app:layout_constraintStart_toEndOf="@+id/trackThumbnail"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/rightWell"
+                app:layout_constraintStart_toEndOf="@+id/artistThumbnail"
                 app:layout_constraintTop_toBottomOf="@+id/name"
-                tools:text="artist" />
-
-            <TextView
-                android:id="@+id/album"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:text="@{track.album}"
-                android:textAlignment="viewStart"
-                android:textAllCaps="false"
-                android:textColor="@color/text_light"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toStartOf="@+id/queueButton"
-                app:layout_constraintStart_toEndOf="@+id/trackThumbnail"
-                app:layout_constraintTop_toBottomOf="@+id/artist"
-                tools:text="album" />
+                tools:text="rock, indie, " />
 
             <ImageView
-                android:id="@+id/trackThumbnail"
+                android:id="@+id/artistThumbnail"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginStart="8dp"
@@ -116,7 +99,7 @@
                 android:adjustViewBounds="false"
                 android:cropToPadding="false"
                 android:scaleType="centerCrop"
-                app:imageUrl="@{track.imageUrl}"
+                app:imageUrl="@{artist.imageUrl}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintDimensionRatio=""
                 app:layout_constraintStart_toEndOf="@+id/rank"
@@ -134,18 +117,6 @@
                 app:layout_constraintStart_toStartOf="@+id/leftWell"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0" />
-
-            <ImageButton
-                android:id="@+id/queueButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/colorTransparent"
-                android:onClick="@{() -> playCallback.onClick(track)}"
-                android:scaleType="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/rightWell"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_queue_music" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

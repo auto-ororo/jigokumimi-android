@@ -26,6 +26,13 @@ interface SpotifyApiService {
         @Query("offset") offset: Int?
     ): GetMyFavoriteTracksResponse
 
+    @GET("me/top/artists")
+    suspend fun getArtists(
+        @Header("Authorization") authorization: String,
+        @Query("limit") limit: Int?,
+        @Query("offset") offset: Int?
+    ): GetMyFavoriteArtistsResponse
+
     @GET("me")
     suspend fun getUserProfile(
         @Header("Authorization") authorization: String
@@ -36,6 +43,12 @@ interface SpotifyApiService {
         @Header("Authorization") authorization: String,
         @Path("id") id : String
     ): GetTrackDetailResponse
+
+    @GET("artists/{id}")
+    suspend fun getArtistDetail(
+        @Header("Authorization") authorization: String,
+        @Path("id") id : String
+    ): SpotifyArtistFull
 }
 
 // シングルトンでインターフェースを実装する

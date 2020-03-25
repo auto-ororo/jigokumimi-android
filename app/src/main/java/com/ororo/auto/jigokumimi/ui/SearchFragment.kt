@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -11,17 +12,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.databinding.FragmentSearchTracksBinding
+import com.ororo.auto.jigokumimi.databinding.FragmentSearchBinding
 import com.ororo.auto.jigokumimi.util.Constants
-import com.ororo.auto.jigokumimi.viewmodels.SearchTracksViewModel
+import com.ororo.auto.jigokumimi.viewmodels.SearchViewModel
 import timber.log.Timber
 
 /**
  * 検索画面
  */
-class SearchTracksFragment : BaseFragment() {
+class SearchFragment : BaseFragment() {
 
-    lateinit var viewModel: SearchTracksViewModel
+    lateinit var viewModel: SearchViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,17 +30,17 @@ class SearchTracksFragment : BaseFragment() {
     ): View? {
         // Inflate the layout for this fragment
         activity?.run {
-            val viewModelFactory = SearchTracksViewModel.Factory(this.application)
+            val viewModelFactory = SearchViewModel.Factory(this.application)
 
             viewModel = ViewModelProvider(
                 viewModelStore,
                 viewModelFactory
-            ).get(SearchTracksViewModel::class.java)
+            ).get(SearchViewModel::class.java)
         }
 
-        val binding: FragmentSearchTracksBinding = DataBindingUtil.inflate(
+        val binding: FragmentSearchBinding = DataBindingUtil.inflate(
             inflater,
-            R.layout.fragment_search_tracks,
+            R.layout.fragment_search,
             container,
             false
         )
@@ -84,6 +85,17 @@ class SearchTracksFragment : BaseFragment() {
         adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown)
         binding.distanceSpinner.adapter = adapter
 
+        // スピナー内のアイテムが選択されたときの動作を設定
+        binding.distanceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+               viewModel.setDistanceFromSelectedSpinnerString(binding.distanceSpinner.getItemAtPosition(p2).toString())
+            }
+
+        }
+
         setHasOptionsMenu(true)
 
         return binding.root
@@ -93,7 +105,7 @@ class SearchTracksFragment : BaseFragment() {
      * 曲情報を検索
      */
     private fun searchTracks() {
-        viewModel.searchTracks()
+        viewModel.searchMusic()
     }
 
     /**
@@ -103,7 +115,7 @@ class SearchTracksFragment : BaseFragment() {
         Timber.d(this.findNavController().currentDestination.toString())
         viewModel.doneSearchTracks()
         this.findNavController()
-            .navigate(SearchTracksFragmentDirections.actionSearchTracksFragmentToDetectedSongListFragment())
+            .navigate(SearchFragmentDirections.actionSearchFragmentToResultFragment(viewModel.searchType.value!!))
     }
 
     /**

@@ -6,15 +6,6 @@
     app:startDestination="@id/splashFragment">
 
     <fragment
-        android:id="@+id/detectedSongListFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.DetectedTrackListFragment"
-        android:label="fragment_detected_song_list"
-        tools:layout="@layout/fragment_detected_track_list" >
-        <action
-            android:id="@+id/action_detectedSongListFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/loginFragment"
         android:name="com.ororo.auto.jigokumimi.ui.LoginFragment"
         android:label="LoginFragment" >
@@ -22,16 +13,16 @@
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
         <action
-            android:id="@+id/action_loginFragment_to_searchTracksFragment"
-            app:destination="@id/searchTracksFragment" />
+            android:id="@+id/action_loginFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.ororo.auto.jigokumimi.ui.SignUpFragment"
         android:label="SignUpFragment" >
         <action
-            android:id="@+id/action_signUpFragment_to_searchTracksFragment"
-            app:destination="@id/searchTracksFragment" />
+            android:id="@+id/action_signUpFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
     <fragment
         android:id="@+id/splashFragment"
@@ -41,19 +32,30 @@
             android:id="@+id/action_splashFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
         <action
-            android:id="@+id/action_splashFragment_to_searchTracksFragment"
-            app:destination="@id/searchTracksFragment" />
+            android:id="@+id/action_splashFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
     <fragment
-        android:id="@+id/searchTracksFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.SearchTracksFragment"
-        android:label="SearchTracksFragment" >
+        android:id="@+id/searchFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.SearchFragment"
+        android:label="SearchFragment">
         <action
-            android:id="@+id/action_searchTracksFragment_to_detectedSongListFragment"
-            app:destination="@id/detectedSongListFragment"
-            app:popUpToInclusive="false" />
-        <action
-            android:id="@+id/action_searchTracksFragment_to_loginFragment"
+            android:id="@+id/action_searchFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.ResultFragment"
+        android:label="Result"
+        tools:layout="@layout/fragment_result_list" >
+        <action
+            android:id="@+id/action_resultFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <argument
+            android:name="searchType"
+            app:argType="com.ororo.auto.jigokumimi.util.Constants$SearchType" />
     </fragment>
 </navigation>

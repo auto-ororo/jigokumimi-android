@@ -15,7 +15,7 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.LocationRepository
-import com.ororo.auto.jigokumimi.repository.TracksRepository
+import com.ororo.auto.jigokumimi.repository.MusicRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -24,17 +24,17 @@ import java.io.IOException
 
 
 /**
- * 周辺曲情報に関するViewのViewModel
+ * 検索結果画面のViewModel
  *
  *
  */
-class TrackListViewModel(application: Application) :
+class ResultViewModel(application: Application) :
     BaseAndroidViewModel(application), MediaPlayer.OnCompletionListener {
 
     /*
-     * 曲情報を取得､管理するRepository
+     * 音楽情報を取得､管理するRepository
      */
-    private val tracksRepository = TracksRepository(
+    private val musicRepository = MusicRepository(
         getDatabase(application),
         PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
     )
@@ -52,7 +52,12 @@ class TrackListViewModel(application: Application) :
     /**
      * 取得した周辺曲情報の一覧
      */
-    val tracklist = tracksRepository.tracks
+    val tracklist = musicRepository.tracks
+
+    /**
+     * 取得した周辺アーティスト情報の一覧
+     */
+    val artistlist = musicRepository.artists
 
     /*
      * 再生中の曲情報
@@ -73,50 +78,6 @@ class TrackListViewModel(application: Application) :
      * 再生中の曲ID
      */
     private var playingTrackId: String = ""
-
-    /**
-     * 周辺曲情報を更新する
-     */
-    fun refreshTracksFromRepository() {
-        viewModelScope.launch() {
-            try {
-                // 位置情報を取得する
-                val flow = locationRepository.getCurrentLocation()
-                flow.collect { location: Location ->
-                    Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
-
-                    // SpotifyのユーザーIDを取得する
-                    val spotifyUserId = authRepository.getSpotifyUserProfile().id
-
-                    tracksRepository.refreshTracks(spotifyUserId, location)
-
-                    Timber.d("Refresh Tracks Succeeded")
-                }
-
-            } catch (e: Exception) {
-                val msg = when (e) {
-                    is HttpException -> {
-                        if (e.code() == 401) {
-                            _isTokenExpired.postValue(true)
-                            getApplication<Application>().getString(R.string.token_expired_error_message)
-                        } else {
-                            getMessageFromHttpException(e)
-                        }
-                    }
-                    is IOException -> {
-                        getApplication<Application>().getString(R.string.no_connection_error_message)
-                    }
-                    else -> {
-                        getApplication<Application>().getString(
-                            R.string.general_error_message,
-                            e.javaClass
-                        )
-                    }
-                }
-                showMessageDialog(msg)
-            }
-        }
-    }
 
     /*
      * 再生する曲を指定数だけ進めるor戻す
@@ -237,9 +198,9 @@ class TrackListViewModel(application: Application) :
      */
     class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(TrackListViewModel::class.java)) {
+            if (modelClass.isAssignableFrom(ResultViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return TrackListViewModel(app) as T
+                return ResultViewModel(app) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

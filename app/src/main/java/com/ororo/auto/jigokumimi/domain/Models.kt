@@ -12,9 +12,21 @@ data class Track(
     val id: String,
     val album: String,
     val name: String,
-    val artist: String,
+    val artists: String,
     val imageUrl: String,
     val previewUrl: String,
+    val rank: Int,
+    val popularity: Int
+)
+
+/**
+ * domain artist
+ */
+data class Artist(
+    val id: String,
+    val name: String,
+    val imageUrl: String,
+    val genres: String?,
     val rank: Int,
     val popularity: Int
 )

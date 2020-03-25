@@ -5,7 +5,7 @@ import androidx.preference.PreferenceManager
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.ororo.auto.jigokumimi.database.getDatabase
-import com.ororo.auto.jigokumimi.repository.TracksRepository
+import com.ororo.auto.jigokumimi.repository.MusicRepository
 import retrofit2.HttpException
 
 
@@ -14,7 +14,7 @@ class RefreshDataWorker(appContext: Context, params: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         val database = getDatabase(applicationContext)
-        val repository = TracksRepository(database, PreferenceManager.getDefaultSharedPreferences(applicationContext))
+        val repository = MusicRepository(database, PreferenceManager.getDefaultSharedPreferences(applicationContext))
 
         try {
 //          repository.refreshTracks()

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.TrackListViewModel" />
+            type="com.ororo.auto.jigokumimi.viewmodels.ResultViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@{viewModel.playingTrack.artist + '-' + viewModel.playingTrack.album }"
+            android:text="@{viewModel.playingTrack.artists + '-' + viewModel.playingTrack.album }"
             android:textColor="@color/colorWhite"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"

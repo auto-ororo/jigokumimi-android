@@ -10,31 +10,39 @@ import androidx.room.*
  */
 
 @Dao
-interface TrackDao {
+interface MusicDao {
     @Transaction
-    @Query("select * from tracksaround order by rank")
-    fun getTracks(): LiveData<List<TracksAround>>
+    @Query("select * from trackaround order by rank")
+    fun getTracks(): LiveData<List<TrackAround>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTrack(tracks: List<TracksAround>)
+    fun insertTrack(tracks: List<TrackAround>)
+
+    @Transaction
+    @Query("select * from artistaround order by rank")
+    fun getArtists(): LiveData<List<ArtistAround>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertArtist(tracks: List<ArtistAround>)
 }
 
 @Database(
-    entities = [TracksAround::class],
-    version = 1
+    entities = [TrackAround::class, ArtistAround::class],
+    version = 1,
+    exportSchema = false
 )
-abstract class TracksDatabase : RoomDatabase() {
-    abstract val trackDao: TrackDao
+abstract class MusicDatabase : RoomDatabase() {
+    abstract val musicDao: MusicDao
 }
 
-private lateinit var INSTANCE: TracksDatabase
+private lateinit var INSTANCE: MusicDatabase
 
-fun getDatabase(context: Context): TracksDatabase {
-    synchronized(TracksDatabase::class.java) {
+fun getDatabase(context: Context): MusicDatabase {
+    synchronized(MusicDatabase::class.java) {
         if (!::INSTANCE.isInitialized) {
             INSTANCE = Room.databaseBuilder(
                 context.applicationContext,
-                TracksDatabase::class.java,
+                MusicDatabase::class.java,
                 "jikomumimi-db"
             ).build()
         }
