@@ -13,7 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
-import com.ororo.auto.jigokumimi.viewmodels.TrackListViewModel
+import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
 import kotlinx.android.synthetic.main.fragment_mini_player.*
 
 
@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_mini_player.*
  */
 class MiniPlayerFragment : Fragment() {
 
-    lateinit var viewModel: TrackListViewModel
+    lateinit var viewModel: ResultViewModel
 
     lateinit var binding: FragmentMiniPlayerBinding
 
@@ -33,12 +33,12 @@ class MiniPlayerFragment : Fragment() {
         // Inflate the layout for this fragment
 
         activity?.run {
-            val viewModelFactory = TrackListViewModel.Factory(this.application)
+            val viewModelFactory = ResultViewModel.Factory(this.application)
 
             viewModel = ViewModelProvider(
                 viewModelStore,
                 viewModelFactory
-            ).get(TrackListViewModel::class.java)
+            ).get(ResultViewModel::class.java)
         }
 
         binding = DataBindingUtil.inflate(

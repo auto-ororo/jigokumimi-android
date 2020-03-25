@@ -36,7 +36,7 @@ data class GetTrackDetailResponse(
 )
 
 /**
- * Get for [/me/tracks] response
+ * Get for [/me/top/tracks] response
  */
 @JsonClass(generateAdapter = true)
 data class GetMyFavoriteTracksResponse(
@@ -58,8 +58,40 @@ fun GetMyFavoriteTracksResponse.asPostMyFavoriteTracksRequest(
 ): List<PostMyFavoriteTracksRequest> {
     return items.map {
         PostMyFavoriteTracksRequest(
-            spotifyArtistId = spotifyUserId,
+            spotifyUserId = spotifyUserId,
             spotifyTrackId = it.id,
+            longitude = location.longitude,
+            latitude = location.latitude,
+            popularity = it.popularity
+        )
+    }
+}
+
+/**
+ * Get for [/me/top/artists] response
+ */
+@JsonClass(generateAdapter = true)
+data class GetMyFavoriteArtistsResponse(
+    val items: List<SpotifyArtistFull>,
+    val total: Int,
+    val limit: Int,
+    val offset: Int,
+    val previous: String?,
+    val href: String?,
+    val next: String?
+)
+
+/**
+ * Spotifyから取得したお気に入りアーティストリストを元にJigokumimiへ送信するリクエストBodyを作成する
+ */
+fun GetMyFavoriteArtistsResponse.asPostMyFavoriteArtistsRequest(
+    spotifyUserId: String,
+    location: Location
+): List<PostMyFavoriteArtistsRequest> {
+    return items.map {
+        PostMyFavoriteArtistsRequest(
+            spotifyUserId = spotifyUserId,
+            spotifyArtistId = it.id,
             longitude = location.longitude,
             latitude = location.latitude,
             popularity = it.popularity
@@ -117,6 +149,23 @@ data class SpotifyArtist(
     val href: String,
     val id: String,
     val name: String,
+    val type: String,
+    val uri: String
+)
+
+/**
+ * Spotify artist
+ */
+@JsonClass(generateAdapter = true)
+data class SpotifyArtistFull(
+    @Json(name = "external_urls") val externalUrls: Map<String, String>,
+    val followers: SpotifyFollower,
+    val genres: List<String>?,
+    val href: String,
+    val id: String,
+    val images: List<SpotifyImage>,
+    val name: String,
+    val popularity: Int,
     val type: String,
     val uri: String
 )
@@ -228,7 +277,7 @@ data class GetMeResponse(
 )
 
 /**
- * Get for [/songs] response
+ * Get for [/tracks] response
  */
 @JsonClass(generateAdapter = true)
 data class GetTracksAroundResponse(
@@ -237,33 +286,65 @@ data class GetTracksAroundResponse(
 )
 
 /**
- * Post for [/songs] request
+ * Get for [/artists] response
+ */
+@JsonClass(generateAdapter = true)
+data class GetArtistsAroundResponse(
+    val message: String,
+    val data: List<ArtistAround>?
+)
+
+/**
+ * Post for [/tracks] request
  */
 @JsonClass(generateAdapter = true)
 data class PostMyFavoriteTracksRequest(
     @Json(name = "spotify_track_id") val spotifyTrackId: String,
-    @Json(name = "spotify_user_id") val spotifyArtistId: String,
+    @Json(name = "spotify_user_id") val spotifyUserId: String,
     val longitude: Double,
     val latitude: Double,
     val popularity: Int
 )
 
 /**
- * Post for [/songs] response
+ * Post response
  */
 @JsonClass(generateAdapter = true)
-data class PostMyFavoriteTracksResponse(
+data class PostResponse(
     val message: String,
     val data: List<String>?
 )
 
 /**
- * Song Around
+ * Post for [/artists] request
+ */
+@JsonClass(generateAdapter = true)
+data class PostMyFavoriteArtistsRequest(
+    @Json(name = "spotify_artist_id") val spotifyArtistId: String,
+    @Json(name = "spotify_user_id") val spotifyUserId: String,
+    val longitude: Double,
+    val latitude: Double,
+    val popularity: Int
+)
+
+
+/**
+ * Track Around
  */
 @JsonClass(generateAdapter = true)
 data class TrackAround(
     val rank: Int,
     @Json(name = "spotify_track_id") val spotifyTrackId: String,
+    val popularity: Int
+)
+
+/**
+ * Artist Around
+ */
+@JsonClass(generateAdapter = true)
+data class ArtistAround(
+    val rank: Int,
+    @Json(name = "spotify_artist_id") val spotifyArtistId: String,
     val popularity: Int
 )
 

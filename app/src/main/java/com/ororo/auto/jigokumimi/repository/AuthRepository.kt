@@ -102,9 +102,9 @@ class AuthRepository(private val prefData: SharedPreferences) {
 
     suspend fun refreshSpotifyAuthToken(token: String) =
         withContext(Dispatchers.IO) {
-            Timber.d("refresh spotify auth token is called")
 
             prefData.edit().putString(Constants.SP_SPOTIFY_TOKEN_KEY, "Bearer $token").apply()
+            Timber.d("refresh spotify auth token is called : $token")
         }
 
     suspend fun getSpotifyUserProfile(): SpotifyUserResponse =

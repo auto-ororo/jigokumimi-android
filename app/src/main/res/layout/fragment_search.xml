@@ -6,15 +6,14 @@
     <data>
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.SearchTracksViewModel" />
+            type="com.ororo.auto.jigokumimi.viewmodels.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.SearchTracksFragment">
-
+        tools:context=".ui.SearchFragment">
 
         <Button
             android:id="@+id/searchTracksButton"
@@ -32,14 +31,15 @@
         <Spinner
             android:id="@+id/distanceSpinner"
             android:layout_width="0dp"
+            android:entries="@array/distance_array"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:background="@color/colorPrimary"
             android:spinnerMode="dialog"
-            android:textSize="36sp"
             android:textAlignment="center"
+            android:textSize="36sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/selectDistanceSuggest" />
