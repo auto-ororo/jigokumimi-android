@@ -1,26 +1,20 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
-import android.location.Location
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.MusicRepository
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import timber.log.Timber
-import java.io.IOException
 
 
 /**
@@ -38,11 +32,6 @@ class ResultViewModel(application: Application) :
         getDatabase(application),
         PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
     )
-
-    /*
-     * 位置情報を取得､管理するRepository
-     */
-    private val locationRepository = LocationRepository(application)
 
     /*
      * 音楽再生クラス
@@ -69,10 +58,16 @@ class ResultViewModel(application: Application) :
      */
     var isPlaying = MutableLiveData<Boolean>(false)
 
-    /*
+    /**
+     * 再生プレーヤーの表示状態(Private)
+     */
+    private var _isMiniPlayerShown = MutableLiveData(false)
+
+    /**
      * 再生プレーヤーの表示状態
      */
-    var isMiniPlayerShown = MutableLiveData<Boolean>(false)
+    val isMiniPlayerShown: LiveData<Boolean>
+        get() = _isMiniPlayerShown
 
     /**
      * 再生中の曲ID
@@ -146,6 +141,8 @@ class ResultViewModel(application: Application) :
                     start()
                     playingTrackId = playingTrack.value?.id!!
                 }
+            } else {
+                mp?.start()
             }
 
         } catch (e: Exception) {
@@ -191,6 +188,21 @@ class ResultViewModel(application: Application) :
      */
     override fun onCompletion(mp: MediaPlayer?) {
         skipNextTrack()
+    }
+
+    /**
+     * プレーヤーを隠す
+     */
+    fun hideMiniPlayer() {
+        _isMiniPlayerShown.value = false
+    }
+
+    /**
+     * プレーヤーを表示する
+     */
+    fun showMiniPlayer() {
+        _isMiniPlayerShown.value = true
+
     }
 
     /**

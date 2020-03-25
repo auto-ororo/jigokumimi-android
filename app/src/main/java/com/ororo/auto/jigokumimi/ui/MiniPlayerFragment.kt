@@ -11,6 +11,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.transition.Slide
+import androidx.transition.TransitionManager
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
 import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
@@ -56,7 +58,7 @@ class MiniPlayerFragment : Fragment() {
             viewLifecycleOwner,
             Observer<Boolean> { isPlaying ->
                 if (isPlaying) {
-                    viewModel.isMiniPlayerShown.value = true
+                    viewModel.showMiniPlayer()
                     viewModel.playTrack()
                     seekBar.max = viewModel.mp?.duration!!
                     viewModel.mp?.setOnCompletionListener(viewModel)
@@ -70,6 +72,11 @@ class MiniPlayerFragment : Fragment() {
         viewModel.isMiniPlayerShown.observe(
             viewLifecycleOwner,
             Observer<Boolean> { isMiniPlayerShown ->
+                // 下から出現するアニメーションを付ける
+                TransitionManager.beginDelayedTransition(
+                    binding.miniPlayerLayout,
+                    Slide(Gravity.BOTTOM)
+                )
                 if (isMiniPlayerShown) {
                     binding.miniPlayerLayout.visibility = View.VISIBLE
                 } else {
@@ -111,9 +118,9 @@ class MiniPlayerFragment : Fragment() {
         Thread(Runnable {
             while (true) {
                 try {
-                    if (viewModel.mp != null) {
+                    viewModel.mp?.let {
                         val msg = Message()
-                        msg.what = viewModel.mp!!.currentPosition
+                        msg.what = it.currentPosition
                         handler.sendMessage(msg)
                         Thread.sleep(10)
                     }
@@ -150,7 +157,7 @@ class MiniPlayerFragment : Fragment() {
                 try {
                     // 上から下のスワイプを判断
                     if (e2.y - e1.y > swipeMinDistance && Math.abs(velocityY) > swipeThresholdVelocity) {
-                        binding.miniPlayerLayout.visibility = GONE
+                        viewModel.hideMiniPlayer()
                     }
                 } catch (e: Exception) { // nothing
                 }
@@ -166,10 +173,10 @@ class MiniPlayerFragment : Fragment() {
         Handler(Handler.Callback { msg ->
             val currentPosition = msg.what
             // 再生位置を更新
-            seekBar.progress = currentPosition
+            binding.seekBar.progress = currentPosition
             // 経過時間ラベル更新
-            elapsedTimeText.text = viewModel.createTimeLabel(currentPosition)
-            remainingTimeText.text =
+            binding.elapsedTimeText.text = viewModel.createTimeLabel(currentPosition)
+            binding.remainingTimeText.text =
                 "- ${viewModel.createTimeLabel(viewModel.mp?.duration!! - currentPosition)}"
 
             true
