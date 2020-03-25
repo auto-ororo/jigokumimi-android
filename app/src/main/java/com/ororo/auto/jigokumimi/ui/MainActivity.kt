@@ -83,9 +83,6 @@ class MainActivity : AppCompatActivity() {
                 AuthorizationResponse.Type.ERROR -> {
                     Timber.e(response.error)
                 }
-                else -> {
-                    Timber.e("no handled error")
-                }
             }
         }
     }
