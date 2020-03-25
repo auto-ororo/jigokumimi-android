@@ -3,9 +3,7 @@ package com.ororo.auto.jigokumimi.viewmodels
 import android.app.Application
 import android.util.Patterns
 import androidx.lifecycle.*
-import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -16,13 +14,6 @@ import java.util.regex.Pattern
  * ログイン画面のViewModel
  */
 class LoginViewModel(application: Application) : BaseAndroidViewModel(application) {
-
-    /**
-     * 認証系リポジトリ
-     */
-    val authRepository = AuthRepository(
-        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
-    )
 
     /**
      *  ログイン状態(Private)

@@ -14,8 +14,6 @@ import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Track
-import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.TracksRepository
 import kotlinx.coroutines.flow.collect
@@ -45,12 +43,6 @@ class TrackListViewModel(application: Application) :
      * 位置情報を取得､管理するRepository
      */
     private val locationRepository = LocationRepository(application)
-
-    /**
-     * 認証系にアクセスするRepository
-     */
-    private val authRepository =
-        AuthRepository(PreferenceManager.getDefaultSharedPreferences(application.applicationContext))
 
     /*
      * 音楽再生クラス
@@ -83,17 +75,6 @@ class TrackListViewModel(application: Application) :
     private var playingTrackId: String = ""
 
     /**
-     *  トークン認証切れ状態(Private)
-     */
-    private var _isTokenExpired = MutableLiveData(false)
-
-    /**
-     *  トークン認証切れ状態
-     */
-    val isTokenExpired: MutableLiveData<Boolean>
-        get() = _isTokenExpired
-
-    /**
      * 周辺曲情報を更新する
      */
     fun refreshTracksFromRepository() {
@@ -116,56 +97,7 @@ class TrackListViewModel(application: Application) :
                 val msg = when (e) {
                     is HttpException -> {
                         if (e.code() == 401) {
-                            isTokenExpired.postValue(true)
-                           getApplication<Application>().getString(R.string.token_expired_error_message)
-                        } else {
-                            getMessageFromHttpException(e)
-                        }
-                    }
-                    is IOException -> {
-                        getApplication<Application>().getString(R.string.no_connection_error_message)
-                    }
-                    else -> {
-                        getApplication<Application>().getString(
-                            R.string.general_error_message,
-                            e.javaClass
-                        )
-                    }
-                }
-                showMessageDialog(msg)
-            }
-        }
-    }
-
-    /**
-     * 位置情報取得後､APサーバーに位置情報､及びSpotifyから取得したお気に入りの曲リストを送信する
-     */
-    fun postLocationAndMyFavoriteTracks() {
-        Timber.d("Post Location And Fav Tracks Called")
-        viewModelScope.launch() {
-            try {
-                // 位置情報を取得する
-                val flow = locationRepository.getCurrentLocation()
-                flow.collect { location: Location ->
-                    Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
-
-                    // SpotifyのユーザーIDを取得する
-                    val spotifyUserId = authRepository.getSpotifyUserProfile().id
-
-                    // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-                    val postTracks = tracksRepository.getMyFavoriteTracks()
-                        .asPostMyFavoriteTracksRequest(spotifyUserId, location)
-
-                    // Jigokumimiにお気に入り曲リストを登録
-                    tracksRepository.postMyFavoriteTracks(postTracks)
-                    Timber.d("Post Fav Tracks Succeeded")
-                }
-            } catch (e: Exception) {
-                val msg = when (e) {
-                    is HttpException -> {
-                        // トークン認証切れの場合ログイン画面に遷移
-                        if (e.code() == 401) {
-                            isTokenExpired.postValue(true)
+                            _isTokenExpired.postValue(true)
                             getApplication<Application>().getString(R.string.token_expired_error_message)
                         } else {
                             getMessageFromHttpException(e)
@@ -184,10 +116,6 @@ class TrackListViewModel(application: Application) :
                 showMessageDialog(msg)
             }
         }
-    }
-
-    fun moveLoginDone() {
-        _isTokenExpired.postValue(false)
     }
 
     /*

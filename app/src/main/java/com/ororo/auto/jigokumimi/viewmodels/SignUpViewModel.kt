@@ -19,13 +19,6 @@ import java.util.regex.Pattern
 class SignUpViewModel(application: Application) : BaseAndroidViewModel(application) {
 
     /**
-     * 認証系リポジトリ
-     */
-    private val authRepository = AuthRepository(
-        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
-    )
-
-    /**
      *  登録状態(Private)
      */
     private var _isSignUp = MutableLiveData(false)

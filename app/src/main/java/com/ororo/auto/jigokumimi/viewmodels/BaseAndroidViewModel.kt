@@ -3,8 +3,11 @@ package com.ororo.auto.jigokumimi.viewmodels
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_HOST
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_SCHEME
@@ -21,6 +24,13 @@ import retrofit2.HttpException
 open class BaseAndroidViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
+     * 認証系リポジトリ
+     */
+    val authRepository = AuthRepository(
+        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
+    )
+
+    /**
      * エラーメッセージダイアログの表示状態
      */
     var isErrorDialogShown = MutableLiveData<Boolean>(false)
@@ -35,6 +45,25 @@ open class BaseAndroidViewModel(application: Application) : AndroidViewModel(app
      */
     val errorMessage: MutableLiveData<String>
         get() = _errorMessage
+
+    /**
+     *  トークン認証切れ状態(Private)
+     */
+    protected var _isTokenExpired = MutableLiveData(false)
+
+    /**
+     *  トークン認証切れ状態
+     */
+    val isTokenExpired: LiveData<Boolean>
+        get() = _isTokenExpired
+
+    /**
+     * ログイン画面遷移後の処理
+     * トークン認証フラグをリセットする
+     */
+    fun moveLoginDone() {
+        _isTokenExpired.postValue(false)
+    }
 
     /**
      * 例外を元にエラーメッセージを表示する
@@ -84,4 +113,5 @@ open class BaseAndroidViewModel(application: Application) : AndroidViewModel(app
             .setCampaign("your-campaign-token")
             .build()
     }
+
 }

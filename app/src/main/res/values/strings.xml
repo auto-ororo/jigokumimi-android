@@ -33,6 +33,14 @@
     <string name="title_dialog_error">ERROR</string>
     <string name="title_dialog_info">INFO</string>
     <string name="splash_text">起動中。。。</string>
+    <string name="search_tracks_button_text">集める</string>
+    <string name="tracks_text">Track</string>
+    <string name="artist_text">Artist</string>
+    <string name="select_types_suggest">タイプを選択</string>
+    <string name="select_distance_suggest">範囲を選択</string>
+    <string name="get_music_suggest">みんなが聴いている音楽を集めよう</string>
+
+
 
 </resources>
 

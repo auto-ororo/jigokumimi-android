@@ -19,21 +19,19 @@
         android:name="com.ororo.auto.jigokumimi.ui.LoginFragment"
         android:label="LoginFragment" >
         <action
-            android:id="@+id/action_loginFragment_to_detectedSongListFragment"
-            app:destination="@id/detectedSongListFragment"
-            app:popUpTo="@id/loginFragment" />
-        <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_searchTracksFragment"
+            app:destination="@id/searchTracksFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.ororo.auto.jigokumimi.ui.SignUpFragment"
         android:label="SignUpFragment" >
         <action
-            android:id="@+id/action_signUpFragment_to_detectedSongListFragment"
-            app:destination="@id/detectedSongListFragment"
-            app:popUpTo="@id/signUpFragment" />
+            android:id="@+id/action_signUpFragment_to_searchTracksFragment"
+            app:destination="@id/searchTracksFragment" />
     </fragment>
     <fragment
         android:id="@+id/splashFragment"
@@ -43,7 +41,19 @@
             android:id="@+id/action_splashFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
         <action
-            android:id="@+id/action_splashFragment_to_detectedSongListFragment"
-            app:destination="@id/detectedSongListFragment" />
+            android:id="@+id/action_splashFragment_to_searchTracksFragment"
+            app:destination="@id/searchTracksFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchTracksFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.SearchTracksFragment"
+        android:label="SearchTracksFragment" >
+        <action
+            android:id="@+id/action_searchTracksFragment_to_detectedSongListFragment"
+            app:destination="@id/detectedSongListFragment"
+            app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_searchTracksFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
 </navigation>
