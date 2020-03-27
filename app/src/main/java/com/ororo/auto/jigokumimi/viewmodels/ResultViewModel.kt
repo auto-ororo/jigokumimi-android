@@ -22,16 +22,9 @@ import com.ororo.auto.jigokumimi.repository.MusicRepository
  *
  *
  */
-class ResultViewModel(application: Application) :
+class ResultViewModel(application: Application, private val musicRepository: MusicRepository) :
     BaseAndroidViewModel(application), MediaPlayer.OnCompletionListener {
 
-    /*
-     * 音楽情報を取得､管理するRepository
-     */
-    private val musicRepository = MusicRepository(
-        getDatabase(application),
-        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
-    )
 
     /*
      * 音楽再生クラス
@@ -212,7 +205,7 @@ class ResultViewModel(application: Application) :
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(ResultViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return ResultViewModel(app) as T
+                return ResultViewModel(app, MusicRepository.getRepository(app)) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

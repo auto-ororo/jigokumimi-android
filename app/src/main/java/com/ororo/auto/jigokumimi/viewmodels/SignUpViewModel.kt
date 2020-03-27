@@ -16,7 +16,8 @@ import java.util.regex.Pattern
 /**
  * 新規登録画面のViewModel
  */
-class SignUpViewModel(application: Application) : BaseAndroidViewModel(application) {
+class SignUpViewModel(application: Application, private val authRepository: AuthRepository) :
+    BaseAndroidViewModel(application) {
 
     /**
      *  登録状態(Private)
@@ -209,7 +210,7 @@ class SignUpViewModel(application: Application) : BaseAndroidViewModel(applicati
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SignUpViewModel(app) as T
+                return SignUpViewModel(app, AuthRepository.getRepository(app)) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

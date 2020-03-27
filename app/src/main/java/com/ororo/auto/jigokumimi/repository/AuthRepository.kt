@@ -1,6 +1,8 @@
 package com.ororo.auto.jigokumimi.repository
 
+import android.app.Application
 import android.content.SharedPreferences
+import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.Dispatchers
@@ -8,7 +10,10 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
-class AuthRepository(private val prefData: SharedPreferences) {
+class AuthRepository(
+    private val prefData: SharedPreferences,
+    private val jigokumimiApiService: JigokumimiApiService
+) {
 
     /**
      * Jigokumiminiに対して新規登録リクエストを行う
@@ -18,7 +23,7 @@ class AuthRepository(private val prefData: SharedPreferences) {
             Timber.d("sign up jigokumimi is called")
 
             // 新規登録リクエストを実施
-            return@withContext JigokumimiApi.retrofitService.signUp(
+            return@withContext jigokumimiApiService.signUp(
                 signUpRequest
             )
 
@@ -32,7 +37,7 @@ class AuthRepository(private val prefData: SharedPreferences) {
             Timber.d("login jigokumimi is called")
 
             // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-            val loginResponse = JigokumimiApi.retrofitService.login(
+            val loginResponse = jigokumimiApiService.login(
                 LoginRequest(email, password)
             )
 
@@ -52,9 +57,9 @@ class AuthRepository(private val prefData: SharedPreferences) {
     /**
      * SharedPreferencesからログイン情報を取得する
      */
-    fun getSavedLoginInfo() : Pair<String, String> {
-        val email = prefData.getString(Constants.SP_JIGOKUMIMI_EMAIL_KEY,"")!!
-        val password = prefData.getString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY,"")!!
+    fun getSavedLoginInfo(): Pair<String, String> {
+        val email = prefData.getString(Constants.SP_JIGOKUMIMI_EMAIL_KEY, "")!!
+        val password = prefData.getString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY, "")!!
 
         return Pair(email, password)
     }
@@ -69,7 +74,7 @@ class AuthRepository(private val prefData: SharedPreferences) {
             val token = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")
 
             // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-            JigokumimiApi.retrofitService.logout(
+            jigokumimiApiService.logout(
                 token!!
             )
 
@@ -94,7 +99,7 @@ class AuthRepository(private val prefData: SharedPreferences) {
             val token = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
 
             // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-            return@withContext JigokumimiApi.retrofitService.getProfile(
+            return@withContext jigokumimiApiService.getProfile(
                 token
             )
 
@@ -116,4 +121,22 @@ class AuthRepository(private val prefData: SharedPreferences) {
             return@withContext SpotifyApi.retrofitService.getUserProfile(spotifyToken)
         }
 
+    /**
+     * Factoryクラス
+     */
+    companion object {
+        @Volatile
+        private var INSTANCE: AuthRepository? = null
+
+        fun getRepository(app: Application): AuthRepository {
+            return INSTANCE ?: synchronized(this) {
+                AuthRepository(
+                    PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
+                    JigokumimiApi.retrofitService
+                ).also {
+                    INSTANCE = it
+                }
+            }
+        }
+    }
 }

@@ -16,6 +16,14 @@ buildscript {
         retrofitVersion = "2.7.1"
         glideVersion = "4.11.0"
         dataBindingCompilerVersion = gradleVersion // Always need to be the same.
+
+        mockitoVersion = '2.8.9'
+        hamcrestVersion = '1.3'
+        robolectricVersion = '4.3.1'
+        androidXTestCoreVersion = '1.2.0'
+        androidXTestExtKotlinRunnerVersion = '1.1.1'
+        androidXTestRulesVersion = '1.2.0-beta01'
+        archTestingVersion = '2.0.0'
     }
 
     repositories {

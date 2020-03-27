@@ -40,6 +40,11 @@ android {
         enabled = true
     }
     buildToolsVersion = '28.0.3'
+
+
+    testOptions.unitTests {
+        includeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -102,6 +107,19 @@ dependencies {
 
     // Shared Preferences
     implementation 'androidx.preference:preference:1.1.0'
+
+
+    testImplementation "org.hamcrest:hamcrest-all:$hamcrestVersion"
+
+    // AndroidX Test - JVM testing
+    testImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion"
+
+    testImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
+
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
+
+    testImplementation "androidx.arch.core:core-testing:$archTestingVersion"
+
 }
 
 // AndroidStudio上のFlowの警告を抑止

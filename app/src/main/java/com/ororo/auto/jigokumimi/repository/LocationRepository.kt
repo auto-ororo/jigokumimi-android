@@ -10,9 +10,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class LocationRepository(context: Application) {
+class LocationRepository(application: Application) {
 
-    val fusedLocationClient: FusedLocationProviderClient = FusedLocationProviderClient(context)
+    val fusedLocationClient: FusedLocationProviderClient = FusedLocationProviderClient(application)
 
     fun getCurrentLocation(): Flow<Location> = callbackFlow {
         val request = LocationRequest().also {
@@ -30,6 +30,25 @@ class LocationRepository(context: Application) {
         fusedLocationClient.requestLocationUpdates(request, callback, null)
         awaitClose {
             fusedLocationClient.removeLocationUpdates(callback)
+        }
+    }
+
+    /**
+     * Factoryクラス
+     */
+    companion object {
+        @Volatile
+        private var INSTANCE: LocationRepository? = null
+
+        fun getRepository(app: Application): LocationRepository {
+            return INSTANCE ?: synchronized(this) {
+
+                LocationRepository(
+                    app
+                ).also {
+                    INSTANCE = it
+                }
+            }
         }
     }
 }

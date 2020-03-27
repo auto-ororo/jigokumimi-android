@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Patterns
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.repository.AuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -13,7 +14,8 @@ import java.util.regex.Pattern
 /**
  * ログイン画面のViewModel
  */
-class LoginViewModel(application: Application) : BaseAndroidViewModel(application) {
+class LoginViewModel(application: Application, private val authRepository: AuthRepository) :
+    BaseAndroidViewModel(application) {
 
     /**
      *  ログイン状態(Private)
@@ -126,7 +128,9 @@ class LoginViewModel(application: Application) : BaseAndroidViewModel(applicatio
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return LoginViewModel(app) as T
+                return LoginViewModel(
+                    app, AuthRepository.getRepository(app)
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

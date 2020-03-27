@@ -9,6 +9,7 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
+import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.MusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
@@ -18,15 +19,12 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
-class SearchViewModel(application: Application) : BaseAndroidViewModel(application) {
+class SearchViewModel(
+    application: Application,
+    private val authRepository: AuthRepository,
+    private val musicRepository: MusicRepository
+) : BaseAndroidViewModel(application) {
 
-    /*
-     * 曲情報を取得､管理するRepository
-     */
-    private val tracksRepository = MusicRepository(
-        getDatabase(application),
-        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
-    )
 
     /*
      * 位置情報を取得､管理するRepository
@@ -76,27 +74,27 @@ class SearchViewModel(application: Application) : BaseAndroidViewModel(applicati
                         // 検索種別が曲の場合
 
                         // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-                        val postTracks = tracksRepository.getMyFavoriteTracks()
+                        val postTracks = musicRepository.getMyFavoriteTracks()
                             .asPostMyFavoriteTracksRequest(spotifyUserId, location)
 
                         // Jigokumimiにお気に入り曲リストを登録
-                        tracksRepository.postMyFavoriteTracks(postTracks)
+                        musicRepository.postMyFavoriteTracks(postTracks)
 
                         // 周りのJigokumimiユーザーのお気に入り曲を取得
-                        tracksRepository.refreshTracks(spotifyUserId, location, _distance.value!!)
+                        musicRepository.refreshTracks(spotifyUserId, location, _distance.value!!)
 
                     } else {
                         // 検索種別がアーティストの場合
 
                         // ユーザーのお気に入りアーティスト一覧を取得し､リクエストを作成
-                        val postArtists = tracksRepository.getMyFavoriteArtists()
+                        val postArtists = musicRepository.getMyFavoriteArtists()
                             .asPostMyFavoriteArtistsRequest(spotifyUserId, location)
 
                         // Jigokumimiにお気に入り曲リストを登録
-                        tracksRepository.postMyFavoriteArtists(postArtists)
+                        musicRepository.postMyFavoriteArtists(postArtists)
 
                         // 周りのJigokumimiユーザーのお気に入り曲を取得
-                        tracksRepository.refreshArtists(spotifyUserId, location, _distance.value!!)
+                        musicRepository.refreshArtists(spotifyUserId, location, _distance.value!!)
                     }
 
 
@@ -168,7 +166,11 @@ class SearchViewModel(application: Application) : BaseAndroidViewModel(applicati
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SearchViewModel(app) as T
+                return SearchViewModel(
+                    app,
+                    AuthRepository.getRepository(app),
+                    MusicRepository.getRepository(app)
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
