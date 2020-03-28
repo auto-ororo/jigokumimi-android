@@ -12,7 +12,8 @@ import timber.log.Timber
 
 class AuthRepository(
     private val prefData: SharedPreferences,
-    private val jigokumimiApiService: JigokumimiApiService
+    private val jigokumimiApiService: JigokumimiApiService,
+    private val spotifyApiService: SpotifyApiService
 ) {
 
     /**
@@ -118,7 +119,7 @@ class AuthRepository(
 
             val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
-            return@withContext SpotifyApi.retrofitService.getUserProfile(spotifyToken)
+            return@withContext spotifyApiService.getUserProfile(spotifyToken)
         }
 
     /**
@@ -132,7 +133,8 @@ class AuthRepository(
             return INSTANCE ?: synchronized(this) {
                 AuthRepository(
                     PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
-                    JigokumimiApi.retrofitService
+                    JigokumimiApi.retrofitService,
+                    SpotifyApi.retrofitService
                 ).also {
                     INSTANCE = it
                 }

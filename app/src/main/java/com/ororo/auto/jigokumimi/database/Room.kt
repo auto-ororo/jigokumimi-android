@@ -23,7 +23,7 @@ interface MusicDao {
     fun getArtists(): LiveData<List<ArtistAround>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertArtist(tracks: List<ArtistAround>)
+    fun insertArtist(artists: List<ArtistAround>)
 }
 
 @Database(

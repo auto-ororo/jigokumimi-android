@@ -68,8 +68,7 @@ class MainActivity : AppCompatActivity() {
 
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN -> {
-                    val authRepository =
-                        AuthRepository(PreferenceManager.getDefaultSharedPreferences(this))
+                    val authRepository = AuthRepository.getRepository(application)
 
                     GlobalScope.launch(Dispatchers.IO) {
 

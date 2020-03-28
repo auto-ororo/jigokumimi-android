@@ -282,7 +282,7 @@ data class GetMeResponse(
 @JsonClass(generateAdapter = true)
 data class GetTracksAroundResponse(
     val message: String,
-    val data: List<TrackAround>?
+    val data: List<TrackAroundNetwork>?
 )
 
 /**
@@ -291,7 +291,7 @@ data class GetTracksAroundResponse(
 @JsonClass(generateAdapter = true)
 data class GetArtistsAroundResponse(
     val message: String,
-    val data: List<ArtistAround>?
+    val data: List<ArtistAroundNetwork>?
 )
 
 /**
@@ -332,7 +332,7 @@ data class PostMyFavoriteArtistsRequest(
  * Track Around
  */
 @JsonClass(generateAdapter = true)
-data class TrackAround(
+data class TrackAroundNetwork(
     val rank: Int,
     @Json(name = "spotify_track_id") val spotifyTrackId: String,
     val popularity: Int
@@ -342,7 +342,7 @@ data class TrackAround(
  * Artist Around
  */
 @JsonClass(generateAdapter = true)
-data class ArtistAround(
+data class ArtistAroundNetwork(
     val rank: Int,
     @Json(name = "spotify_artist_id") val spotifyArtistId: String,
     val popularity: Int

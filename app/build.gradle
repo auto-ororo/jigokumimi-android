@@ -9,11 +9,11 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.ororo.auto.jigokumimi"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -113,13 +113,15 @@ dependencies {
 
     // AndroidX Test - JVM testing
     testImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion"
-
     testImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
-
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
-
     testImplementation "androidx.arch.core:core-testing:$archTestingVersion"
 
+    // Coroutines testting
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineVersion"
+
+    // Faker
+    testImplementation 'com.github.javafaker:javafaker:1.0.2'
 }
 
 // AndroidStudio上のFlowの警告を抑止
