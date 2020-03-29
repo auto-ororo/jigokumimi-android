@@ -59,12 +59,10 @@ class MiniPlayerFragment : Fragment() {
             Observer<Boolean> { isPlaying ->
                 if (isPlaying) {
                     viewModel.showMiniPlayer()
-                    viewModel.playTrack()
                     seekBar.max = viewModel.mp?.duration!!
                     viewModel.mp?.setOnCompletionListener(viewModel)
                     binding.queueButton.setImageResource(R.drawable.ic_pause)
                 } else {
-                    viewModel.stopTrack()
                     binding.queueButton.setImageResource(R.drawable.ic_play_arrow)
                 }
             })
@@ -86,7 +84,11 @@ class MiniPlayerFragment : Fragment() {
         )
 
         binding.queueButton.setOnClickListener {
-            viewModel.isPlaying.value = !viewModel.isPlaying.value!!
+            if (viewModel.isPlaying.value!!) {
+                viewModel.stopTrack()
+            } else {
+                viewModel.resumeTrack()
+            }
         }
 
         binding.nextButton.setOnClickListener {

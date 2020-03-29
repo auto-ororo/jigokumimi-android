@@ -13,6 +13,7 @@ import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.LocationRepository
 import com.ororo.auto.jigokumimi.repository.MusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -60,7 +61,8 @@ class SearchViewModel(
      * 周辺曲情報を更新する
      */
     fun searchMusic() {
-        viewModelScope.launch() {
+        viewModelScope.launch {
+            Timber.d("Search Music called")
             try {
                 // 位置情報を取得する
                 val flow = locationRepository.getCurrentLocation()

@@ -5,10 +5,7 @@ import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
@@ -22,7 +19,6 @@ import com.ororo.auto.jigokumimi.repository.MusicRepository
  */
 class ResultViewModel(application: Application, private val musicRepository: IMusicRepository) :
     BaseAndroidViewModel(application), MediaPlayer.OnCompletionListener {
-
 
     /*
      * 音楽再生クラス
@@ -40,19 +36,31 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
     val artistlist = musicRepository.artists
 
     /*
+     * 再生中の曲情報(private)
+     */
+    private var _playingTrack = MutableLiveData<Track>()
+
+    /*
      * 再生中の曲情報
      */
-    var playingTrack = MutableLiveData<Track>()
+    val playingTrack: LiveData<Track?>
+        get() = _playingTrack
+
+    /*
+     * 再生状態(Private)
+     */
+    private var _isPlaying = MutableLiveData(false)
 
     /*
      * 再生状態
      */
-    var isPlaying = MutableLiveData<Boolean>(false)
+    val isPlaying: LiveData<Boolean>
+        get() = _isPlaying
 
     /**
      * 再生プレーヤーの表示状態(Private)
      */
-    private var _isMiniPlayerShown = MutableLiveData(false)
+    private val _isMiniPlayerShown = MutableLiveData(false)
 
     /**
      * 再生プレーヤーの表示状態
@@ -60,26 +68,29 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
     val isMiniPlayerShown: LiveData<Boolean>
         get() = _isMiniPlayerShown
 
-    /**
-     * 再生中の曲ID
-     */
-    private var playingTrackId: String = ""
-
     /*
      * 再生する曲を指定数だけ進めるor戻す
      */
     private fun movePlayingTrack(moveIndex: Int) {
-        val track: List<Track>? = tracklist.value?.filter {
-            it.rank == (playingTrack.value?.rank!! + moveIndex)
-        }
 
-        if (track?.size!! > 0) {
-            playingTrack.value = track[0]
-        } else {
-            if (moveIndex > 0) {
-                playingTrack.value = tracklist.value?.get(0)
-            } else {
-                playingTrack.value = tracklist.value?.get(tracklist.value!!.lastIndex)
+        val currentIndex = tracklist.value?.indexOf(playingTrack.value)
+
+        currentIndex?.let {
+            val sumIndex = it + moveIndex
+
+            _playingTrack.value = when {
+                sumIndex < 0 -> {
+                    //指定位置が0以下の場合はリスト中最後の曲を設定
+                    tracklist.value?.last()
+                }
+                sumIndex > tracklist.value?.lastIndex!! -> {
+                    //指定位置が要素数を超える場合はリスト中最初の曲を設定
+                    tracklist.value?.get(0)
+                }
+                else -> {
+                    // それ以外は指定位置の曲を設定
+                    tracklist.value?.get(sumIndex)
+                }
             }
         }
     }
@@ -89,7 +100,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
      */
     fun skipNextTrack() {
         movePlayingTrack(1)
-        isPlaying.value = true
+        playTrack()
     }
 
     /*
@@ -101,8 +112,8 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                 it.seekTo(0)
             } else {
                 movePlayingTrack(-1)
+                playTrack()
             }
-            isPlaying.value = true
         }
     }
 
@@ -114,27 +125,22 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
         try {
             stopTrack()
 
-            // 再生する曲が変わった場合はMediaPlayerを初期化
-            if (playingTrackId != playingTrack.value?.id) {
-                mp = MediaPlayer().apply {
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        setAudioAttributes(
-                            AudioAttributes
-                                .Builder()
-                                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                .build()
-                        )
-                    } else {
-                        setAudioStreamType(AudioManager.STREAM_MUSIC)
-                    }
-                    setDataSource(playingTrack.value?.previewUrl!!)
-                    prepare()
-                    start()
-                    playingTrackId = playingTrack.value?.id!!
+            mp = MediaPlayer().apply {
+                if (Build.VERSION.SDK_INT >= 21) {
+                    setAudioAttributes(
+                        AudioAttributes
+                            .Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build()
+                    )
+                    setDataSource (playingTrack.value?.previewUrl!!)
+                    prepare ()
+                    start ()
+                } else {
+                    setAudioStreamType(AudioManager.STREAM_MUSIC)
                 }
-            } else {
-                mp?.start()
             }
+            _isPlaying.value = true
 
         } catch (e: Exception) {
             val msg =
@@ -147,11 +153,31 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
      * 曲を停止する
      */
     fun stopTrack() {
+        _isPlaying.value = false
         mp?.let {
             if (it.isPlaying) {
                 it.pause()
             }
         }
+    }
+
+    /*
+     * 曲を再開する
+     */
+    fun resumeTrack() {
+        mp?.let {
+            if (!it.isPlaying) {
+                it.start()
+            }
+        }
+        _isPlaying.value = true
+    }
+
+    /**
+     * 再生曲を設定する
+     */
+    fun setPlayingTrack(track: Track) {
+        _playingTrack.value = track
     }
 
     /**
@@ -193,7 +219,6 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
      */
     fun showMiniPlayer() {
         _isMiniPlayerShown.value = true
-
     }
 
     /**

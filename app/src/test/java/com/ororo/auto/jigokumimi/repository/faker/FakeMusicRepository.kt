@@ -2,18 +2,23 @@ package com.ororo.auto.jigokumimi.repository.faker
 
 import android.location.Location
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import java.lang.Exception
 
-class FakeMusicRepository(exception: Exception? = null) : IMusicRepository, BaseFakeRepository(exception) {
+class FakeMusicRepository(
+    private val _tracks: List<Track> = mutableListOf(),
+    private val _artists: List<Artist> = mutableListOf(),
+    exception: Exception? = null
+) : IMusicRepository, BaseFakeRepository(exception) {
 
     override val tracks: LiveData<List<Track>>
-        get() = TODO("Not yet implemented")
+        get() = MutableLiveData(_tracks)
     override val artists: LiveData<List<Artist>>
-        get() = TODO("Not yet implemented")
+        get() = MutableLiveData(_artists)
 
     override suspend fun refreshTracks(
         spotifyUserId: String,

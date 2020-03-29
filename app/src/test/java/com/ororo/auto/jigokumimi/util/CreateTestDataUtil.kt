@@ -1,6 +1,7 @@
 package com.ororo.auto.jigokumimi.util
 
 import com.github.javafaker.Faker
+import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
 import java.util.*
 
@@ -264,6 +265,18 @@ class CreateTestDataUtil {
             popularity = faker.number().randomDigit(),
             previewUrl = faker.internet().url()
         )
+    }
 
+    fun createDummyTrack() : Track {
+       return Track(
+            album = faker.lorem().word(),
+            artists = faker.name().fullName(),
+            id = faker.random().hex(),
+            imageUrl = faker.internet().url(),
+            name = faker.name().fullName(),
+            popularity = faker.number().randomDigit(),
+            previewUrl = faker.internet().url(),
+            rank = faker.number().randomDigit()
+        )
     }
 }
