@@ -10,11 +10,11 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-class LocationRepository(application: Application) {
+class LocationRepository(application: Application) : ILocationRepository {
 
     val fusedLocationClient: FusedLocationProviderClient = FusedLocationProviderClient(application)
 
-    fun getCurrentLocation(): Flow<Location> = callbackFlow {
+    override fun getCurrentLocation(): Flow<Location> = callbackFlow {
         val request = LocationRequest().also {
             it.interval = 60000
             it.priority = LocationRequest.PRIORITY_HIGH_ACCURACY

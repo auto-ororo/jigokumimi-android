@@ -5,6 +5,7 @@ import android.util.Patterns
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.AuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -14,7 +15,7 @@ import java.util.regex.Pattern
 /**
  * ログイン画面のViewModel
  */
-class LoginViewModel(application: Application, private val authRepository: AuthRepository) :
+class LoginViewModel(application: Application, val authRepository: IAuthRepository) :
     BaseAndroidViewModel(application) {
 
     /**

@@ -26,12 +26,12 @@ class MusicRepository(
     private val prefData: SharedPreferences,
     private val spotifyApiService: SpotifyApiService,
     private val jigokumimiApiService: JigokumimiApiService
-) {
+) : IMusicRepository {
 
     /**
      * 周辺曲情報
      */
-    val tracks: LiveData<List<Track>> = Transformations.map(musicDao.getTracks()) {
+    override val tracks: LiveData<List<Track>> = Transformations.map(musicDao.getTracks()) {
         Timber.d("data changed: $it")
         it.asTrackModel()
     }
@@ -39,26 +39,24 @@ class MusicRepository(
     /**
      * 周辺アーティスト情報
      */
-    val artists: LiveData<List<Artist>> = Transformations.map(musicDao.getArtists()) {
+    override val artists: LiveData<List<Artist>> = Transformations.map(musicDao.getArtists()) {
         Timber.d("data changed: $it")
         it.asArtistModel()
     }
 
-    var limit: Int = 20
-
-    var offset: Int = 0
-    var total: Int = Int.MAX_VALUE
+    val limit: Int = 20
+    val offset: Int = 0
+    val total: Int = Int.MAX_VALUE
 
     /**
      * 周辺曲情報を更新する
      */
-    suspend fun refreshTracks(spotifyUserId: String, location: Location, distance: Int) =
+    override suspend fun refreshTracks(spotifyUserId: String, location: Location, distance: Int) =
         withContext(Dispatchers.IO) {
             Timber.d("refresh tracks is called")
 
             val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
             Timber.d("トークン: $jigokumimiToken")
-
 
             // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
             val tracksAround = jigokumimiApiService.getTracksAround(
@@ -93,12 +91,14 @@ class MusicRepository(
             databaseTracks?.let {
                 musicDao.insertTrack(it)
             }
+
+            return@withContext
         }
 
     /**
      * ユーザーのお気に入り曲を取得する
      */
-    suspend fun getMyFavoriteTracks(): GetMyFavoriteTracksResponse =
+    override suspend fun getMyFavoriteTracks(): GetMyFavoriteTracksResponse =
         withContext(Dispatchers.IO) {
             Timber.d("get my favorite tracks is called")
 
@@ -114,7 +114,7 @@ class MusicRepository(
     /**
      * ユーザーのお気に入り曲を位置情報と一緒に登録する
      */
-    suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): PostResponse =
+    override suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): PostResponse =
         withContext(Dispatchers.IO) {
             Timber.d("post my favorite tracks is called")
 
@@ -129,7 +129,7 @@ class MusicRepository(
     /**
      * 周辺アーティスト情報を更新する
      */
-    suspend fun refreshArtists(spotifyUserId: String, location: Location, distance: Int) =
+    override suspend fun refreshArtists(spotifyUserId: String, location: Location, distance: Int) =
         withContext(Dispatchers.IO) {
             Timber.d("refresh tracks is called")
 
@@ -170,7 +170,7 @@ class MusicRepository(
     /**
      * ユーザーのお気に入りアーティストを取得する
      */
-    suspend fun getMyFavoriteArtists(): GetMyFavoriteArtistsResponse =
+    override suspend fun getMyFavoriteArtists(): GetMyFavoriteArtistsResponse =
         withContext(Dispatchers.IO) {
             Timber.d("get my favorite tracks is called")
 
@@ -186,7 +186,7 @@ class MusicRepository(
     /**
      * ユーザーのお気に入りアーティストを更新する
      */
-    suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): PostResponse =
+    override suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): PostResponse =
         withContext(Dispatchers.IO) {
             Timber.d("post my favorite tracks is called")
 

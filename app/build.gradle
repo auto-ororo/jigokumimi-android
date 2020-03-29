@@ -122,6 +122,9 @@ dependencies {
 
     // Faker
     testImplementation 'com.github.javafaker:javafaker:1.0.2'
+
+    // Optional -- Mockito framework
+    testImplementation 'org.mockito:mockito-core:2.19.0'
 }
 
 // AndroidStudio上のFlowの警告を抑止

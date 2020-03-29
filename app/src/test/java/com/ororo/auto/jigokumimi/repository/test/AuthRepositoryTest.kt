@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.repository
+package com.ororo.auto.jigokumimi.repository.test
 
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.network.*
+import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat

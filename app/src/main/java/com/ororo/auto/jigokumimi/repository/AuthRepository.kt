@@ -14,12 +14,12 @@ class AuthRepository(
     private val prefData: SharedPreferences,
     private val jigokumimiApiService: JigokumimiApiService,
     private val spotifyApiService: SpotifyApiService
-) {
+) : IAuthRepository {
 
     /**
      * Jigokumiminiに対して新規登録リクエストを行う
      */
-    suspend fun signUpJigokumimi(signUpRequest: SignUpRequest) =
+    override suspend fun signUpJigokumimi(signUpRequest: SignUpRequest) =
         withContext(Dispatchers.IO) {
             Timber.d("sign up jigokumimi is called")
 
@@ -33,7 +33,7 @@ class AuthRepository(
     /**
      * Jigokumiminiに対してログインリクエストを行う
      */
-    suspend fun loginJigokumimi(email: String, password: String) =
+    override suspend fun loginJigokumimi(email: String, password: String) =
         withContext(Dispatchers.IO) {
             Timber.d("login jigokumimi is called")
 
@@ -58,7 +58,7 @@ class AuthRepository(
     /**
      * SharedPreferencesからログイン情報を取得する
      */
-    fun getSavedLoginInfo(): Pair<String, String> {
+    override fun getSavedLoginInfo(): Pair<String, String> {
         val email = prefData.getString(Constants.SP_JIGOKUMIMI_EMAIL_KEY, "")!!
         val password = prefData.getString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY, "")!!
 
@@ -68,7 +68,7 @@ class AuthRepository(
     /**
      * Jigokumiminiに対してログアウトリクエストを行う
      */
-    suspend fun logoutJigokumimi() =
+    override suspend fun logoutJigokumimi() =
         withContext(Dispatchers.IO) {
             Timber.d("login jigokumimi is called")
 
@@ -93,7 +93,7 @@ class AuthRepository(
     /**
      * Jigokumiminiのユーザー情報の取得リクエストを行う
      */
-    suspend fun getJigokumimiUserProfile() =
+    override suspend fun getJigokumimiUserProfile() =
         withContext(Dispatchers.IO) {
             Timber.d("get jigokumimi user profile is called")
 
@@ -106,14 +106,20 @@ class AuthRepository(
 
         }
 
-    suspend fun refreshSpotifyAuthToken(token: String) =
+    /**
+     * 端末に保存したSpotifyのアクセストークンを更新する
+     */
+    override suspend fun refreshSpotifyAuthToken(token: String) =
         withContext(Dispatchers.IO) {
 
             prefData.edit().putString(Constants.SP_SPOTIFY_TOKEN_KEY, "Bearer $token").apply()
             Timber.d("refresh spotify auth token is called : $token")
         }
 
-    suspend fun getSpotifyUserProfile(): SpotifyUserResponse =
+    /**
+     * Spotifyのユーザープロフィールを取得する
+     */
+    override suspend fun getSpotifyUserProfile(): SpotifyUserResponse =
         withContext(Dispatchers.IO) {
             Timber.d("refresh spotify auth token is called")
 

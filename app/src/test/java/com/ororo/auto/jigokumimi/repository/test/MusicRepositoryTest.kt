@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.repository
+package com.ororo.auto.jigokumimi.repository.test
 
 import android.content.SharedPreferences
 import android.location.Location
@@ -10,6 +10,7 @@ import com.ororo.auto.jigokumimi.database.ArtistAround
 import com.ororo.auto.jigokumimi.database.FakeMusicDao
 import com.ororo.auto.jigokumimi.database.TrackAround
 import com.ororo.auto.jigokumimi.network.*
+import com.ororo.auto.jigokumimi.repository.MusicRepository
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat

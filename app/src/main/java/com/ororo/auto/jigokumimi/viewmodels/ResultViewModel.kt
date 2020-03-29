@@ -9,11 +9,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.domain.Track
-import com.ororo.auto.jigokumimi.repository.LocationRepository
+import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.repository.MusicRepository
 
 
@@ -22,7 +20,7 @@ import com.ororo.auto.jigokumimi.repository.MusicRepository
  *
  *
  */
-class ResultViewModel(application: Application, private val musicRepository: MusicRepository) :
+class ResultViewModel(application: Application, private val musicRepository: IMusicRepository) :
     BaseAndroidViewModel(application), MediaPlayer.OnCompletionListener {
 
 
