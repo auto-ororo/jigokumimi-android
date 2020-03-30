@@ -2,18 +2,12 @@ package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
 import android.location.Location
-import android.widget.AdapterView
 import androidx.lifecycle.*
-import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
-import com.ororo.auto.jigokumimi.repository.AuthRepository
-import com.ororo.auto.jigokumimi.repository.LocationRepository
-import com.ororo.auto.jigokumimi.repository.MusicRepository
+import com.ororo.auto.jigokumimi.repository.*
 import com.ororo.auto.jigokumimi.util.Constants
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -22,15 +16,10 @@ import java.io.IOException
 
 class SearchViewModel(
     application: Application,
-    private val authRepository: AuthRepository,
-    private val musicRepository: MusicRepository
+    private val authRepository: IAuthRepository,
+    private val musicRepository: IMusicRepository,
+    private val locationRepository: ILocationRepository
 ) : BaseAndroidViewModel(application) {
-
-
-    /*
-     * 位置情報を取得､管理するRepository
-     */
-    private val locationRepository = LocationRepository(application)
 
     /**
      *  検索完了フラグ(Private)
@@ -54,8 +43,16 @@ class SearchViewModel(
     val searchType: LiveData<Constants.SearchType>
         get() = _searchType
 
-
+    /**
+     *  検索距離(Private)
+     */
     private val _distance = MutableLiveData(0)
+
+    /**
+     *  検索距離
+     */
+    val distance: LiveData<Int>
+        get() = _distance
 
     /**
      * 周辺曲情報を更新する
@@ -171,7 +168,8 @@ class SearchViewModel(
                 return SearchViewModel(
                     app,
                     AuthRepository.getRepository(app),
-                    MusicRepository.getRepository(app)
+                    MusicRepository.getRepository(app),
+                    LocationRepository.getRepository(app)
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
