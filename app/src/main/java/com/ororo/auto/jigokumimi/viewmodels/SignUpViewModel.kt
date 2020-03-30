@@ -7,6 +7,7 @@ import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.SignUpRequest
 import com.ororo.auto.jigokumimi.repository.AuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -16,7 +17,7 @@ import java.util.regex.Pattern
 /**
  * 新規登録画面のViewModel
  */
-class SignUpViewModel(application: Application, private val authRepository: AuthRepository) :
+class SignUpViewModel(application: Application, private val authRepository: IAuthRepository) :
     BaseAndroidViewModel(application) {
 
     /**
@@ -27,7 +28,7 @@ class SignUpViewModel(application: Application, private val authRepository: Auth
     /**
      *  登録状態
      */
-    val isSignUp: MutableLiveData<Boolean>
+    val isSignUp: LiveData<Boolean>
         get() = _isSignUp
 
     /**
@@ -38,7 +39,7 @@ class SignUpViewModel(application: Application, private val authRepository: Auth
     /**
      *  ログイン状態
      */
-    val isLogin: MutableLiveData<Boolean>
+    val isLogin: LiveData<Boolean>
         get() = _isLogin
 
     /**
@@ -119,7 +120,7 @@ class SignUpViewModel(application: Application, private val authRepository: Auth
      * 新規登録実行
      */
     fun signUp() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 authRepository.signUpJigokumimi(
                     SignUpRequest(
@@ -129,7 +130,7 @@ class SignUpViewModel(application: Application, private val authRepository: Auth
                         passwordConfirmation = passwordConfirmation.value!!
                     )
                 )
-                _isSignUp.postValue(true)
+                _isSignUp.value = true
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {
@@ -154,10 +155,10 @@ class SignUpViewModel(application: Application, private val authRepository: Auth
      * ログイン実行
      */
     fun login() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 authRepository.loginJigokumimi(email.value!!, password.value!!)
-                _isLogin.postValue(true)
+                _isLogin.value = true
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {

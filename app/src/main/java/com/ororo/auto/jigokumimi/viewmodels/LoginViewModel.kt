@@ -6,7 +6,6 @@ import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -82,7 +81,7 @@ class LoginViewModel(application: Application, val authRepository: IAuthReposito
      * ログイン実行
      */
     fun login() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 authRepository.loginJigokumimi(email.value!!, password.value!!)
                 _isLogin.postValue(true)
