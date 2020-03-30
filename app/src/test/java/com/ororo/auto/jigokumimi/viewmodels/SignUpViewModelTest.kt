@@ -36,10 +36,6 @@ class SignUpViewModelTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    // Coroiutineルールを設定
-    @get:Rule
-    var testCoroutineRule = TestCoroutineRule()
-
     @Before
     fun createViewModel() {
         viewModel = SignUpViewModel(

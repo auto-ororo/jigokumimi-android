@@ -6,10 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.repository.AuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SplashViewModel(application: Application, private val authRepository: AuthRepository) :
+class SplashViewModel(application: Application, private val authRepository: IAuthRepository) :
     BaseAndroidViewModel(application) {
 
     /**
@@ -38,20 +39,20 @@ class SplashViewModel(application: Application, private val authRepository: Auth
      * 端末に保存されたログイン情報を元にログインを試みる
      */
     fun loginBySavedInput() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val (email, password) = authRepository.getSavedLoginInfo()
                 if (email != "" && password != "") {
                     authRepository.loginJigokumimi(email, password)
-                    _isLogin.postValue(true)
+                    _isLogin.value = true
                 } else {
-                    _isLogin.postValue(false)
+                    _isLogin.value = false
 
                 }
             } catch (e: Exception) {
-                _isLogin.postValue(false)
+                _isLogin.value = false
             } finally {
-                _isReady.postValue(true)
+                _isReady.value = true
             }
 
         }
