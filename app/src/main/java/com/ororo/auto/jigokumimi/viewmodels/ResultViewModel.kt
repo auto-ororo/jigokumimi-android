@@ -133,12 +133,12 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                             .build()
                     )
-                    setDataSource (playingTrack.value?.previewUrl!!)
-                    prepare ()
-                    start ()
                 } else {
                     setAudioStreamType(AudioManager.STREAM_MUSIC)
                 }
+                setDataSource (playingTrack.value?.previewUrl!!)
+                prepare ()
+                start ()
             }
             _isPlaying.value = true
 

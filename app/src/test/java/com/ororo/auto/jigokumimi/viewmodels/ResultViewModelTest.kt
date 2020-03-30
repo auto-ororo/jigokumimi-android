@@ -49,19 +49,6 @@ class ResultViewModelTest {
     }
 
     @Test
-    fun playTrack_startが呼ばれ再生フラグがtrueになること() {
-
-        // MediaPlayerモックを作成
-        val mockMp = mock(MediaPlayer::class.java)
-        viewModel.mp = mockMp
-
-        viewModel.playTrack()
-
-        verify(mockMp, times(1)).start()
-        assertThat(viewModel.isPlaying.value, IsEqual(true))
-    }
-
-    @Test
     fun stopTrack_MediaPlayerが再生状態_Pauseが呼ばれ再生フラグがオフになること() {
 
         // 再生状態のMediaPlayerモックを作成
@@ -88,13 +75,13 @@ class ResultViewModelTest {
         // メソッド呼び出し
         viewModel.stopTrack()
 
-        verify(mockMp, times(1)).pause()
+        verify(mockMp, times(0)).pause()
         assertThat(viewModel.isPlaying.value, IsEqual(false))
 
     }
 
     @Test
-    fun resumeTrack_MediaPlayerが再生状態_Startが呼ばれること() {
+    fun resumeTrack_MediaPlayerが停止状態_Startが呼ばれること() {
 
         // 停止状態のMediaPlayerモックを作成
         val mockMp = mock(MediaPlayer::class.java)
