@@ -63,7 +63,7 @@ class LoginFragmentTest {
     }
 
     @Test
-    fun ログインボタンタップ_サーバー接続失敗_エラーメッセージが表示されること() {
+    fun ログインボタンタップ_ログイン失敗_エラーメッセージが表示されること() {
 
         // Navigation設定
         val scenario = launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
