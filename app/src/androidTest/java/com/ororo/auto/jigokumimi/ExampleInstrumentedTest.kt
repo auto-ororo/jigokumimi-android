@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.ororo.auto.vinylbucket", appContext.packageName)
+        assertEquals("com.ororo.auto.jigokumimi", appContext.packageName)
     }
 }
