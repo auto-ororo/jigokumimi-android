@@ -103,7 +103,6 @@ class AuthRepository(
             return@withContext jigokumimiApiService.getProfile(
                 token
             )
-
         }
 
     /**
@@ -127,24 +126,4 @@ class AuthRepository(
 
             return@withContext spotifyApiService.getUserProfile(spotifyToken)
         }
-
-    /**
-     * Factoryクラス
-     */
-    companion object {
-        @Volatile
-        private var INSTANCE: AuthRepository? = null
-
-        fun getRepository(app: Application): AuthRepository {
-            return INSTANCE ?: synchronized(this) {
-                AuthRepository(
-                    PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
-                    JigokumimiApi.retrofitService,
-                    SpotifyApi.retrofitService
-                ).also {
-                    INSTANCE = it
-                }
-            }
-        }
-    }
 }

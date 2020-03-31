@@ -198,26 +198,25 @@ class MusicRepository(
             )
         }
 
-
     /**
      * Factoryクラス
      */
-    companion object {
-        @Volatile
-        private var INSTANCE: MusicRepository? = null
-
-        fun getRepository(app: Application): MusicRepository {
-            return INSTANCE ?: synchronized(this) {
-
-                MusicRepository(
-                    getDatabase(app.applicationContext).musicDao,
-                    PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
-                    SpotifyApi.retrofitService,
-                    JigokumimiApi.retrofitService
-                ).also {
-                    INSTANCE = it
-                }
-            }
-        }
-    }
+//    companion object {
+//        @Volatile
+//        private var INSTANCE: MusicRepository? = null
+//
+//        fun getRepository(app: Application): MusicRepository {
+//            return INSTANCE ?: synchronized(this) {
+//
+//                MusicRepository(
+//                    getDatabase(app.applicationContext).musicDao,
+//                    PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
+//                    SpotifyApi.retrofitService,
+//                    JigokumimiApi.retrofitService
+//                ).also {
+//                    INSTANCE = it
+//                }
+//            }
+//        }
+//    }
 }

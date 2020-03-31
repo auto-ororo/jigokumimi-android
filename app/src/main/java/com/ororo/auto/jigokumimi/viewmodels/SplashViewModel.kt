@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +66,10 @@ class SplashViewModel(application: Application, private val authRepository: IAut
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SplashViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SplashViewModel(app, AuthRepository.getRepository(app)) as T
+                return SplashViewModel(
+                    app,
+                    (app.applicationContext as JigokumimiApplication).authRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

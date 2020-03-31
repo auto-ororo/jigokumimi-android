@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Patterns
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
+import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.SignUpRequest
 import com.ororo.auto.jigokumimi.repository.AuthRepository
@@ -211,7 +212,9 @@ class SignUpViewModel(application: Application, private val authRepository: IAut
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SignUpViewModel(app, AuthRepository.getRepository(app)) as T
+                return SignUpViewModel(app,
+                    (app.applicationContext as JigokumimiApplication).authRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

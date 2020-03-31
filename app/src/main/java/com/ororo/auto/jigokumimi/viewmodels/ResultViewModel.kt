@@ -6,6 +6,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import androidx.lifecycle.*
+import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
@@ -136,9 +137,9 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                 } else {
                     setAudioStreamType(AudioManager.STREAM_MUSIC)
                 }
-                setDataSource (playingTrack.value?.previewUrl!!)
-                prepare ()
-                start ()
+                setDataSource(playingTrack.value?.previewUrl!!)
+                prepare()
+                start()
             }
             _isPlaying.value = true
 
@@ -228,7 +229,10 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(ResultViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return ResultViewModel(app, MusicRepository.getRepository(app)) as T
+                return ResultViewModel(
+                    app,
+                    (app.applicationContext as JigokumimiApplication).musicRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

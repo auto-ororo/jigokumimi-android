@@ -3,6 +3,7 @@ package com.ororo.auto.jigokumimi.viewmodels
 import android.app.Application
 import android.location.Location
 import androidx.lifecycle.*
+import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
@@ -167,9 +168,9 @@ class SearchViewModel(
                 @Suppress("UNCHECKED_CAST")
                 return SearchViewModel(
                     app,
-                    AuthRepository.getRepository(app),
-                    MusicRepository.getRepository(app),
-                    LocationRepository.getRepository(app)
+                    (app.applicationContext as JigokumimiApplication).authRepository,
+                    (app.applicationContext as JigokumimiApplication).musicRepository,
+                    (app.applicationContext as JigokumimiApplication).locationRepository
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
