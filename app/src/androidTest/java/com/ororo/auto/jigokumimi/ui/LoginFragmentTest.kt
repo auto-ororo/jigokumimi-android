@@ -13,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import io.mockk.every
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -20,32 +21,35 @@ import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
 import retrofit2.HttpException
 import retrofit2.Response
-
+import io.mockk.mockk
+import io.mockk.verify
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class LoginFragmentTest {
 
     private lateinit var repository: IAuthRepository
+    private lateinit var navController: NavController
 
     @Before
-    fun initRepository() {
-        repository = mock(IAuthRepository::class.java)
+    fun init() {
+        // mock化したrepositoryをServiceLocatorへ登録し、テスト実行時に参照するように設定)
+        repository = mockk(relaxed = true)
         ServiceLocator.authRepository = repository
+
+        // 検索画面を起動し、NavControllerを設定
+        val scenario = launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
+        navController = mockk<NavController>(relaxed = true)
+        scenario.onFragment {
+            Navigation.setViewNavController(it.view!!, navController)
+        }
+
     }
 
     @Test
     fun ログインボタンタップ_サーバー接続成功_検索画面に遷移すること() {
-
-        // GIVEN - On the home screen
-        val scenario = launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
-        val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
 
         // サンプルEmail
         val sampleMail = "test@test.com"
@@ -56,21 +60,16 @@ class LoginFragmentTest {
         onView(withId(R.id.passwordEdit)).perform(replaceText(samplePassword))
         onView(withId(R.id.login_button)).perform(click())
 
-        verify(navController).navigate(
-            LoginFragmentDirections.actionLoginFragmentToSearchFragment()
-        )
+        verify {
+            navController.navigate(
+                LoginFragmentDirections.actionLoginFragmentToSearchFragment()
+            )
+        }
 
     }
 
     @Test
     fun ログインボタンタップ_ログイン失敗_エラーメッセージが表示されること() {
-
-        // Navigation設定
-        val scenario = launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
-        val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
 
         // サンプルEmail
         val sampleMail = "test@test.com"
@@ -87,10 +86,12 @@ class LoginFragmentTest {
                 )
             )
         )
-        runBlocking {
-            // emailとpasswordを空文字以外に設定
-            doThrow(exception).`when`(repository).loginJigokumimi(sampleMail, samplePassword)
-        }
+
+       every {
+           runBlocking {
+               repository.loginJigokumimi(any(), any())
+           }
+       } throws exception
 
         onView(withId(R.id.emailEdit)).perform(replaceText(sampleMail))
         onView(withId(R.id.passwordEdit)).perform(replaceText(samplePassword))
@@ -101,9 +102,6 @@ class LoginFragmentTest {
 
     @Test
     fun 無効なメールアドレス_8文字以上のパスワード_ログインボタンが非活性となること() {
-
-        // 画面立ち上げ
-        launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
 
         // サンプルEmail(無効メールアドレス)
         val sampleMail = "testtest.com"
@@ -118,9 +116,6 @@ class LoginFragmentTest {
     @Test
     fun 有効なメールアドレス_8文字未満のパスワード_ログインボタンが非活性となること() {
 
-        // 画面立ち上げ
-        launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
-
         // サンプルEmail
         val sampleMail = "test@test.com"
         // サンプルPassword(無効)
@@ -134,17 +129,12 @@ class LoginFragmentTest {
     @Test
     fun サインアップボタンタップ_新規登録画面に遷移すること() {
 
-        val scenario = launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
-        val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
-
         onView(withId(R.id.signup_button)).perform(click())
 
-        verify(navController).navigate(
-            LoginFragmentDirections.actionLoginFragmentToSignUpFragment()
-        )
+        verify {
+            navController.navigate(
+                LoginFragmentDirections.actionLoginFragmentToSignUpFragment()
+            )
+        }
     }
-
 }

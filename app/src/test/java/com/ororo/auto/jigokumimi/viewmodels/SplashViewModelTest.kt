@@ -6,6 +6,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import getOrAwaitValue
+import io.mockk.every
+import io.mockk.mockk
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.hamcrest.core.IsEqual
@@ -14,7 +16,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
 import retrofit2.HttpException
 import retrofit2.Response
 import java.util.*
@@ -26,7 +27,7 @@ class SplashViewModelTest {
 
     val faker = Faker(Locale("jp_JP"))
 
-    val mockAuthRepo = mock(IAuthRepository::class.java)
+    val mockAuthRepo = mockk<IAuthRepository>(relaxed = true)
 
     // LiveDataのテストに必要なルールを設定
     @get:Rule
@@ -47,7 +48,10 @@ class SplashViewModelTest {
         // emailとpasswordを空文字以外に設定
         val sampleEmail = faker.internet().safeEmailAddress()
         val samplePassword = faker.random().hex()
-        `when`(mockAuthRepo.getSavedLoginInfo()).thenReturn(Pair(sampleEmail, samplePassword))
+
+        every {
+            mockAuthRepo.getSavedLoginInfo()
+        } returns Pair(sampleEmail, samplePassword)
 
         // メソッド呼び出し
         viewModel.loginBySavedInput()
@@ -62,7 +66,9 @@ class SplashViewModelTest {
         // emailとpasswordを空文字以外に設定
         val sampleEmail = faker.internet().safeEmailAddress()
         val samplePassword = ""
-        `when`(mockAuthRepo.getSavedLoginInfo()).thenReturn(Pair(sampleEmail, samplePassword))
+        every {
+            mockAuthRepo.getSavedLoginInfo()
+        } returns Pair(sampleEmail, samplePassword)
 
         // メソッド呼び出し
         viewModel.loginBySavedInput()
@@ -76,7 +82,9 @@ class SplashViewModelTest {
         // emailとpasswordを空文字以外に設定
         val sampleEmail = ""
         val samplePassword = faker.random().hex()
-        `when`(mockAuthRepo.getSavedLoginInfo()).thenReturn(Pair(sampleEmail, samplePassword))
+        every {
+            mockAuthRepo.getSavedLoginInfo()
+        } returns Pair(sampleEmail, samplePassword)
 
         // メソッド呼び出し
         viewModel.loginBySavedInput()
@@ -92,7 +100,9 @@ class SplashViewModelTest {
         // emailとpasswordを空文字以外に設定
         val sampleEmail = ""
         val samplePassword = ""
-        `when`(mockAuthRepo.getSavedLoginInfo()).thenReturn(Pair(sampleEmail, samplePassword))
+        every {
+            mockAuthRepo.getSavedLoginInfo()
+        } returns Pair(sampleEmail, samplePassword)
 
         // メソッド呼び出し
         viewModel.loginBySavedInput()
@@ -113,9 +123,7 @@ class SplashViewModelTest {
                 )
             )
         )
-
-        // emailとpasswordを空文字以外に設定
-        doThrow(exception).`when`(mockAuthRepo).getSavedLoginInfo()
+        every { mockAuthRepo.getSavedLoginInfo() } throws exception
 
         // メソッド呼び出し
         viewModel.loginBySavedInput()

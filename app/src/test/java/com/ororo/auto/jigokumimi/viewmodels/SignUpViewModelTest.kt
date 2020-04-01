@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
-import TestCoroutineRule
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4

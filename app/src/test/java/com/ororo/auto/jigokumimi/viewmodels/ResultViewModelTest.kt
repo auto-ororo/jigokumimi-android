@@ -8,13 +8,15 @@ import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.faker.FakeMusicRepository
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
 import java.util.*
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
@@ -34,6 +36,8 @@ class ResultViewModelTest {
 
     val testDataUtil = CreateTestDataUtil()
 
+    lateinit var mockMp: MediaPlayer
+
     @Before
     fun createViewModel() {
         val tracks = mutableListOf<Track>()
@@ -46,20 +50,22 @@ class ResultViewModelTest {
             ApplicationProvider.getApplicationContext(),
             FakeMusicRepository(_tracks = tracks)
         )
+
+        mockMp = mockk(relaxed = true)
+        viewModel.mp = mockMp
     }
 
     @Test
     fun stopTrack_MediaPlayerが再生状態_Pauseが呼ばれ再生フラグがオフになること() {
 
-        // 再生状態のMediaPlayerモックを作成
-        val mockMp = mock(MediaPlayer::class.java)
-        `when`(mockMp.isPlaying).thenReturn(true)
-        viewModel.mp = mockMp
+        every {
+            mockMp.isPlaying
+        } returns true
 
         // メソッド呼び出し
         viewModel.stopTrack()
 
-        verify(mockMp, times(1)).pause()
+        verify { mockMp.pause() }
         assertThat(viewModel.isPlaying.value, IsEqual(false))
 
     }
@@ -67,15 +73,14 @@ class ResultViewModelTest {
     @Test
     fun stopTrack_MediaPlayerが停止状態_Pauseが呼ばれず再生フラグがオフになること() {
 
-        // 再生状態のMediaPlayerモックを作成
-        val mockMp = mock(MediaPlayer::class.java)
-        `when`(mockMp.isPlaying).thenReturn(false)
-        viewModel.mp = mockMp
+        every {
+            mockMp.isPlaying
+        } returns false
 
         // メソッド呼び出し
         viewModel.stopTrack()
 
-        verify(mockMp, times(0)).pause()
+        verify(inverse = true ) { mockMp.pause() }
         assertThat(viewModel.isPlaying.value, IsEqual(false))
 
     }
@@ -83,29 +88,28 @@ class ResultViewModelTest {
     @Test
     fun resumeTrack_MediaPlayerが停止状態_Startが呼ばれること() {
 
-        // 停止状態のMediaPlayerモックを作成
-        val mockMp = mock(MediaPlayer::class.java)
-        `when`(mockMp.isPlaying).thenReturn(false)
-        viewModel.mp = mockMp
+        every {
+            mockMp.isPlaying
+        } returns false
 
         // メソッド呼び出し
         viewModel.resumeTrack()
 
-        verify(mockMp, times(1)).start()
+        verify { mockMp.start() }
     }
 
     @Test
     fun resumeTrack_MediaPlayerが再生状態_Startが呼ばれないこと() {
 
         // 再生状態のMediaPlayerモックを作成
-        val mockMp = mock(MediaPlayer::class.java)
-        `when`(mockMp.isPlaying).thenReturn(true)
-        viewModel.mp = mockMp
+        every {
+            mockMp.isPlaying
+        } returns true
 
         // メソッド呼び出し
         viewModel.resumeTrack()
 
-        verify(mockMp, times(0)).start()
+        verify(inverse = true) { mockMp.start() }
     }
 
     @Test

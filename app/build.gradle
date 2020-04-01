@@ -137,13 +137,13 @@ dependencies {
     androidTestImplementation 'com.github.javafaker:javafaker:1.0.2'
 
     // Mockito
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
-    androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dexMakerVersion"
+//    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+//    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
+//    androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dexMakerVersion"
 
     // mockk
-    androidTestImplementation "io.mockk:mockk-android:1.9.3"
-    testImplementation "io.mockk:mockk-android:1.9.3"
+    androidTestImplementation "io.mockk:mockk-android:$mockkVersion"
+    testImplementation "io.mockk:mockk:$mockkVersion"
 
 
     // espresso

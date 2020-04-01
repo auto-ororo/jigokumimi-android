@@ -12,8 +12,10 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.network.SignUpRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -21,32 +23,32 @@ import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.*
 import retrofit2.HttpException
 import retrofit2.Response
-
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class SighUpFragmentTest {
 
     private lateinit var repository: IAuthRepository
+    private lateinit var navController: NavController
 
     @Before
-    fun initRepository() {
-        repository = mock(IAuthRepository::class.java)
+    fun init() {
+        // mock化したrepositoryをServiceLocatorへ登録し、テスト実行時に参照するように設定)
+        repository = mockk(relaxed = true)
         ServiceLocator.authRepository = repository
+
+        // 検索画面を起動し、NavControllerを設定
+        val scenario = launchFragmentInContainer<SignUpFragment>(null, R.style.AppTheme)
+        navController = mockk(relaxed = true)
+        scenario.onFragment {
+            Navigation.setViewNavController(it.view!!, navController)
+        }
     }
 
     @Test
     fun サインアップボタンタップ_新規登録成功_OKダイアログタップ後検索画面に遷移すること() {
-
-        // Navigation設定
-        val scenario = launchFragmentInContainer<SignUpFragment>(null, R.style.AppTheme)
-        val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
 
         // 登録フォーム入力
         inputSignUpForm(
@@ -56,23 +58,20 @@ class SighUpFragmentTest {
             samplePasswordConfirmation = "12345678"
         )
 
+        // サインアップボタンをタップ
         onView(withId(R.id.sign_up_button)).perform(click())
+
+        // 新規登録に成功したダイアログのOKをタップ
         onView(withId(R.id.ok_button)).perform(click())
 
-        verify(navController).navigate(
-            SignUpFragmentDirections.actionSignUpFragmentToSearchFragment()
-        )
+        // 検索画面に遷移することを確認
+        verify {
+            navController.navigate(SignUpFragmentDirections.actionSignUpFragmentToSearchFragment())
+        }
     }
 
     @Test
     fun サインアップボタンタップ_登録失敗_エラーメッセージが表示されること() {
-
-        // Navigation設定
-        val scenario = launchFragmentInContainer<SignUpFragment>(null, R.style.AppTheme)
-        val navController = mock(NavController::class.java)
-        scenario.onFragment {
-            Navigation.setViewNavController(it.view!!, navController)
-        }
 
         val sampleName = "hogehoge"
         val sampleMail = "test@test.com"
@@ -88,14 +87,11 @@ class SighUpFragmentTest {
                 )
             )
         )
-        runBlocking {
-            // emailとpasswordを空文字以外に設定
-            doThrow(exception).`when`(repository).signUpJigokumimi(
-                SignUpRequest(
-                    sampleName, sampleMail, samplePassword, samplePasswordConfirmation
-                )
-            )
-        }
+        every {
+            runBlocking {
+                repository.signUpJigokumimi(any())
+            }
+        } throws exception
 
         // 登録フォーム入力
         inputSignUpForm(
@@ -105,16 +101,15 @@ class SighUpFragmentTest {
             samplePasswordConfirmation
         )
 
+        // サインアップボタンタップ
         onView(withId(R.id.sign_up_button)).perform(click())
 
+        // エラーメッセージが表示されることを確認
         onView(withId(R.id.title_text)).check(matches(isDisplayed()));
     }
 
     @Test
     fun 名前が空文字_サインアップボタンが非活性となること() {
-
-        // 画面立ち上げ
-        launchFragmentInContainer<SignUpFragment>(null, R.style.AppTheme)
 
         // 登録フォーム入力
         inputSignUpForm(
@@ -124,14 +119,12 @@ class SighUpFragmentTest {
             samplePasswordConfirmation = "12345678"
         )
 
+        // サインアップボタンが非活性になることを確認
         onView(withId(R.id.sign_up_button)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun メールアドレスが不正_サインアップボタンが非活性となること() {
-
-        // 画面立ち上げ
-        launchFragmentInContainer<SignUpFragment>(null, R.style.AppTheme)
 
         // 登録フォーム入力
         inputSignUpForm(
@@ -141,14 +134,12 @@ class SighUpFragmentTest {
             samplePasswordConfirmation = "12345678"
         )
 
+        // サインアップボタンが非活性になることを確認
         onView(withId(R.id.sign_up_button)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun パスワードが8文字未満_サインアップボタンが非活性となること() {
-
-        // 画面立ち上げ
-        launchFragmentInContainer<SignUpFragment>(null, R.style.AppTheme)
 
         // 登録フォーム入力
         inputSignUpForm(
@@ -158,14 +149,12 @@ class SighUpFragmentTest {
             samplePasswordConfirmation = "1234567"
         )
 
+        // サインアップボタンが非活性になることを確認
         onView(withId(R.id.sign_up_button)).check(matches(not(isEnabled())))
     }
 
     @Test
     fun パスワードが確認用パスワードと異なる_サインアップボタンが非活性となること() {
-
-        // 画面立ち上げ
-        launchFragmentInContainer<SignUpFragment>(null, R.style.AppTheme)
 
         // 登録フォーム入力
         inputSignUpForm(
@@ -175,6 +164,7 @@ class SighUpFragmentTest {
             samplePasswordConfirmation = "87654321"
         )
 
+        // サインアップボタンが非活性になることを確認
         onView(withId(R.id.sign_up_button)).check(matches(not(isEnabled())))
     }
 

@@ -8,7 +8,6 @@ import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
-import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeAuthRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeLocationRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeMusicRepository
@@ -22,8 +21,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-import org.mockito.Mockito.mock
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
@@ -147,7 +144,7 @@ class SearchViewModelTest {
                 R.string.token_expired_error_message
             )
 
-        assertThat(viewModel.errorMessage.value, IsEqual(extectedMessage ))
+        assertThat(viewModel.errorMessage.value, IsEqual(extectedMessage))
         assertThat(viewModel.isErrorDialogShown.value, IsEqual(true))
         assertThat(viewModel.isSearchFinished.value, IsEqual(false))
     }
@@ -219,7 +216,4 @@ class SearchViewModelTest {
         assertThat(viewModel.distance.value, IsEqual(100))
     }
 
-    private fun <T> anyNonNull(clazz: Class<T>): T {
-        return Mockito.any(clazz)
-    }
 }

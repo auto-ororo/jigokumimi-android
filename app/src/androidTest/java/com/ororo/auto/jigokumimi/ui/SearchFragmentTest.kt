@@ -58,7 +58,7 @@ class SearchFragmentTest {
     private val testDataUtil = CreateAndroidTestDataUtil()
 
     @Before
-    fun initRepository() {
+    fun init() {
         // mock化したrepositoryをServiceLocatorへ登録し、テスト実行時に参照するように設定)
         authRepository = mockk(relaxed = true)
         musicRepository = mockk(relaxed = true)
