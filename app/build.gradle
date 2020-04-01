@@ -136,11 +136,6 @@ dependencies {
     testImplementation 'com.github.javafaker:javafaker:1.0.2'
     androidTestImplementation 'com.github.javafaker:javafaker:1.0.2'
 
-    // Mockito
-//    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-//    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
-//    androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dexMakerVersion"
-
     // mockk
     androidTestImplementation "io.mockk:mockk-android:$mockkVersion"
     testImplementation "io.mockk:mockk:$mockkVersion"

@@ -268,20 +268,29 @@ class CreateAndroidTestDataUtil {
         )
     }
 
-    fun createDummyTrack() : Track {
-       return Track(
-            album = faker.lorem().word(),
-            artists = faker.name().fullName(),
-            id = faker.random().hex(),
-            imageUrl = faker.internet().url(),
-            name = faker.name().fullName(),
-            popularity = faker.number().randomDigit(),
-            previewUrl = faker.internet().url(),
-            rank = faker.number().randomDigit()
+    fun createDummyTrack(
+        album: String = faker.lorem().word(),
+        artists: String = faker.name().fullName(),
+        id: String = faker.random().hex(),
+        imageUrl: String = faker.internet().url(),
+        name: String = faker.name().fullName(),
+        popularity: Int = faker.number().randomDigit(),
+        previewUrl: String = faker.internet().url(),
+        rank: Int = faker.number().randomDigit()
+    ): Track {
+        return Track(
+            album = album,
+            artists = artists,
+            id = id,
+            imageUrl = imageUrl,
+            name = name,
+            popularity = popularity,
+            previewUrl = previewUrl,
+            rank = rank
         )
     }
 
-    fun createDummyArtist() : Artist {
+    fun createDummyArtist(): Artist {
         return Artist(
             id = faker.random().hex(),
             imageUrl = faker.internet().url(),
