@@ -91,8 +91,8 @@ class ResultFragment : BaseFragment() {
             // キューボタンがタップされたときの処理を設定
             viewModelAdapterTrack = ResultTrackListAdapter(PlayClick { track: Track ->
 
-                viewModel.playingTrack.value = track
-                viewModel.isPlaying.value = true
+                viewModel.setPlayingTrack(track)
+                viewModel.playTrack()
             })
 
             binding.recyclerView.adapter = viewModelAdapterTrack
@@ -150,7 +150,6 @@ class ResultTrackListAdapter(val callback: PlayClick) :
     override fun onBindViewHolder(holderTrack: ResultTrackListViewHolder, position: Int) {
         holderTrack.viewDataBinding.also {
             it.track = tracks[position]
-
             it.playCallback = callback
         }
     }

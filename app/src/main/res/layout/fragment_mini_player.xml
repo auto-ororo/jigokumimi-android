@@ -57,7 +57,7 @@
             tools:text="Artist - Album" />
 
         <ImageButton
-            android:id="@+id/queueButton"
+            android:id="@+id/playStopButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/colorTransparent"
@@ -72,10 +72,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/colorTransparent"
-            app:layout_constraintBottom_toBottomOf="@+id/queueButton"
+            app:layout_constraintBottom_toBottomOf="@+id/playStopButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/queueButton"
+            app:layout_constraintStart_toEndOf="@+id/playStopButton"
             app:srcCompat="@drawable/ic_skip_next" />
 
         <ImageButton
@@ -83,8 +83,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@color/colorTransparent"
-            app:layout_constraintBottom_toBottomOf="@+id/queueButton"
-            app:layout_constraintEnd_toStartOf="@+id/queueButton"
+            app:layout_constraintBottom_toBottomOf="@+id/playStopButton"
+            app:layout_constraintEnd_toStartOf="@+id/playStopButton"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/ic_skip_previous" />
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            app:layout_constraintBottom_toTopOf="@+id/queueButton"
+            app:layout_constraintBottom_toTopOf="@+id/playStopButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/artistAlbumText" />

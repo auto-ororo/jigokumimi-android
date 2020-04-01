@@ -1,9 +1,11 @@
 package com.ororo.auto.jigokumimi.repository
 
+import android.app.Application
 import android.content.SharedPreferences
 import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.database.*
 import com.ororo.auto.jigokumimi.database.ArtistAround
 import com.ororo.auto.jigokumimi.database.TrackAround
@@ -19,12 +21,17 @@ import timber.log.Timber
  * 周辺の曲を検索し、ローカルDBに保存するRepository
  */
 
-class MusicRepository(private val database: MusicDatabase, private val prefData: SharedPreferences) {
+class MusicRepository(
+    private val musicDao: MusicDao,
+    private val prefData: SharedPreferences,
+    private val spotifyApiService: SpotifyApiService,
+    private val jigokumimiApiService: JigokumimiApiService
+) : IMusicRepository {
 
     /**
      * 周辺曲情報
      */
-    val tracks: LiveData<List<Track>> = Transformations.map(database.musicDao.getTracks()) {
+    override val tracks: LiveData<List<Track>> = Transformations.map(musicDao.getTracks()) {
         Timber.d("data changed: $it")
         it.asTrackModel()
     }
@@ -32,39 +39,40 @@ class MusicRepository(private val database: MusicDatabase, private val prefData:
     /**
      * 周辺アーティスト情報
      */
-    val artists: LiveData<List<Artist>> = Transformations.map(database.musicDao.getArtists()) {
+    override val artists: LiveData<List<Artist>> = Transformations.map(musicDao.getArtists()) {
         Timber.d("data changed: $it")
         it.asArtistModel()
     }
 
-    var limit: Int = 20
-
-    var offset: Int = 0
-    var total: Int = Int.MAX_VALUE
+    val limit: Int = 20
+    val offset: Int = 0
+    val total: Int = Int.MAX_VALUE
 
     /**
      * 周辺曲情報を更新する
      */
-    suspend fun refreshTracks(spotifyUserId: String, location: Location, distance: Int) =
+    override suspend fun refreshTracks(spotifyUserId: String, location: Location, distance: Int) =
         withContext(Dispatchers.IO) {
             Timber.d("refresh tracks is called")
 
-            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY,"")!!
+            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
             Timber.d("トークン: $jigokumimiToken")
 
-
             // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-            val tracksAround = JigokumimiApi.retrofitService.getTracksAround(
+            val tracksAround = jigokumimiApiService.getTracksAround(
                 authorization = jigokumimiToken,
-                userId =  spotifyUserId,
-                latitude =  location.latitude,
-                longitude =  location.longitude,
-                distance =  distance
+                userId = spotifyUserId,
+                latitude = location.latitude,
+                longitude = location.longitude,
+                distance = distance
             )
 
             val databaseTracks = tracksAround.data?.map { trackAround ->
-                val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY,"")!!
-                val trackDetail = SpotifyApi.retrofitService.getTrackDetail(spotifyToken, trackAround.spotifyTrackId)
+                val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
+                val trackDetail = spotifyApiService.getTrackDetail(
+                    spotifyToken,
+                    trackAround.spotifyTrackId
+                )
                 return@map TrackAround(
 
                     id = trackDetail.id,
@@ -81,20 +89,22 @@ class MusicRepository(private val database: MusicDatabase, private val prefData:
             }
 
             databaseTracks?.let {
-                database.musicDao.insertTrack(it)
+                musicDao.insertTrack(it)
             }
+
+            return@withContext
         }
 
     /**
      * ユーザーのお気に入り曲を取得する
      */
-    suspend fun getMyFavoriteTracks(): GetMyFavoriteTracksResponse =
+    override suspend fun getMyFavoriteTracks(): GetMyFavoriteTracksResponse =
         withContext(Dispatchers.IO) {
             Timber.d("get my favorite tracks is called")
 
-            val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY,"")!!
+            val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
-            return@withContext SpotifyApi.retrofitService.getTracks(
+            return@withContext spotifyApiService.getTracks(
                 spotifyToken,
                 limit,
                 offset
@@ -104,13 +114,13 @@ class MusicRepository(private val database: MusicDatabase, private val prefData:
     /**
      * ユーザーのお気に入り曲を位置情報と一緒に登録する
      */
-    suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): PostResponse =
+    override suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): PostResponse =
         withContext(Dispatchers.IO) {
             Timber.d("post my favorite tracks is called")
 
-            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY,"")!!
+            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
 
-            return@withContext JigokumimiApi.retrofitService.postTracks(
+            return@withContext jigokumimiApiService.postTracks(
                 jigokumimiToken,
                 tracks
             )
@@ -119,26 +129,29 @@ class MusicRepository(private val database: MusicDatabase, private val prefData:
     /**
      * 周辺アーティスト情報を更新する
      */
-    suspend fun refreshArtists(spotifyUserId: String, location: Location, distance: Int) =
+    override suspend fun refreshArtists(spotifyUserId: String, location: Location, distance: Int) =
         withContext(Dispatchers.IO) {
             Timber.d("refresh tracks is called")
 
-            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY,"")!!
+            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
             Timber.d("トークン: $jigokumimiToken")
 
 
             // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-            val artistsAround = JigokumimiApi.retrofitService.getArtistsAround(
+            val artistsAround = jigokumimiApiService.getArtistsAround(
                 authorization = jigokumimiToken,
-                userId =  spotifyUserId,
-                latitude =  location.latitude,
-                longitude =  location.longitude,
-                distance =  distance
+                userId = spotifyUserId,
+                latitude = location.latitude,
+                longitude = location.longitude,
+                distance = distance
             )
 
             val databaseArtists = artistsAround.data?.map { artistAround ->
-                val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY,"")!!
-                val artistDetail = SpotifyApi.retrofitService.getArtistDetail(spotifyToken, artistAround.spotifyArtistId)
+                val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
+                val artistDetail = spotifyApiService.getArtistDetail(
+                    spotifyToken,
+                    artistAround.spotifyArtistId
+                )
                 return@map ArtistAround(
                     id = artistDetail.id,
                     name = artistDetail.name,
@@ -150,20 +163,20 @@ class MusicRepository(private val database: MusicDatabase, private val prefData:
             }
 
             databaseArtists?.let {
-                database.musicDao.insertArtist(it)
+                musicDao.insertArtist(it)
             }
         }
 
     /**
      * ユーザーのお気に入りアーティストを取得する
      */
-    suspend fun getMyFavoriteArtists(): GetMyFavoriteArtistsResponse =
+    override suspend fun getMyFavoriteArtists(): GetMyFavoriteArtistsResponse =
         withContext(Dispatchers.IO) {
             Timber.d("get my favorite tracks is called")
 
-            val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY,"")!!
+            val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
-            return@withContext SpotifyApi.retrofitService.getArtists(
+            return@withContext spotifyApiService.getArtists(
                 spotifyToken,
                 limit,
                 offset
@@ -173,15 +186,37 @@ class MusicRepository(private val database: MusicDatabase, private val prefData:
     /**
      * ユーザーのお気に入りアーティストを更新する
      */
-    suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): PostResponse =
+    override suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): PostResponse =
         withContext(Dispatchers.IO) {
             Timber.d("post my favorite tracks is called")
 
-            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY,"")!!
+            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
 
-            return@withContext JigokumimiApi.retrofitService.postArtists(
+            return@withContext jigokumimiApiService.postArtists(
                 jigokumimiToken,
                 artists
             )
         }
+
+    /**
+     * Factoryクラス
+     */
+//    companion object {
+//        @Volatile
+//        private var INSTANCE: MusicRepository? = null
+//
+//        fun getRepository(app: Application): MusicRepository {
+//            return INSTANCE ?: synchronized(this) {
+//
+//                MusicRepository(
+//                    getDatabase(app.applicationContext).musicDao,
+//                    PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
+//                    SpotifyApi.retrofitService,
+//                    JigokumimiApi.retrofitService
+//                ).also {
+//                    INSTANCE = it
+//                }
+//            }
+//        }
+//    }
 }

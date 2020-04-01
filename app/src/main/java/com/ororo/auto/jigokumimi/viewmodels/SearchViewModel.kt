@@ -2,15 +2,12 @@ package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
 import android.location.Location
-import android.widget.AdapterView
 import androidx.lifecycle.*
-import androidx.preference.PreferenceManager
+import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
-import com.ororo.auto.jigokumimi.repository.LocationRepository
-import com.ororo.auto.jigokumimi.repository.MusicRepository
+import com.ororo.auto.jigokumimi.repository.*
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -18,20 +15,12 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 
-class SearchViewModel(application: Application) : BaseAndroidViewModel(application) {
-
-    /*
-     * 曲情報を取得､管理するRepository
-     */
-    private val tracksRepository = MusicRepository(
-        getDatabase(application),
-        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
-    )
-
-    /*
-     * 位置情報を取得､管理するRepository
-     */
-    private val locationRepository = LocationRepository(application)
+class SearchViewModel(
+    application: Application,
+    private val authRepository: IAuthRepository,
+    private val musicRepository: IMusicRepository,
+    private val locationRepository: ILocationRepository
+) : BaseAndroidViewModel(application) {
 
     /**
      *  検索完了フラグ(Private)
@@ -55,14 +44,23 @@ class SearchViewModel(application: Application) : BaseAndroidViewModel(applicati
     val searchType: LiveData<Constants.SearchType>
         get() = _searchType
 
-
+    /**
+     *  検索距離(Private)
+     */
     private val _distance = MutableLiveData(0)
+
+    /**
+     *  検索距離
+     */
+    val distance: LiveData<Int>
+        get() = _distance
 
     /**
      * 周辺曲情報を更新する
      */
     fun searchMusic() {
-        viewModelScope.launch() {
+        viewModelScope.launch {
+            Timber.d("Search Music called")
             try {
                 // 位置情報を取得する
                 val flow = locationRepository.getCurrentLocation()
@@ -76,27 +74,27 @@ class SearchViewModel(application: Application) : BaseAndroidViewModel(applicati
                         // 検索種別が曲の場合
 
                         // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-                        val postTracks = tracksRepository.getMyFavoriteTracks()
+                        val postTracks = musicRepository.getMyFavoriteTracks()
                             .asPostMyFavoriteTracksRequest(spotifyUserId, location)
 
                         // Jigokumimiにお気に入り曲リストを登録
-                        tracksRepository.postMyFavoriteTracks(postTracks)
+                        musicRepository.postMyFavoriteTracks(postTracks)
 
                         // 周りのJigokumimiユーザーのお気に入り曲を取得
-                        tracksRepository.refreshTracks(spotifyUserId, location, _distance.value!!)
+                        musicRepository.refreshTracks(spotifyUserId, location, _distance.value!!)
 
                     } else {
                         // 検索種別がアーティストの場合
 
                         // ユーザーのお気に入りアーティスト一覧を取得し､リクエストを作成
-                        val postArtists = tracksRepository.getMyFavoriteArtists()
+                        val postArtists = musicRepository.getMyFavoriteArtists()
                             .asPostMyFavoriteArtistsRequest(spotifyUserId, location)
 
                         // Jigokumimiにお気に入り曲リストを登録
-                        tracksRepository.postMyFavoriteArtists(postArtists)
+                        musicRepository.postMyFavoriteArtists(postArtists)
 
                         // 周りのJigokumimiユーザーのお気に入り曲を取得
-                        tracksRepository.refreshArtists(spotifyUserId, location, _distance.value!!)
+                        musicRepository.refreshArtists(spotifyUserId, location, _distance.value!!)
                     }
 
 
@@ -168,7 +166,12 @@ class SearchViewModel(application: Application) : BaseAndroidViewModel(applicati
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SearchViewModel(app) as T
+                return SearchViewModel(
+                    app,
+                    (app.applicationContext as JigokumimiApplication).authRepository,
+                    (app.applicationContext as JigokumimiApplication).musicRepository,
+                    (app.applicationContext as JigokumimiApplication).locationRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

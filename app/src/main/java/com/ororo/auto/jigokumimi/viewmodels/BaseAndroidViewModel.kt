@@ -21,14 +21,9 @@ import retrofit2.HttpException
  * エラーメッセージ機構を共通化
  *
  */
-open class BaseAndroidViewModel(application: Application) : AndroidViewModel(application) {
-
-    /**
-     * 認証系リポジトリ
-     */
-    val authRepository = AuthRepository(
-        PreferenceManager.getDefaultSharedPreferences(application.applicationContext)
-    )
+open class BaseAndroidViewModel(
+    application: Application
+) : AndroidViewModel(application) {
 
     /**
      * エラーメッセージダイアログの表示状態
@@ -93,11 +88,11 @@ open class BaseAndroidViewModel(application: Application) : AndroidViewModel(app
      */
     fun getAuthenticationRequest(type: AuthorizationResponse.Type): AuthorizationRequest {
         return AuthorizationRequest.Builder(
-                Constants.CLIENT_ID,
-                type,
-                Uri.Builder().scheme(SPOTIFY_SDK_REDIRECT_SCHEME)
-                    .authority(SPOTIFY_SDK_REDIRECT_HOST).build().toString()
-            )
+            Constants.CLIENT_ID,
+            type,
+            Uri.Builder().scheme(SPOTIFY_SDK_REDIRECT_SCHEME)
+                .authority(SPOTIFY_SDK_REDIRECT_HOST).build().toString()
+        )
             .setShowDialog(false)
             .setScopes(
                 arrayOf(

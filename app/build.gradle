@@ -9,11 +9,11 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.ororo.auto.jigokumimi"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -40,6 +40,12 @@ android {
         enabled = true
     }
     buildToolsVersion = '28.0.3'
+
+    testOptions.unitTests {
+        includeAndroidResources = true
+    }
+
+
 }
 
 dependencies {
@@ -85,7 +91,9 @@ dependencies {
 
     // moshi for parsing the JSON format
     implementation "com.squareup.moshi:moshi:$moshiVersion"
-    implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
+    implementation("com.squareup.moshi:moshi-kotlin:$moshiVersion") {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
+    }
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
 
     // glide for images
@@ -102,6 +110,42 @@ dependencies {
 
     // Shared Preferences
     implementation 'androidx.preference:preference:1.1.0'
+
+
+    testImplementation "org.hamcrest:hamcrest-all:$hamcrestVersion"
+
+    // AndroidX Test - JVM testing
+    testImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion"
+    testImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
+    testImplementation "androidx.arch.core:core-testing:$archTestingVersion"
+
+    androidTestImplementation "androidx.test:runner:$androidXTestCoreVersion"
+    androidTestImplementation "androidx.test:rules:$androidXTestCoreVersion"
+    androidTestImplementation "androidx.test:monitor:$androidXTestCoreVersion"
+    androidTestImplementation 'androidx.test:rules:1.3.0-alpha05'
+
+    debugImplementation('androidx.fragment:fragment-testing:1.2.0') {
+        exclude group: 'androidx.test', module: 'core'
+    }
+
+    // Coroutines testting
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineVersion"
+
+    // Faker
+    testImplementation 'com.github.javafaker:javafaker:1.0.2'
+    androidTestImplementation 'com.github.javafaker:javafaker:1.0.2'
+
+    // mockk
+    androidTestImplementation "io.mockk:mockk-android:$mockkVersion"
+    testImplementation "io.mockk:mockk:$mockkVersion"
+
+
+    // espresso
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
+
+
 }
 
 // AndroidStudio上のFlowの警告を抑止

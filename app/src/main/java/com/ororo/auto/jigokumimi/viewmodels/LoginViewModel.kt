@@ -3,8 +3,10 @@ package com.ororo.auto.jigokumimi.viewmodels
 import android.app.Application
 import android.util.Patterns
 import androidx.lifecycle.*
+import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
-import kotlinx.coroutines.Dispatchers
+import com.ororo.auto.jigokumimi.repository.AuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -13,7 +15,8 @@ import java.util.regex.Pattern
 /**
  * ログイン画面のViewModel
  */
-class LoginViewModel(application: Application) : BaseAndroidViewModel(application) {
+class LoginViewModel(application: Application, val authRepository: IAuthRepository) :
+    BaseAndroidViewModel(application) {
 
     /**
      *  ログイン状態(Private)
@@ -79,7 +82,7 @@ class LoginViewModel(application: Application) : BaseAndroidViewModel(applicatio
      * ログイン実行
      */
     fun login() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 authRepository.loginJigokumimi(email.value!!, password.value!!)
                 _isLogin.postValue(true)
@@ -126,7 +129,9 @@ class LoginViewModel(application: Application) : BaseAndroidViewModel(applicatio
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return LoginViewModel(app) as T
+                return LoginViewModel(
+                    app,(app.applicationContext as JigokumimiApplication).authRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

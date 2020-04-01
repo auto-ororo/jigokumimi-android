@@ -5,10 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.ororo.auto.jigokumimi.JigokumimiApplication
+import com.ororo.auto.jigokumimi.repository.AuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SplashViewModel(application: Application) : BaseAndroidViewModel(application) {
+class SplashViewModel(application: Application, private val authRepository: IAuthRepository) :
+    BaseAndroidViewModel(application) {
 
     /**
      *  初期化状態(Private)
@@ -36,20 +40,20 @@ class SplashViewModel(application: Application) : BaseAndroidViewModel(applicati
      * 端末に保存されたログイン情報を元にログインを試みる
      */
     fun loginBySavedInput() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val (email, password) = authRepository.getSavedLoginInfo()
                 if (email != "" && password != "") {
                     authRepository.loginJigokumimi(email, password)
-                    _isLogin.postValue(true)
+                    _isLogin.value = true
                 } else {
-                    _isLogin.postValue(false)
+                    _isLogin.value = false
 
                 }
             } catch (e: Exception) {
-                _isLogin.postValue(false)
+                _isLogin.value = false
             } finally {
-                _isReady.postValue(true)
+                _isReady.value = true
             }
 
         }
@@ -62,7 +66,10 @@ class SplashViewModel(application: Application) : BaseAndroidViewModel(applicati
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SplashViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SplashViewModel(app) as T
+                return SplashViewModel(
+                    app,
+                    (app.applicationContext as JigokumimiApplication).authRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }

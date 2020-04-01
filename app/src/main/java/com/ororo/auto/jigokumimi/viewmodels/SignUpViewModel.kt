@@ -4,9 +4,11 @@ import android.app.Application
 import android.util.Patterns
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
+import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.SignUpRequest
 import com.ororo.auto.jigokumimi.repository.AuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -16,7 +18,8 @@ import java.util.regex.Pattern
 /**
  * 新規登録画面のViewModel
  */
-class SignUpViewModel(application: Application) : BaseAndroidViewModel(application) {
+class SignUpViewModel(application: Application, private val authRepository: IAuthRepository) :
+    BaseAndroidViewModel(application) {
 
     /**
      *  登録状態(Private)
@@ -26,7 +29,7 @@ class SignUpViewModel(application: Application) : BaseAndroidViewModel(applicati
     /**
      *  登録状態
      */
-    val isSignUp: MutableLiveData<Boolean>
+    val isSignUp: LiveData<Boolean>
         get() = _isSignUp
 
     /**
@@ -37,7 +40,7 @@ class SignUpViewModel(application: Application) : BaseAndroidViewModel(applicati
     /**
      *  ログイン状態
      */
-    val isLogin: MutableLiveData<Boolean>
+    val isLogin: LiveData<Boolean>
         get() = _isLogin
 
     /**
@@ -118,7 +121,7 @@ class SignUpViewModel(application: Application) : BaseAndroidViewModel(applicati
      * 新規登録実行
      */
     fun signUp() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 authRepository.signUpJigokumimi(
                     SignUpRequest(
@@ -128,7 +131,7 @@ class SignUpViewModel(application: Application) : BaseAndroidViewModel(applicati
                         passwordConfirmation = passwordConfirmation.value!!
                     )
                 )
-                _isSignUp.postValue(true)
+                _isSignUp.value = true
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {
@@ -153,10 +156,10 @@ class SignUpViewModel(application: Application) : BaseAndroidViewModel(applicati
      * ログイン実行
      */
     fun login() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 authRepository.loginJigokumimi(email.value!!, password.value!!)
-                _isLogin.postValue(true)
+                _isLogin.value = true
             } catch (e: Exception) {
                 val msg = when (e) {
                     is HttpException -> {
@@ -209,7 +212,9 @@ class SignUpViewModel(application: Application) : BaseAndroidViewModel(applicati
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return SignUpViewModel(app) as T
+                return SignUpViewModel(app,
+                    (app.applicationContext as JigokumimiApplication).authRepository
+                ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
