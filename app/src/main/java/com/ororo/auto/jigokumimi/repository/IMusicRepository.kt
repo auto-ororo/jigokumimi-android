@@ -46,4 +46,15 @@ interface IMusicRepository {
      * ユーザーのお気に入りアーティストを更新する
      */
     suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): PostResponse
+
+    /**
+     * Spotify上でお気に入り曲を登録/解除する
+     */
+    suspend fun changeTrackFavoriteState(trackId: String, state: Boolean)
+
+    /**
+     * Spotify上のアーティストをフォロー/フォロー解除する
+     */
+    suspend fun changeArtistFollowState(userId: String, state: Boolean)
+
 }

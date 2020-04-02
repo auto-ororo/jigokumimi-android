@@ -6,13 +6,23 @@
 
     <data>
 
+        <import type="com.ororo.auto.jigokumimi.R" />
+
         <variable
             name="track"
             type="com.ororo.auto.jigokumimi.domain.Track" />
 
         <variable
             name="playCallback"
-            type="com.ororo.auto.jigokumimi.ui.PlayClick" />
+            type="com.ororo.auto.jigokumimi.ui.PlayTrackClick" />
+
+        <variable
+            name="saveOrRemoveCallback"
+            type="com.ororo.auto.jigokumimi.ui.SaveOrRemoveTrackClick" />
+
+        <variable
+            name="position"
+            type="Integer" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -139,13 +149,28 @@
                 android:id="@+id/queueButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 android:background="@color/colorTransparent"
-                android:onClick="@{() -> playCallback.onClick(track)}"
+                android:onClick="@{() -> playCallback.onClick(position)}"
                 android:scaleType="center"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/clickableOverlay"
                 app:layout_constraintEnd_toEndOf="@+id/rightWell"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/saveTrackButton"
                 app:srcCompat="@drawable/ic_queue_music" />
+
+            <ImageButton
+                android:id="@+id/saveTrackButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorTransparent"
+                android:onClick="@{() -> saveOrRemoveCallback.onClick(track)}"
+                android:scaleType="center"
+                app:dynamicSrcCompat="@{track.isSaved ? R.drawable.ic_favorite : R.drawable.ic_favorite_border }"
+                app:layout_constraintBottom_toTopOf="@+id/queueButton"
+                app:layout_constraintEnd_toStartOf="@+id/rightWell"
+                app:layout_constraintTop_toBottomOf="@+id/clickableOverlay"
+                tools:srcCompat="@drawable/ic_favorite_border" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>

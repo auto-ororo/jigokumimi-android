@@ -11,6 +11,23 @@ import com.squareup.moshi.JsonClass
 
 /*** Spotify ***/
 
+
+/**
+ * Post for [me/tracks/] Request
+ */
+@JsonClass(generateAdapter = true)
+data class SaveTracksRequest(
+    val ids: List<String>
+)
+
+/**
+ * Post for [/me/following] Request
+ */
+@JsonClass(generateAdapter = true)
+data class FollowArtistsOrUsersRequest(
+    val ids: List<String>
+)
+
 /**
  * Get for [/tracks/{id}] response
  */

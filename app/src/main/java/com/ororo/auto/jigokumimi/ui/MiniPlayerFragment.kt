@@ -5,7 +5,6 @@ import android.os.Handler
 import android.os.Message
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.View.GONE
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -54,9 +53,10 @@ class MiniPlayerFragment : Fragment() {
 
         binding.viewModel = viewModel
 
+        // 再生/停止時の動作
         viewModel.isPlaying.observe(
             viewLifecycleOwner,
-            Observer<Boolean> { isPlaying ->
+            Observer { isPlaying ->
                 if (isPlaying) {
                     viewModel.showMiniPlayer()
                     seekBar.max = viewModel.mp?.duration!!
@@ -67,14 +67,16 @@ class MiniPlayerFragment : Fragment() {
                 }
             })
 
+        // 音楽プレーヤーの表示/非表示
         viewModel.isMiniPlayerShown.observe(
             viewLifecycleOwner,
-            Observer<Boolean> { isMiniPlayerShown ->
-                // 下から出現するアニメーションを付ける
+            Observer { isMiniPlayerShown ->
+                // 下からプレイヤーが出現するようにアニメーションを設定
                 TransitionManager.beginDelayedTransition(
                     binding.miniPlayerLayout,
                     Slide(Gravity.BOTTOM)
                 )
+
                 if (isMiniPlayerShown) {
                     binding.miniPlayerLayout.visibility = View.VISIBLE
                 } else {
@@ -83,6 +85,14 @@ class MiniPlayerFragment : Fragment() {
             }
         )
 
+        // お気にり曲追加ボタン
+        binding.saveTrackButton.setOnClickListener {
+            viewModel.tracklist.value!![viewModel.playingTrackIndex.value!!].let {
+                viewModel.changeTrackFavoriteState(it)
+            }
+        }
+
+        // 再生・停止ボタン
         binding.playStopButton.setOnClickListener {
             if (viewModel.isPlaying.value!!) {
                 viewModel.stopTrack()
@@ -91,14 +101,17 @@ class MiniPlayerFragment : Fragment() {
             }
         }
 
+        // スキップ(次へ)
         binding.nextButton.setOnClickListener {
             viewModel.skipNextTrack()
         }
 
+        // スキップ(戻る)
         binding.previousButton.setOnClickListener {
             viewModel.skipPreviousTrack()
         }
 
+        // シークバー
         binding.seekBar.setOnSeekBarChangeListener(
             object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -116,7 +129,7 @@ class MiniPlayerFragment : Fragment() {
             }
         )
 
-        // Thread (seekBarを更新する)
+        // シークバーの位置と再生時間を同期させるThread
         Thread(Runnable {
             while (true) {
                 try {
@@ -140,7 +153,6 @@ class MiniPlayerFragment : Fragment() {
 
     /**
      * 上から下にスワイプした際にプレーヤーを隠すジェスチャクラス
-     * OnCreateViewで作らないと動作しない可能性
      */
     private val gesture = GestureDetector(
         activity,
@@ -168,8 +180,8 @@ class MiniPlayerFragment : Fragment() {
         })
 
     /**
-     * 再生状態を監視すイベントハンドラ
-     * シークバー､再生時間の表示を更新する
+     * 再生状態を監視するイベントハンドラ
+     * シークバー､再生時間の表示を同期
      */
     private val handler =
         Handler(Handler.Callback { msg ->

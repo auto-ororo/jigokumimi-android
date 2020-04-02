@@ -16,7 +16,7 @@ import com.ororo.auto.jigokumimi.domain.Track
  *
  */
 @Entity
-data class TrackAround(
+data class DisplayedTrack(
     @PrimaryKey
     val id: String,
     val rank: Int,
@@ -25,13 +25,14 @@ data class TrackAround(
     val artists: String,
     val imageUrl: String,
     val previewUrl: String,
-    val popularity: Int
+    val popularity: Int,
+    val isSaved: Boolean
 )
 
 /**
  * Map TrackAround  to domain entities
  */
-fun List<TrackAround>.asTrackModel(): List<Track> {
+fun List<DisplayedTrack>.asTrackModel(): List<Track> {
     return map {
         Track(
             id = it.id,
@@ -41,7 +42,8 @@ fun List<TrackAround>.asTrackModel(): List<Track> {
             imageUrl = it.imageUrl,
             previewUrl = it.previewUrl,
             rank = it.rank,
-            popularity = it.popularity
+            popularity = it.popularity,
+            isSaved = it.isSaved
         )
     }
 }
@@ -51,20 +53,21 @@ fun List<TrackAround>.asTrackModel(): List<Track> {
  *
  */
 @Entity
-data class ArtistAround(
+data class DisplayedArtist(
     @PrimaryKey
     val id: String,
     val rank: Int,
     val name: String,
     val imageUrl: String,
     val genres: String?,
-    val popularity: Int
+    val popularity: Int,
+    val isFollowed:Boolean
 )
 
 /**
  * Map ArtistAround  to domain entities
  */
-fun List<ArtistAround>.asArtistModel(): List<Artist> {
+fun List<DisplayedArtist>.asArtistModel(): List<Artist> {
     return map {
         Artist(
             id = it.id,
@@ -72,7 +75,8 @@ fun List<ArtistAround>.asArtistModel(): List<Artist> {
             genres = it.genres,
             imageUrl = it.imageUrl,
             rank = it.rank,
-            popularity = it.popularity
+            popularity = it.popularity,
+            isFollowed = it.isFollowed
         )
     }
 }
