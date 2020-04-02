@@ -42,6 +42,17 @@ open class BaseAndroidViewModel(
         get() = _errorMessage
 
     /**
+     * Snackbarのメッセージ内容(Private)
+     */
+    protected var _snackbarMessage = MutableLiveData<String>()
+
+    /**
+     * SnackBarのメッセージ内容
+     */
+    val snackbarMessage: MutableLiveData<String>
+        get() = _snackbarMessage
+
+    /**
      *  トークン認証切れ状態(Private)
      */
     protected var _isTokenExpired = MutableLiveData(false)
@@ -56,17 +67,33 @@ open class BaseAndroidViewModel(
      * ログイン画面遷移後の処理
      * トークン認証フラグをリセットする
      */
-    fun moveLoginDone() {
+    fun onMovedLogin() {
         _isTokenExpired.postValue(false)
     }
 
     /**
      * 例外を元にエラーメッセージを表示する
      */
-    protected fun showMessageDialog(message: String) {
+    fun showMessageDialog(message: String) {
         _errorMessage.postValue(message)
         isErrorDialogShown.postValue(true)
     }
+
+    /**
+     * Snackbarメッセージを表示する
+     */
+    fun showSnackbar(message: String) {
+        _snackbarMessage.postValue(message)
+    }
+
+
+    /**
+     * Snackbarメッセージを表示する
+     */
+    fun showedSnackbar() {
+        _snackbarMessage.postValue("")
+    }
+
 
     /**
      * HTTPExceptionを元にエラーメッセージを取得する

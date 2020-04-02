@@ -86,22 +86,37 @@ class ResultFragment : BaseFragment() {
 
         binding.viewModel = viewModel
 
-        // 検索種別に応じてアダプター(リストに表示するレイアウト)を分岐
+        // 検索種別に応じてアダプター(リストに表示する項目)を切り替え
         if (args.searchType == Constants.SearchType.TRACK) {
-            // キューボタンがタップされたときの処理を設定
-            viewModelAdapterTrack = ResultTrackListAdapter(PlayClick { track: Track ->
 
-                viewModel.setPlayingTrack(track)
-                viewModel.playTrack()
-            })
+            // キューアイコンがタップされたときのコールバックを設定
+            val playCallback = PlayTrackClick { index: Int ->
+                onQueueButtonClicked(index)
+            }
 
+            // Track追加ボタンがタップされたときのコールバックを設定
+            val saveOrRemoveCallback = SaveOrRemoveTrackClick { track: Track ->
+                onSaveOrRemoveButtonClicked(track)
+            }
+
+            // コールバックをコンストラクタに渡してアダプタを登録
+            viewModelAdapterTrack = ResultTrackListAdapter(
+                playCallback,
+                saveOrRemoveCallback
+            )
             binding.recyclerView.adapter = viewModelAdapterTrack
 
         } else {
-            viewModelAdapterArtist = ResultArtistListAdapter()
+
+            // Artistフォローボタンがタップされたときのコールバックを設定
+            val followOrUnFollowCallback = FollowOrUnFollowArtistClick { artist: Artist ->
+                onFollowOrUnFollowButtonClicked(artist)
+            }
+
+            // コールバックをコンストラクタに渡してアダプタを登録
+            viewModelAdapterArtist = ResultArtistListAdapter(followOrUnFollowCallback)
             binding.recyclerView.adapter = viewModelAdapterArtist
         }
-
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -110,12 +125,27 @@ class ResultFragment : BaseFragment() {
         return binding.root
     }
 
+    private fun onQueueButtonClicked(trackIndex: Int) {
+        viewModel.setPlayingTrack(trackIndex)
+        viewModel.playTrack()
+    }
+
+    private fun onSaveOrRemoveButtonClicked(track: Track) {
+        viewModel.changeTrackFavoriteState(track)
+    }
+
+    private fun onFollowOrUnFollowButtonClicked(artist: Artist) {
+        viewModel.changeArtistFollowState(artist)
+    }
 }
 
 /**
  * Trackを設定､表示するアダプタ
  */
-class ResultTrackListAdapter(val callback: PlayClick) :
+class ResultTrackListAdapter(
+    val playTrackCallback: PlayTrackClick,
+    val saveOrRemoveTrackCallback: SaveOrRemoveTrackClick
+) :
     RecyclerView.Adapter<ResultTrackListViewHolder>() {
 
     /**
@@ -150,7 +180,9 @@ class ResultTrackListAdapter(val callback: PlayClick) :
     override fun onBindViewHolder(holderTrack: ResultTrackListViewHolder, position: Int) {
         holderTrack.viewDataBinding.also {
             it.track = tracks[position]
-            it.playCallback = callback
+            it.playCallback = playTrackCallback
+            it.saveOrRemoveCallback = saveOrRemoveTrackCallback
+            it.position = position
         }
     }
 }
@@ -169,7 +201,7 @@ class ResultTrackListViewHolder(val viewDataBinding: ResultTrackItemBinding) :
 /**
  * Artistを設定､表示するアダプタ
  */
-class ResultArtistListAdapter() :
+class ResultArtistListAdapter(val followOrUnFollowArtistCallback: FollowOrUnFollowArtistClick) :
     RecyclerView.Adapter<ResultArtistListViewHolder>() {
 
     /**
@@ -204,6 +236,7 @@ class ResultArtistListAdapter() :
     override fun onBindViewHolder(holderTrack: ResultArtistListViewHolder, position: Int) {
         holderTrack.viewDataBinding.also {
             it.artist = artists[position]
+            it.followOrUnFollowCallback = followOrUnFollowArtistCallback
 
         }
     }
@@ -221,14 +254,28 @@ class ResultArtistListViewHolder(val viewDataBinding: ResultArtistItemBinding) :
 }
 
 /**
- * リストアイテム内のキューアイコンをクリックしたときのイベントハンドラ
+ * Trackお気に入り追加ボタンをクリックしたときの動作を定義
  *
  */
-class PlayClick(val block: (Track) -> Unit) {
-    /**
-     * Called when a song is clicked
-     *
-     * @param track the song that was clicked
-     */
+class SaveOrRemoveTrackClick(val block: (Track) -> Unit) {
+
     fun onClick(track: Track) = block(track)
+}
+
+/**
+ * キューボタンをクリックしたときの動作を定義
+ *
+ */
+class PlayTrackClick(val block: (Int) -> Unit) {
+
+    fun onClick(trackIndex: Int) = block(trackIndex)
+}
+
+/**
+ * Artistフォローボタンをクリックしたときの動作を定義
+ *
+ */
+class FollowOrUnFollowArtistClick(val block: (Artist) -> Unit) {
+
+    fun onClick(artist: Artist) = block(artist)
 }

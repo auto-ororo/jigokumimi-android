@@ -8,9 +8,12 @@ import android.os.Build
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
-import com.ororo.auto.jigokumimi.repository.MusicRepository
+import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 
 /**
@@ -21,7 +24,7 @@ import com.ororo.auto.jigokumimi.repository.MusicRepository
 class ResultViewModel(application: Application, private val musicRepository: IMusicRepository) :
     BaseAndroidViewModel(application), MediaPlayer.OnCompletionListener {
 
-    /*
+    /**
      * 音楽再生クラス
      */
     var mp: MediaPlayer? = null
@@ -36,23 +39,23 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
      */
     val artistlist = musicRepository.artists
 
-    /*
-     * 再生中の曲情報(private)
+    /**
+     * 再生中の曲情報インデックス(private)
      */
-    private var _playingTrack = MutableLiveData<Track>()
+    private var _playingTrackIndex = MutableLiveData<Int>(0)
 
-    /*
-     * 再生中の曲情報
+    /**
+     * 再生中の曲情報インデックス
      */
-    val playingTrack: LiveData<Track?>
-        get() = _playingTrack
+    val playingTrackIndex: LiveData<Int>
+        get() = _playingTrackIndex
 
-    /*
+    /**
      * 再生状態(Private)
      */
     private var _isPlaying = MutableLiveData(false)
 
-    /*
+    /**
      * 再生状態
      */
     val isPlaying: LiveData<Boolean>
@@ -69,34 +72,130 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
     val isMiniPlayerShown: LiveData<Boolean>
         get() = _isMiniPlayerShown
 
-    /*
+    /**
+     * Spitify上の曲お気に入り状態を変更する
+     */
+    fun changeTrackFavoriteState(track: Track) {
+        viewModelScope.launch {
+
+            try {
+                musicRepository.changeTrackFavoriteState(track.id, !track.isSaved)
+
+                val msg = if (track.isSaved) {
+                    getApplication<Application>().getString(
+                        R.string.remove_track_message,
+                        track.name
+                    )
+                } else {
+                    getApplication<Application>().getString(
+                        R.string.save_track_message,
+                        track.name
+                    )
+                }
+
+                showSnackbar(msg)
+
+            } catch (e: Exception) {
+                val msg = when (e) {
+                    is HttpException -> {
+                        if (e.code() == 401) {
+                            _isTokenExpired.postValue(true)
+                            getApplication<Application>().getString(R.string.token_expired_error_message)
+                        } else {
+                            getMessageFromHttpException(e)
+                        }
+                    }
+                    is IOException -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                    else -> {
+                        getApplication<Application>().getString(
+                            R.string.general_error_message,
+                            e.javaClass
+                        )
+                    }
+                }
+                showMessageDialog(msg)
+            }
+        }
+    }
+
+    /**
+     * Spitify上のアーティストフォロー状態を変更する
+     */
+    fun changeArtistFollowState(artist: Artist) {
+        viewModelScope.launch {
+
+            try {
+                musicRepository.changeArtistFollowState(artist.id, !artist.isFollowed)
+
+                val msg = if (artist.isFollowed) {
+                    getApplication<Application>().getString(
+                        R.string.un_follow_artist_message,
+                        artist.name
+                    )
+                } else {
+                    getApplication<Application>().getString(
+                        R.string.follow_artist_message,
+                        artist.name
+                    )
+                }
+
+                showSnackbar(msg)
+
+            } catch (e: Exception) {
+                val msg = when (e) {
+                    is HttpException -> {
+                        if (e.code() == 401) {
+                            _isTokenExpired.postValue(true)
+                            getApplication<Application>().getString(R.string.token_expired_error_message)
+                        } else {
+                            getMessageFromHttpException(e)
+                        }
+                    }
+                    is IOException -> {
+                        getApplication<Application>().getString(R.string.no_connection_error_message)
+                    }
+                    else -> {
+                        getApplication<Application>().getString(
+                            R.string.general_error_message,
+                            e.javaClass
+                        )
+                    }
+                }
+                showMessageDialog(msg)
+            }
+        }
+    }
+
+    /**
      * 再生する曲を指定数だけ進めるor戻す
      */
     private fun movePlayingTrack(moveIndex: Int) {
 
-        val currentIndex = tracklist.value?.indexOf(playingTrack.value)
+        val currentIndex = _playingTrackIndex.value
 
         currentIndex?.let {
             val sumIndex = it + moveIndex
 
-            _playingTrack.value = when {
+            _playingTrackIndex.value = when {
                 sumIndex < 0 -> {
                     //指定位置が0以下の場合はリスト中最後の曲を設定
-                    tracklist.value?.last()
+                    tracklist.value?.lastIndex
                 }
                 sumIndex > tracklist.value?.lastIndex!! -> {
                     //指定位置が要素数を超える場合はリスト中最初の曲を設定
-                    tracklist.value?.get(0)
+                    0
                 }
                 else -> {
                     // それ以外は指定位置の曲を設定
-                    tracklist.value?.get(sumIndex)
+                    sumIndex
                 }
             }
         }
     }
 
-    /*
+    /**
      * 再生する曲を一つ進める
      */
     fun skipNextTrack() {
@@ -104,7 +203,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
         playTrack()
     }
 
-    /*
+    /**
      * 再生する曲を一つ戻すor開始位置に戻す
      */
     fun skipPreviousTrack() {
@@ -118,7 +217,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
         }
     }
 
-    /*
+    /**
      * 曲を再生する
      */
     fun playTrack() {
@@ -137,7 +236,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                 } else {
                     setAudioStreamType(AudioManager.STREAM_MUSIC)
                 }
-                setDataSource(playingTrack.value?.previewUrl!!)
+                setDataSource(tracklist.value!!.get(playingTrackIndex.value!!).previewUrl)
                 prepare()
                 start()
             }
@@ -150,7 +249,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
         }
     }
 
-    /*
+    /**
      * 曲を停止する
      */
     fun stopTrack() {
@@ -162,7 +261,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
         }
     }
 
-    /*
+    /**
      * 曲を再開する
      */
     fun resumeTrack() {
@@ -177,8 +276,8 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
     /**
      * 再生曲を設定する
      */
-    fun setPlayingTrack(track: Track) {
-        _playingTrack.value = track
+    fun setPlayingTrack(index: Int) {
+        _playingTrackIndex.value = index
     }
 
     /**

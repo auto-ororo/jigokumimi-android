@@ -6,9 +6,9 @@ import androidx.preference.PreferenceManager
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
-import com.ororo.auto.jigokumimi.database.ArtistAround
+import com.ororo.auto.jigokumimi.database.DisplayedArtist
 import com.ororo.auto.jigokumimi.database.FakeMusicDao
-import com.ororo.auto.jigokumimi.database.TrackAround
+import com.ororo.auto.jigokumimi.database.DisplayedTrack
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.repository.MusicRepository
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
@@ -62,7 +62,7 @@ class MusicRepositoryTest {
         // ダミーデータ、及び期待されるDBレコードを作成
         val tracksAroundNetWork: MutableList<TrackAroundNetwork> = mutableListOf()
         val tracksDetail: MutableList<GetTrackDetailResponse> = mutableListOf()
-        val expectedDatabase: MutableList<TrackAround> = mutableListOf()
+        val expectedDatabase: MutableList<DisplayedTrack> = mutableListOf()
         for (i in 1..10) {
             // 曲情報を紐付けるID
             // このIDを元にJigokumimiから取得する周辺曲情報、Spotifyから取得する曲詳細情報、ローカルDBに保存する曲情報を紐つける
@@ -77,7 +77,7 @@ class MusicRepositoryTest {
             )
             // メソッド呼び出し後に期待されるDBのレコードを作成
             expectedDatabase.add(
-                TrackAround(
+                DisplayedTrack(
                     id = spotifyTrackId,
                     popularity = tracksAroundNetWork.last().popularity,
                     album = tracksDetail.last().album.name,
@@ -126,7 +126,7 @@ class MusicRepositoryTest {
         // ダミーデータ、及び期待されるDBレコードを作成
         val artistsAroundNetWork: MutableList<ArtistAroundNetwork> = mutableListOf()
         val artistsDetail: MutableList<SpotifyArtistFull> = mutableListOf()
-        val expectedDatabase: MutableList<ArtistAround> = mutableListOf()
+        val expectedDatabase: MutableList<DisplayedArtist> = mutableListOf()
         for (i in 1..10) {
             // アーティスト情報を紐付けるID
             // このIDを元にJigokumimiから取得する周辺アーティスト情報、Spotifyから取得するアーティスト詳細情報、ローカルDBに保存するアーティスト情報を紐つける
@@ -141,7 +141,7 @@ class MusicRepositoryTest {
             )
             // メソッド呼び出し後に期待されるDBレコードを作成
             expectedDatabase.add(
-                ArtistAround(
+                DisplayedArtist(
                     id = spotifyArtistId,
                     popularity = artistsAroundNetWork.last().popularity,
                     imageUrl = artistsDetail.last().images.get(0).url,

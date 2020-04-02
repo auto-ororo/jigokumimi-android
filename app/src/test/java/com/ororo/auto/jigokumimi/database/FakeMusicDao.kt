@@ -4,23 +4,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 class FakeMusicDao(
-    val tracksAround: MutableList<TrackAround> = mutableListOf(),
-    val artistsAround: MutableList<ArtistAround> = mutableListOf()
+    val tracksDisplayed: MutableList<DisplayedTrack> = mutableListOf(),
+    val artistsDisplayed: MutableList<DisplayedArtist> = mutableListOf()
 ) : MusicDao {
 
-    override fun getTracks(): LiveData<List<TrackAround>> {
-        return MutableLiveData(tracksAround)
+    override fun getTracks(): LiveData<List<DisplayedTrack>> {
+        return MutableLiveData(tracksDisplayed)
     }
 
-    override fun insertTrack(tracks: List<TrackAround>) {
-        tracksAround.addAll(tracks)
+    override fun insertTrack(displayedTrackLogs: List<DisplayedTrack>) {
+        tracksDisplayed.addAll(displayedTrackLogs)
     }
 
-    override fun getArtists(): LiveData<List<ArtistAround>> {
-        return MutableLiveData(artistsAround)
+    override fun getArtists(): LiveData<List<DisplayedArtist>> {
+        return MutableLiveData(artistsDisplayed)
     }
 
-    override fun insertArtist(artists: List<ArtistAround>) {
-        artistsAround.addAll(artists)
+    override fun insertArtist(displayedArtist: List<DisplayedArtist>) {
+        artistsDisplayed.addAll(displayedArtist)
     }
 }

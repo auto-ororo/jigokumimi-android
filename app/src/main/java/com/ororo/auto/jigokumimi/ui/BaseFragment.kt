@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.viewmodels.BaseAndroidViewModel
@@ -40,6 +41,17 @@ open class BaseFragment() : Fragment() {
             }
         )
 
+        // Snackbarメッセージが設定された際にSnackbarを表示
+        viewModel.snackbarMessage.observe(
+            viewLifecycleOwner,
+            Observer {
+                if (it != ""){
+                    Snackbar.make(this.view!!, it, Snackbar.LENGTH_SHORT).show()
+                    viewModel.showedSnackbar()
+                }
+            }
+        )
+
         viewModel.isTokenExpired.observe(viewLifecycleOwner) {
             if (it) onTokenExpired(viewModel)
         }
@@ -62,7 +74,7 @@ open class BaseFragment() : Fragment() {
      * トークンの認証期限が切れた際、ログイン画面に遷移する
      */
     protected fun onTokenExpired(viewModel: BaseAndroidViewModel) {
-        viewModel.moveLoginDone()
+        viewModel.onMovedLogin()
         this.findNavController()
             .navigate(R.id.loginFragment)
     }

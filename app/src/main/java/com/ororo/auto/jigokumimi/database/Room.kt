@@ -12,22 +12,30 @@ import androidx.room.*
 @Dao
 interface MusicDao {
     @Transaction
-    @Query("select * from trackaround order by rank")
-    fun getTracks(): LiveData<List<TrackAround>>
+    @Query("select * from displayedtrack order by rank")
+    fun getTracks(): LiveData<List<DisplayedTrack>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTrack(tracks: List<TrackAround>)
+    fun insertTrack(displayedTrackLogs: List<DisplayedTrack>)
+
+    // 条件でUpdate
+    @Query("UPDATE displayedtrack SET isSaved = :isSaved WHERE id = :id")
+    fun updateTrackSaveFlag(id: String, isSaved: Boolean)
 
     @Transaction
-    @Query("select * from artistaround order by rank")
-    fun getArtists(): LiveData<List<ArtistAround>>
+    @Query("select * from displayedartist order by rank")
+    fun getArtists(): LiveData<List<DisplayedArtist>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertArtist(artists: List<ArtistAround>)
+    fun insertArtist(displayedArtist: List<DisplayedArtist>)
+
+    // 条件でUpdate
+    @Query("UPDATE displayedartist SET isFollowed = :isFollowed WHERE id = :id")
+    fun updateArtistSaveFlag(id: String, isFollowed: Boolean)
 }
 
 @Database(
-    entities = [TrackAround::class, ArtistAround::class],
+    entities = [DisplayedTrack::class, DisplayedArtist::class],
     version = 1,
     exportSchema = false
 )
@@ -43,7 +51,7 @@ fun getDatabase(context: Context): MusicDatabase {
             INSTANCE = Room.databaseBuilder(
                 context.applicationContext,
                 MusicDatabase::class.java,
-                "jikomumimi-db"
+                "jikomumimi"
             ).build()
         }
     }

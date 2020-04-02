@@ -34,7 +34,7 @@ class BaseAndroidViewModelTest {
 
     @Test
     fun moveLoginDone_isTokenExpiredがFalseであること() {
-        viewModel.moveLoginDone()
+        viewModel.onMovedLogin()
         assertThat(viewModel.isTokenExpired.getOrAwaitValue(), IsEqual(false))
     }
 

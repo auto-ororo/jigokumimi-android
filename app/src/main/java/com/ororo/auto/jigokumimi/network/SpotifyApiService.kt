@@ -2,6 +2,7 @@ package com.ororo.auto.jigokumimi.network
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
@@ -41,14 +42,53 @@ interface SpotifyApiService {
     @GET("tracks/{id}")
     suspend fun getTrackDetail(
         @Header("Authorization") authorization: String,
-        @Path("id") id : String
+        @Path("id") id: String
     ): GetTrackDetailResponse
 
     @GET("artists/{id}")
     suspend fun getArtistDetail(
         @Header("Authorization") authorization: String,
-        @Path("id") id : String
+        @Path("id") id: String
     ): SpotifyArtistFull
+
+    @PUT("me/tracks")
+    suspend fun putSaveTracks(
+        @Header("Authorization") authorization: String,
+        @Query("ids") ids: String
+    ): Response<Unit>
+
+    @DELETE("me/tracks")
+    suspend fun removeSaveTracks(
+        @Header("Authorization") authorization: String,
+        @Query("ids") ids: String
+    ): Response<Unit>
+
+    @PUT("me/following")
+    suspend fun followArtistsOrUsers(
+        @Header("Authorization") authorization: String,
+        @Query("type") type: String,
+        @Query("ids") ids: String
+    ): Response<Unit>
+
+    @DELETE("me/following")
+    suspend fun unFollowArtistsOrUsers(
+        @Header("Authorization") authorization: String,
+        @Query("type") type: String,
+        @Query("ids") ids: String
+    ): Response<Unit>
+
+    @GET("me/tracks/contains")
+    suspend fun getIfTracksSaved(
+        @Header("Authorization") authorization: String,
+        @Query("ids") ids: String
+    ): List<Boolean>
+
+    @GET("me/following/contains")
+    suspend fun getIfArtistsOrUsersSaved(
+        @Header("Authorization") authorization: String,
+        @Query("type") type: String,
+        @Query("ids") ids: String
+    ): List<Boolean>
 }
 
 // シングルトンでインターフェースを実装する

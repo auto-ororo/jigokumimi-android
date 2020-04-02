@@ -27,7 +27,10 @@
     <string name="request_success_message">通信に成功しました</string>
     <string name="request_fail_message">サーバー側に予期せぬエラーが発生しました。\nしばらく時間を置いて再度お試しください。</string>
     <string name="success_sign_up">新規登録が完了しました。</string>
-
+    <string name="follow_artist_message">%1$s をフォローしました</string>
+    <string name="un_follow_artist_message">%1$s のフォローを解除しました</string>
+    <string name="save_track_message">%1$s をお気に入りの曲に追加しました</string>
+    <string name="remove_track_message">%1$s をお気に入りの曲から削除しました</string>
 
     <!--  title-->
     <string name="title_dialog_error">ERROR</string>
@@ -38,7 +41,7 @@
     <string name="artist_text">Artist</string>
     <string name="select_types_suggest">タイプを選択</string>
     <string name="select_distance_suggest">範囲を選択</string>
-    <string name="get_music_suggest">みんなが聴いている音楽を集めよう</string>
+    <string name="get_music_suggest">まわりの音楽を収集しよう</string>
 
 
 

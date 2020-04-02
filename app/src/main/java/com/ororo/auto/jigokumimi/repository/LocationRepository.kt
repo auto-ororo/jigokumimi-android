@@ -32,23 +32,4 @@ class LocationRepository(application: Application) : ILocationRepository {
             fusedLocationClient.removeLocationUpdates(callback)
         }
     }
-
-    /**
-     * Factoryクラス
-     */
-//    companion object {
-//        @Volatile
-//        private var INSTANCE: LocationRepository? = null
-//
-//        fun getRepository(app: Application): LocationRepository {
-//            return INSTANCE ?: synchronized(this) {
-//
-//                LocationRepository(
-//                    app
-//                ).also {
-//                    INSTANCE = it
-//                }
-//            }
-//        }
-//    }
 }

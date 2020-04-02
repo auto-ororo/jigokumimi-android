@@ -16,7 +16,8 @@ data class Track(
     val imageUrl: String,
     val previewUrl: String,
     val rank: Int,
-    val popularity: Int
+    val popularity: Int,
+    var isSaved: Boolean
 )
 
 /**
@@ -28,5 +29,6 @@ data class Artist(
     val imageUrl: String,
     val genres: String?,
     val rank: Int,
-    val popularity: Int
+    val popularity: Int,
+    val isFollowed: Boolean
 )

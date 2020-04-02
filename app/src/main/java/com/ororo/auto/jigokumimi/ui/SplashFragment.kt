@@ -74,7 +74,7 @@ class SplashFragment : BaseFragment() {
         return binding.root
     }
 
-    // 許可を求める
+    // パーミッションの許可を求める
     private fun requestPermission() {
         requestPermissions(
             arrayOf(
