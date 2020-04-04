@@ -2,8 +2,7 @@ package com.ororo.auto.jigokumimi.repository
 
 import android.content.SharedPreferences
 import android.location.Location
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.MutableLiveData
 import com.ororo.auto.jigokumimi.database.*
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
@@ -27,18 +26,12 @@ class MusicRepository(
     /**
      * 周辺曲情報
      */
-    override val tracks: LiveData<List<Track>> = Transformations.map(musicDao.getTracks()) {
-        Timber.d("data changed: $it")
-        it.asTrackModel()
-    }
+    override val tracks = MutableLiveData<List<Track>>()
 
     /**
      * 周辺アーティスト情報
      */
-    override val artists: LiveData<List<Artist>> = Transformations.map(musicDao.getArtists()) {
-        Timber.d("data changed: $it")
-        it.asArtistModel()
-    }
+    override val artists = MutableLiveData<List<Artist>>()
 
     private val limit: Int = 20
     val offset: Int = 0
@@ -62,7 +55,7 @@ class MusicRepository(
                 distance = distance
             )
 
-            val tracksDatabase = tracksAround.data?.map { trackAround ->
+            val tracksModel = tracksAround.data?.map { trackAround ->
                 val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
                 // 詳細な曲情報を取得
@@ -78,7 +71,7 @@ class MusicRepository(
                 )[0]
 
                 // 取得した情報をエンティティに追加
-                return@map DisplayedTrack(
+                return@map Track(
 
                     id = trackDetail.id,
                     album = trackDetail.album.name,
@@ -94,10 +87,7 @@ class MusicRepository(
                 )
             }
 
-            // ローカルDBに保存
-            tracksDatabase?.let {
-                musicDao.insertTrack(it)
-            }
+            tracks.postValue(tracksModel)
 
             return@withContext
         }
@@ -153,7 +143,7 @@ class MusicRepository(
                 distance = distance
             )
 
-            val artistsDatabase = artistsAround.data?.map { artistAround ->
+            val artistsModel = artistsAround.data?.map { artistAround ->
                 val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
                 // 詳細アーティスト情報を取得
@@ -172,7 +162,7 @@ class MusicRepository(
                 )[0]
 
                 // 取得したアーティスト情報を元にエンティティを作成
-                return@map DisplayedArtist(
+                return@map Artist(
                     id = artistDetail.id,
                     name = artistDetail.name,
                     imageUrl = artistDetail.images[0].url,
@@ -183,10 +173,9 @@ class MusicRepository(
                 )
             }
 
-            // ローカルDBに保存
-            artistsDatabase?.let {
-                musicDao.insertArtist(it)
-            }
+            artists.postValue(artistsModel)
+
+            return@withContext
         }
 
     /**
@@ -223,56 +212,64 @@ class MusicRepository(
     /**
      * Spotify上でお気に入り曲を登録/解除する
      */
-    override suspend fun changeTrackFavoriteState(trackId: String, state: Boolean) =
+    override suspend fun changeTrackFavoriteState(trackIndex: Int, state: Boolean) =
         withContext(Dispatchers.IO) {
             Timber.d("change track favorite state called")
 
-            val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
+            tracks.value?.get(trackIndex)?.let {
 
-            // フラグに応じてお気に入り登録/解除
-            if (state) {
-                spotifyApiService.putSaveTracks(
-                    spotifyToken,
-                    trackId
-                )
-            } else {
-                spotifyApiService.removeSaveTracks(
-                    spotifyToken,
-                    trackId
-                )
+                val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
+
+                // フラグに応じてお気に入り登録/解除
+                if (state) {
+                    spotifyApiService.putSaveTracks(
+                        spotifyToken,
+                        it.id
+                    )
+                } else {
+                    spotifyApiService.removeSaveTracks(
+                        spotifyToken,
+                        it.id
+                    )
+                }
+                it.isSaved = state
             }
 
-            // ローカルDBのフラグ更新
-            musicDao.updateTrackSaveFlag(trackId, state)
+            return@withContext
         }
 
     /**
      * Spotify上でアーティストをフォロー/フォロー解除する
      */
-    override suspend fun changeArtistFollowState(userId: String, state: Boolean) =
+    override suspend fun changeArtistFollowState(artistIndex: Int, state: Boolean) =
+
         withContext(Dispatchers.IO) {
             Timber.d("change artist follow state called")
 
-            val type = "artist"
+            artists.value?.get(artistIndex)?.let { artist ->
+                val type = "artist"
 
-            val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
+                val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
-            // フラグに応じてアーティストフォロー/フォロー解除
-            if (state) {
-                spotifyApiService.followArtistsOrUsers(
-                    spotifyToken,
-                    type,
-                    userId
-                )
-            } else {
-                spotifyApiService.unFollowArtistsOrUsers(
-                    spotifyToken,
-                    type,
-                    userId
-                )
+                // フラグに応じてアーティストフォロー/フォロー解除
+                if (state) {
+                    spotifyApiService.followArtistsOrUsers(
+                        spotifyToken,
+                        type,
+                        artist.id
+                    )
+                } else {
+                    spotifyApiService.unFollowArtistsOrUsers(
+                        spotifyToken,
+                        type,
+                        artist.id
+                    )
+                }
+
+                artist.isFollowed = state
+
             }
 
-            // ローカルDBのフラグ更新
-            musicDao.updateArtistSaveFlag(userId, state)
+            return@withContext
         }
 }

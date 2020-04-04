@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -95,8 +96,8 @@ class ResultFragment : BaseFragment() {
             }
 
             // Track追加ボタンがタップされたときのコールバックを設定
-            val saveOrRemoveCallback = SaveOrRemoveTrackClick { track: Track ->
-                onSaveOrRemoveButtonClicked(track)
+            val saveOrRemoveCallback = SaveOrRemoveTrackClick { trackIndex: Int ->
+                onSaveOrRemoveButtonClicked(trackIndex)
             }
 
             // コールバックをコンストラクタに渡してアダプタを登録
@@ -106,16 +107,27 @@ class ResultFragment : BaseFragment() {
             )
             binding.recyclerView.adapter = viewModelAdapterTrack
 
+            // データが変更された際にAdapterに検知
+            viewModel.changeDataIndex.observe(viewLifecycleOwner) {
+                viewModelAdapterTrack.notifyItemChanged(it)
+            }
+
         } else {
 
             // Artistフォローボタンがタップされたときのコールバックを設定
-            val followOrUnFollowCallback = FollowOrUnFollowArtistClick { artist: Artist ->
-                onFollowOrUnFollowButtonClicked(artist)
+            val followOrUnFollowCallback = FollowOrUnFollowArtistClick { artistIndex: Int ->
+                onFollowOrUnFollowButtonClicked(artistIndex)
             }
 
             // コールバックをコンストラクタに渡してアダプタを登録
             viewModelAdapterArtist = ResultArtistListAdapter(followOrUnFollowCallback)
             binding.recyclerView.adapter = viewModelAdapterArtist
+
+
+            // データが変更された際にAdapterに検知
+            viewModel.changeDataIndex.observe(viewLifecycleOwner) {
+                viewModelAdapterArtist.notifyItemChanged(it)
+            }
         }
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
@@ -130,12 +142,13 @@ class ResultFragment : BaseFragment() {
         viewModel.playTrack()
     }
 
-    private fun onSaveOrRemoveButtonClicked(track: Track) {
-        viewModel.changeTrackFavoriteState(track)
+    private fun onSaveOrRemoveButtonClicked(trackIndex: Int) {
+        viewModel.changeTrackFavoriteState(trackIndex)
+
     }
 
-    private fun onFollowOrUnFollowButtonClicked(artist: Artist) {
-        viewModel.changeArtistFollowState(artist)
+    private fun onFollowOrUnFollowButtonClicked(artistIndex: Int) {
+        viewModel.changeArtistFollowState(artistIndex)
     }
 }
 
@@ -237,7 +250,7 @@ class ResultArtistListAdapter(val followOrUnFollowArtistCallback: FollowOrUnFoll
         holderTrack.viewDataBinding.also {
             it.artist = artists[position]
             it.followOrUnFollowCallback = followOrUnFollowArtistCallback
-
+            it.position = position
         }
     }
 }
@@ -257,9 +270,9 @@ class ResultArtistListViewHolder(val viewDataBinding: ResultArtistItemBinding) :
  * Trackお気に入り追加ボタンをクリックしたときの動作を定義
  *
  */
-class SaveOrRemoveTrackClick(val block: (Track) -> Unit) {
+class SaveOrRemoveTrackClick(val block: (Int) -> Unit) {
 
-    fun onClick(track: Track) = block(track)
+    fun onClick(trackIndex: Int) = block(trackIndex)
 }
 
 /**
@@ -275,7 +288,7 @@ class PlayTrackClick(val block: (Int) -> Unit) {
  * Artistフォローボタンをクリックしたときの動作を定義
  *
  */
-class FollowOrUnFollowArtistClick(val block: (Artist) -> Unit) {
+class FollowOrUnFollowArtistClick(val block: (Int) -> Unit) {
 
-    fun onClick(artist: Artist) = block(artist)
+    fun onClick(artistIndex: Int) = block(artistIndex)
 }

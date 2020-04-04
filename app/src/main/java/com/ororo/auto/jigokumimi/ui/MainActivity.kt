@@ -7,8 +7,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.ActivityMainBinding
 import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
@@ -22,6 +26,7 @@ import timber.log.Timber
 class MainActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +40,17 @@ class MainActivity : AppCompatActivity() {
 
         drawerLayout = binding.drawerLayout
 
-        val navController = this.findNavController(R.id.myNavHostFragment)
+        appBarConfiguration = AppBarConfiguration(
+            //navigation.xmlに設定したidのセットを渡す
+            setOf(R.id.loginFragment, R.id.searchFragment), drawerLayout
+        )
 
-        NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout)
+        val navController = Navigation.findNavController(this, R.id.myNavHostFragment).also {
+            setupActionBarWithNavController(
+                it,
+                appBarConfiguration
+            )
+        }
 
         NavigationUI.setupWithNavController(binding.navView, navController)
 
@@ -45,7 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = this.findNavController(R.id.myNavHostFragment)
-        return NavigationUI.navigateUp(navController, drawerLayout)
+        return navController.navigateUp(appBarConfiguration)
     }
 
     /**

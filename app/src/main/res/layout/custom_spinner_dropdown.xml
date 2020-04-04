@@ -8,4 +8,5 @@
     android:ellipsize="marquee"
     android:singleLine="true"
     android:textAlignment="center"
-    android:textColor="@color/colorPrimary" />
+    android:textColor="@color/colorPrimary"
+    android:textSize="18sp" />

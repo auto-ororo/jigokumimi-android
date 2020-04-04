@@ -2,14 +2,10 @@ package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
 import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.MediaPlayer
-import android.os.Build
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.domain.Artist
-import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -42,7 +38,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
     /**
      * 再生中の曲情報インデックス(private)
      */
-    private var _playingTrackIndex = MutableLiveData<Int>(0)
+    private var _playingTrackIndex = MutableLiveData<Int>()
 
     /**
      * 再生中の曲情報インデックス
@@ -72,99 +68,119 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
     val isMiniPlayerShown: LiveData<Boolean>
         get() = _isMiniPlayerShown
 
+
+    /**
+     * 変更されたデータ位置(Private)
+     */
+    private val _changeDataIndex = MutableLiveData<Int>()
+
+    /**
+     * 変更されたデータ位置
+     */
+    val changeDataIndex: LiveData<Int>
+        get() = _changeDataIndex
+
     /**
      * Spitify上の曲お気に入り状態を変更する
      */
-    fun changeTrackFavoriteState(track: Track) {
+    fun changeTrackFavoriteState(trackIndex: Int) =
         viewModelScope.launch {
 
-            try {
-                musicRepository.changeTrackFavoriteState(track.id, !track.isSaved)
+            tracklist.value?.get(trackIndex)?.let { track ->
+                try {
+                    musicRepository.changeTrackFavoriteState(trackIndex, !track.isSaved)
 
-                val msg = if (track.isSaved) {
-                    getApplication<Application>().getString(
-                        R.string.remove_track_message,
-                        track.name
-                    )
-                } else {
-                    getApplication<Application>().getString(
-                        R.string.save_track_message,
-                        track.name
-                    )
-                }
-
-                showSnackbar(msg)
-
-            } catch (e: Exception) {
-                val msg = when (e) {
-                    is HttpException -> {
-                        if (e.code() == 401) {
-                            _isTokenExpired.postValue(true)
-                            getApplication<Application>().getString(R.string.token_expired_error_message)
-                        } else {
-                            getMessageFromHttpException(e)
-                        }
-                    }
-                    is IOException -> {
-                        getApplication<Application>().getString(R.string.no_connection_error_message)
-                    }
-                    else -> {
+                    val msg = if (track.isSaved) {
                         getApplication<Application>().getString(
-                            R.string.general_error_message,
-                            e.javaClass
+                            R.string.save_track_message,
+                            track.name
+                        )
+                    } else {
+                        getApplication<Application>().getString(
+                            R.string.remove_track_message,
+                            track.name
                         )
                     }
+
+                    _changeDataIndex.postValue(trackIndex)
+                    showSnackbar(msg)
+
+                } catch (e: Exception) {
+                    val msg = when (e) {
+                        is HttpException -> {
+                            if (e.code() == 401) {
+                                _isTokenExpired.postValue(true)
+                                getApplication<Application>().getString(R.string.token_expired_error_message)
+                            } else {
+                                getMessageFromHttpException(e)
+                            }
+                        }
+                        is IOException -> {
+                            getApplication<Application>().getString(R.string.no_connection_error_message)
+                        }
+                        else -> {
+                            getApplication<Application>().getString(
+                                R.string.general_error_message,
+                                e.javaClass
+                            )
+                        }
+                    }
+                    showMessageDialog(msg)
                 }
-                showMessageDialog(msg)
             }
+
         }
-    }
 
     /**
      * Spitify上のアーティストフォロー状態を変更する
      */
-    fun changeArtistFollowState(artist: Artist) {
+    fun changeArtistFollowState(artistIndex: Int) {
         viewModelScope.launch {
 
-            try {
-                musicRepository.changeArtistFollowState(artist.id, !artist.isFollowed)
+            artistlist.value?.get(artistIndex)?.let { artist ->
+                try {
+                    musicRepository.changeArtistFollowState(artistIndex, !artist.isFollowed)
 
-                val msg = if (artist.isFollowed) {
-                    getApplication<Application>().getString(
-                        R.string.un_follow_artist_message,
-                        artist.name
-                    )
-                } else {
-                    getApplication<Application>().getString(
-                        R.string.follow_artist_message,
-                        artist.name
-                    )
-                }
-
-                showSnackbar(msg)
-
-            } catch (e: Exception) {
-                val msg = when (e) {
-                    is HttpException -> {
-                        if (e.code() == 401) {
-                            _isTokenExpired.postValue(true)
-                            getApplication<Application>().getString(R.string.token_expired_error_message)
-                        } else {
-                            getMessageFromHttpException(e)
-                        }
-                    }
-                    is IOException -> {
-                        getApplication<Application>().getString(R.string.no_connection_error_message)
-                    }
-                    else -> {
+                    val msg = if (artist.isFollowed) {
                         getApplication<Application>().getString(
-                            R.string.general_error_message,
-                            e.javaClass
+                            R.string.follow_artist_message,
+                            artist.name
+                        )
+                    } else {
+                        getApplication<Application>().getString(
+                            R.string.un_follow_artist_message,
+                            artist.name
                         )
                     }
+
+                    _changeDataIndex.postValue(artistIndex)
+                    showSnackbar(msg)
+
+                } catch (e: Exception) {
+                    val msg = when (e) {
+                        is HttpException -> {
+                            if (e.code() == 401) {
+                                _isTokenExpired.postValue(true)
+                                getApplication<Application>().getString(R.string.token_expired_error_message)
+                            } else {
+                                getMessageFromHttpException(e)
+                            }
+                        }
+                        is IOException -> {
+                            getApplication<Application>().getString(R.string.no_connection_error_message)
+                        }
+                        else -> {
+                            getApplication<Application>().getString(
+                                R.string.general_error_message,
+                                e.javaClass
+                            )
+                        }
+                    }
+                    showMessageDialog(msg)
                 }
-                showMessageDialog(msg)
+
             }
+
         }
     }
 
@@ -226,16 +242,13 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
             stopTrack()
 
             mp = MediaPlayer().apply {
-                if (Build.VERSION.SDK_INT >= 21) {
-                    setAudioAttributes(
-                        AudioAttributes
-                            .Builder()
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .build()
-                    )
-                } else {
-                    setAudioStreamType(AudioManager.STREAM_MUSIC)
-                }
+                setAudioAttributes(
+                    AudioAttributes
+                        .Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .build()
+                )
+
                 setDataSource(tracklist.value!!.get(playingTrackIndex.value!!).previewUrl)
                 prepare()
                 start()

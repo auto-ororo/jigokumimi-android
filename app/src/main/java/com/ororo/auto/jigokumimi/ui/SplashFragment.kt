@@ -111,15 +111,15 @@ class SplashFragment : BaseFragment() {
      */
     private fun onLoginSucceed() {
         authenticateSpotify(viewModel)
-        this.findNavController()
-            .navigate(SplashFragmentDirections.actionSplashFragmentToSearchFragment())
+//        this.findNavController()
+//            .navigate(SplashFragmentDirections.actionSplashFragmentToSearchFragment())
     }
 
     /**
      * ログインに失敗した場合ログイン画面に遷移
      */
     private fun onLoginFailed() {
-        this.findNavController()
-            .navigate(SplashFragmentDirections.actionSplashFragmentToLoginFragment())
+//        this.findNavController()
+//            .navigate(SplashFragmentDirections.actionSplashFragmentToLoginFragment())
     }
 }

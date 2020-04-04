@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <import type="com.ororo.auto.jigokumimi.R" />
 
         <variable
@@ -39,12 +40,13 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:text="@{String.valueOf(viewModel.tracklist.get(viewModel.playingTrackIndex).rank) + '.' + viewModel.tracklist.get(viewModel.playingTrackIndex).name }"
             android:textColor="@color/colorWhite"
             android:textSize="24sp"
             app:layout_constraintEnd_toStartOf="@+id/saveTrackButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:trackIndexForRankTrack="@{viewModel.playingTrackIndex}"
+            app:trackListForRankTrack="@{viewModel.tracklist}"
             tools:text="99 . Track Name" />
 
         <TextView
@@ -54,12 +56,13 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:text="@{viewModel.tracklist.get(viewModel.playingTrackIndex).artists + '-' + viewModel.tracklist.get(viewModel.playingTrackIndex).album }"
             android:textColor="@color/colorWhite"
             android:textSize="18sp"
             app:layout_constraintEnd_toStartOf="@+id/saveTrackButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/rankTrackNameText"
+            app:trackIndexForArtistAlbum="@{viewModel.playingTrackIndex}"
+            app:trackListForArtistAlbum="@{viewModel.tracklist}"
             tools:text="Artist - Album" />
 
         <ImageButton
@@ -127,10 +130,11 @@
             android:layout_marginBottom="8dp"
             android:background="@color/colorTransparent"
             android:scaleType="center"
-            app:dynamicSrcCompat="@{viewModel.tracklist.get(viewModel.playingTrackIndex).isSaved ? R.drawable.ic_favorite : R.drawable.ic_favorite_border }"
             app:layout_constraintBottom_toTopOf="@+id/seekBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:trackIndexForFavIcon="@{viewModel.playingTrackIndex}"
+            app:trackListForFavIcon="@{viewModel.tracklist}"
             tools:srcCompat="@drawable/ic_favorite_border" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

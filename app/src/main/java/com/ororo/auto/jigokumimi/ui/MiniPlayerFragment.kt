@@ -10,10 +10,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
+import com.ororo.auto.jigokumimi.util.setFavIconFromTrackList
 import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
 import kotlinx.android.synthetic.main.fragment_mini_player.*
 
@@ -85,9 +87,15 @@ class MiniPlayerFragment : Fragment() {
             }
         )
 
+        viewModel.changeDataIndex.observe(viewLifecycleOwner) {
+            if (it == viewModel.playingTrackIndex.value) {
+                setFavIconFromTrackList(binding.saveTrackButton, viewModel.tracklist.value, it)
+            }
+        }
+
         // お気にり曲追加ボタン
         binding.saveTrackButton.setOnClickListener {
-            viewModel.tracklist.value!![viewModel.playingTrackIndex.value!!].let {
+            viewModel.playingTrackIndex.value?.let {
                 viewModel.changeTrackFavoriteState(it)
             }
         }
@@ -142,7 +150,7 @@ class MiniPlayerFragment : Fragment() {
                 } catch (e: InterruptedException) {
                 }
             }
-        }).start();
+        }).start()
 
         binding.miniPlayerLayout.setOnTouchListener { _, event ->
             gesture.onTouchEvent(event)

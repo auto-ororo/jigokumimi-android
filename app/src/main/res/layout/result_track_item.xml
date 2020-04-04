@@ -164,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@color/colorTransparent"
-                android:onClick="@{() -> saveOrRemoveCallback.onClick(track)}"
+                android:onClick="@{() -> saveOrRemoveCallback.onClick(position)}"
                 android:scaleType="center"
                 app:dynamicSrcCompat="@{track.isSaved ? R.drawable.ic_favorite : R.drawable.ic_favorite_border }"
                 app:layout_constraintBottom_toTopOf="@+id/queueButton"

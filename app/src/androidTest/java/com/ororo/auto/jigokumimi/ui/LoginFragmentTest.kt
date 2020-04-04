@@ -62,7 +62,7 @@ class LoginFragmentTest {
 
         verify {
             navController.navigate(
-                LoginFragmentDirections.actionLoginFragmentToSearchFragment()
+                R.id.searchFragment
             )
         }
 
