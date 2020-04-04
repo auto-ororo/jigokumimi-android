@@ -96,7 +96,7 @@ class SignUpFragment : BaseFragment() {
         authenticateSpotify(viewModel)
         viewModel.doneLogin()
         this.findNavController()
-            .navigate(SignUpFragmentDirections.actionSignUpFragmentToSearchFragment())
+            .navigate(R.id.searchFragment)
     }
 
 }

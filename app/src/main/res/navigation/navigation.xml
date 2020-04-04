@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/splashFragment">
+    app:startDestination="@id/loginFragment">
 
     <fragment
         android:id="@+id/loginFragment"
@@ -12,36 +12,19 @@
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
-        <action
-            android:id="@+id/action_loginFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.ororo.auto.jigokumimi.ui.SignUpFragment"
-        android:label="SignUpFragment" >
-        <action
-            android:id="@+id/action_signUpFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-    </fragment>
+        android:label="SignUpFragment" />
     <fragment
         android:id="@+id/splashFragment"
         android:name="com.ororo.auto.jigokumimi.ui.SplashFragment"
-        android:label="SplashFragment" >
-        <action
-            android:id="@+id/action_splashFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-        <action
-            android:id="@+id/action_splashFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-    </fragment>
+        android:label="SplashFragment" />
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.ororo.auto.jigokumimi.ui.SearchFragment"
         android:label="SearchFragment">
-        <action
-            android:id="@+id/action_searchFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
         <action
             android:id="@+id/action_searchFragment_to_resultFragment"
             app:destination="@id/resultFragment" />
@@ -51,9 +34,6 @@
         android:name="com.ororo.auto.jigokumimi.ui.ResultFragment"
         android:label="Result"
         tools:layout="@layout/fragment_result_list" >
-        <action
-            android:id="@+id/action_resultFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
         <argument
             android:name="searchType"
             app:argType="com.ororo.auto.jigokumimi.util.Constants$SearchType" />

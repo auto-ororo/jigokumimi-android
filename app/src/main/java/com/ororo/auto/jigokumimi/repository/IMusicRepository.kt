@@ -50,11 +50,11 @@ interface IMusicRepository {
     /**
      * Spotify上でお気に入り曲を登録/解除する
      */
-    suspend fun changeTrackFavoriteState(trackId: String, state: Boolean)
+    suspend fun changeTrackFavoriteState(trackIndex: Int, state: Boolean)
 
     /**
      * Spotify上のアーティストをフォロー/フォロー解除する
      */
-    suspend fun changeArtistFollowState(userId: String, state: Boolean)
+    suspend fun changeArtistFollowState(artistIndex: Int, state: Boolean)
 
 }

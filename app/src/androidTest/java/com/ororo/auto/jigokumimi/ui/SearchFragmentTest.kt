@@ -100,7 +100,7 @@ class SearchFragmentTest {
 
         // Trackが選択状態になり、Artistが非選択状態になることを確認
         onView(withId(R.id.trackText)).check(matches(withBackGround(R.color.colorPrimary)))
-        onView(withId(R.id.artistText)).check(matches(withBackGround(R.color.colorGrey)))
+        onView(withId(R.id.artistButton)).check(matches(withBackGround(R.color.colorGrey)))
 
         onView(withId(R.id.searchTracksButton)).perform(click())
 
@@ -115,11 +115,11 @@ class SearchFragmentTest {
     fun Artistタップ_検索ボタンタップ_Artistの検索処理が実行されること() {
 
         // Artistタップ
-        onView(withId(R.id.artistText)).perform(click())
+        onView(withId(R.id.artistButton)).perform(click())
 
         // Trackが非選択状態になり、Artistが選択状態になることを確認
         onView(withId(R.id.trackText)).check(matches(withBackGround(R.color.colorGrey)))
-        onView(withId(R.id.artistText)).check(matches(withBackGround(R.color.colorPrimary)))
+        onView(withId(R.id.artistButton)).check(matches(withBackGround(R.color.colorPrimary)))
 
         // 検索ボタンタップ
         onView(withId(R.id.searchTracksButton)).perform(click())

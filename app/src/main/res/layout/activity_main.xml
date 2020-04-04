@@ -26,7 +26,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:navGraph="@navigation/navigation" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navView"

@@ -66,7 +66,9 @@ class LoginFragment : BaseFragment() {
                 .navigate(LoginFragmentDirections.actionLoginFragmentToSignUpFragment())
         }
 
-        setHasOptionsMenu(true)
+        // デモ用ログイン情報
+        viewModel.email.value = getString(R.string.test_email_text)
+        viewModel.password.value = getString(R.string.test_password_text)
 
         return binding.root
     }
@@ -78,7 +80,7 @@ class LoginFragment : BaseFragment() {
         authenticateSpotify(viewModel)
         viewModel.doneLogin()
         this.findNavController()
-            .navigate(LoginFragmentDirections.actionLoginFragmentToSearchFragment())
+            .navigate(R.id.searchFragment)
     }
 
 }

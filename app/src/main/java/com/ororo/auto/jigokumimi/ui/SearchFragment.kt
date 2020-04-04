@@ -1,9 +1,7 @@
 package com.ororo.auto.jigokumimi.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
@@ -57,11 +55,11 @@ class SearchFragment : BaseFragment() {
 
         viewModel.searchType.observe(viewLifecycleOwner) {
             if (it == Constants.SearchType.TRACK) {
-                binding.trackText.setBackgroundColor(ContextCompat.getColor(context!!,R.color.colorPrimary))
-                binding.artistText.setBackgroundColor(ContextCompat.getColor(context!!,R.color.colorGrey))
+                binding.trackButton.setBackgroundResource(R.drawable.shape_rounded_corners_color_primary)
+                binding.artistButton.setBackgroundResource(R.drawable.shape_rounded_corners_color_grey)
             } else {
-                binding.artistText.setBackgroundColor(ContextCompat.getColor(context!!,R.color.colorPrimary))
-                binding.trackText.setBackgroundColor(ContextCompat.getColor(context!!,R.color.colorGrey))
+                binding.trackButton.setBackgroundResource(R.drawable.shape_rounded_corners_color_grey)
+                binding.artistButton.setBackgroundResource(R.drawable.shape_rounded_corners_color_primary)
             }
         }
 
@@ -69,11 +67,11 @@ class SearchFragment : BaseFragment() {
             searchTracks()
         }
 
-        binding.trackText.setOnClickListener {
+        binding.trackButton.setOnClickListener {
             onTrackTextTapped()
         }
 
-        binding.artistText.setOnClickListener {
+        binding.artistButton.setOnClickListener {
             onArtistTextTapped()
         }
 
@@ -97,6 +95,9 @@ class SearchFragment : BaseFragment() {
         }
 
         setHasOptionsMenu(true)
+
+        // ホームメニューアイコンを表示する
+        activity?.actionBar?.setDisplayShowHomeEnabled(true);
 
         return binding.root
     }

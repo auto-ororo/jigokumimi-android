@@ -30,5 +30,5 @@ data class Artist(
     val genres: String?,
     val rank: Int,
     val popularity: Int,
-    val isFollowed: Boolean
+    var isFollowed: Boolean
 )

@@ -16,24 +16,13 @@
         android:layout_height="match_parent"
         tools:context=".ui.SignUpFragment">
 
-        <TextView
-            android:id="@+id/signUpText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/sign_up_text"
-            android:textSize="36sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
 
         <EditText
             android:id="@+id/nameEdit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="@string/name_hint"
@@ -42,7 +31,7 @@
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/signUpText" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/emailEdit"
@@ -101,7 +90,7 @@
             android:layout_marginBottom="16dp"
             android:enabled="@{viewModel.signUpButtonEnabledState}"
             android:text="@string/sign_up_button"
-            android:textSize="24sp"
+            android:textSize="36sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
