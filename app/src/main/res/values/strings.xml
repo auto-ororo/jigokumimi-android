@@ -11,7 +11,6 @@
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
     <string name="login_button">Login</string>
-    <string name="signup_button">Sign Up</string>
     <string name="sign_up_button">SignUp</string>
     <string name="name_hint">Name</string>
     <string name="sign_up_text">新規登録</string>

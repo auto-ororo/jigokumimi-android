@@ -67,34 +67,34 @@ class SearchViewModel(
                 flow.collect { location: Location ->
                     Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
 
-                    // SpotifyのユーザーIDを取得する
-                    val spotifyUserId = authRepository.getSpotifyUserProfile().id
+                    // JigokumimiのユーザーIDを取得する
+                    val jigokumimiUserId = authRepository.getSavedJigokumimiUserId()
 
                     if (searchType.value == Constants.SearchType.TRACK) {
                         // 検索種別が曲の場合
 
                         // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
                         val postTracks = musicRepository.getMyFavoriteTracks()
-                            .asPostMyFavoriteTracksRequest(spotifyUserId, location)
+                            .asPostMyFavoriteTracksRequest(jigokumimiUserId, location)
 
                         // Jigokumimiにお気に入り曲リストを登録
                         musicRepository.postMyFavoriteTracks(postTracks)
 
                         // 周りのJigokumimiユーザーのお気に入り曲を取得
-                        musicRepository.refreshTracks(spotifyUserId, location, _distance.value!!)
+                        musicRepository.refreshTracks(jigokumimiUserId, location, _distance.value!!)
 
                     } else {
                         // 検索種別がアーティストの場合
 
                         // ユーザーのお気に入りアーティスト一覧を取得し､リクエストを作成
                         val postArtists = musicRepository.getMyFavoriteArtists()
-                            .asPostMyFavoriteArtistsRequest(spotifyUserId, location)
+                            .asPostMyFavoriteArtistsRequest(jigokumimiUserId, location)
 
                         // Jigokumimiにお気に入り曲リストを登録
                         musicRepository.postMyFavoriteArtists(postArtists)
 
                         // 周りのJigokumimiユーザーのお気に入り曲を取得
-                        musicRepository.refreshArtists(spotifyUserId, location, _distance.value!!)
+                        musicRepository.refreshArtists(jigokumimiUserId, location, _distance.value!!)
                     }
 
 

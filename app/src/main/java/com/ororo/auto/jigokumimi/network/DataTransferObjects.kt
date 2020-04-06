@@ -75,7 +75,7 @@ fun GetMyFavoriteTracksResponse.asPostMyFavoriteTracksRequest(
 ): List<PostMyFavoriteTracksRequest> {
     return items.map {
         PostMyFavoriteTracksRequest(
-            spotifyUserId = spotifyUserId,
+            userId = spotifyUserId,
             spotifyTrackId = it.id,
             longitude = location.longitude,
             latitude = location.latitude,
@@ -107,7 +107,7 @@ fun GetMyFavoriteArtistsResponse.asPostMyFavoriteArtistsRequest(
 ): List<PostMyFavoriteArtistsRequest> {
     return items.map {
         PostMyFavoriteArtistsRequest(
-            spotifyUserId = spotifyUserId,
+            userId = spotifyUserId,
             spotifyArtistId = it.id,
             longitude = location.longitude,
             latitude = location.latitude,
@@ -262,7 +262,7 @@ data class LoginRequest(
 @JsonClass(generateAdapter = true)
 data class LoginResponse(
     val message: String,
-    val data: Token
+    val data: JigokumimiToken
 )
 
 /**
@@ -280,7 +280,7 @@ data class LogoutResponse(
 @JsonClass(generateAdapter = true)
 data class RefreshResponse(
     val message: String,
-    val data: Token
+    val data: JigokumimiToken
 )
 
 
@@ -317,7 +317,7 @@ data class GetArtistsAroundResponse(
 @JsonClass(generateAdapter = true)
 data class PostMyFavoriteTracksRequest(
     @Json(name = "spotify_track_id") val spotifyTrackId: String,
-    @Json(name = "spotify_user_id") val spotifyUserId: String,
+    @Json(name = "user_id") val userId: String,
     val longitude: Double,
     val latitude: Double,
     val popularity: Int
@@ -338,7 +338,7 @@ data class PostResponse(
 @JsonClass(generateAdapter = true)
 data class PostMyFavoriteArtistsRequest(
     @Json(name = "spotify_artist_id") val spotifyArtistId: String,
-    @Json(name = "spotify_user_id") val spotifyUserId: String,
+    @Json(name = "user_id") val userId: String,
     val longitude: Double,
     val latitude: Double,
     val popularity: Int
@@ -369,7 +369,8 @@ data class ArtistAroundNetwork(
  * Token Response
  */
 @JsonClass(generateAdapter = true)
-data class Token(
+data class JigokumimiToken(
+    val id: String,
     @Json(name = "access_token") val accessToken: String,
     @Json(name = "token_type") val tokenType: String,
     @Json(name = "expires_in") val expiresIn: Int

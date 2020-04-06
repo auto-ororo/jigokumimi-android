@@ -43,6 +43,7 @@ class AuthRepository(
             )
 
             prefData.edit().let {
+                it.putString(Constants.SP_JIGOKUMIMI_USER_ID_KEY, loginResponse.data.id)
                 it.putString(Constants.SP_JIGOKUMIMI_EMAIL_KEY, email)
                 it.putString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY, password)
                 it.putString(
@@ -66,6 +67,13 @@ class AuthRepository(
     }
 
     /**
+     * SharedPreferencesからJigokumimiのユーザーIDを取得する
+     */
+    override fun getSavedJigokumimiUserId(): String {
+        return prefData.getString(Constants.SP_JIGOKUMIMI_USER_ID_KEY, "")!!
+    }
+
+    /**
      * Jigokumiminiに対してログアウトリクエストを行う
      */
     override suspend fun logoutJigokumimi() =
@@ -80,6 +88,7 @@ class AuthRepository(
             )
 
             prefData.edit().let {
+                it.putString(Constants.SP_JIGOKUMIMI_USER_ID_KEY, "")
                 it.putString(Constants.SP_JIGOKUMIMI_EMAIL_KEY, "")
                 it.putString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY, "")
                 it.putString(

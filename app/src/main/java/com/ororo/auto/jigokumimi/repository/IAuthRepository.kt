@@ -23,6 +23,11 @@ interface IAuthRepository {
     fun getSavedLoginInfo(): Pair<String, String>
 
     /**
+     * SharedPreferencesからJigokumimiのユーザーIDを取得する
+     */
+    fun getSavedJigokumimiUserId(): String
+
+    /**
      * Jigokumiminiに対してログアウトリクエストを行う
      */
     suspend fun logoutJigokumimi()
