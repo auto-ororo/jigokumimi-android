@@ -39,7 +39,7 @@ class MusicRepository(
     /**
      * 周辺曲情報を更新する
      */
-    override suspend fun refreshTracks(spotifyUserId: String, location: Location, distance: Int) =
+    override suspend fun refreshTracks(userId: String, location: Location, distance: Int) =
         withContext(Dispatchers.IO) {
             Timber.d("refresh tracks is called")
 
@@ -49,7 +49,7 @@ class MusicRepository(
             // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
             val tracksAround = jigokumimiApiService.getTracksAround(
                 authorization = jigokumimiToken,
-                userId = spotifyUserId,
+                userId = userId,
                 latitude = location.latitude,
                 longitude = location.longitude,
                 distance = distance
@@ -126,7 +126,7 @@ class MusicRepository(
     /**
      * 周辺アーティスト情報を更新する
      */
-    override suspend fun refreshArtists(spotifyUserId: String, location: Location, distance: Int) =
+    override suspend fun refreshArtists(userId: String, location: Location, distance: Int) =
         withContext(Dispatchers.IO) {
             Timber.d("refresh tracks is called")
 
@@ -137,7 +137,7 @@ class MusicRepository(
             // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
             val artistsAround = jigokumimiApiService.getArtistsAround(
                 authorization = jigokumimiToken,
-                userId = spotifyUserId,
+                userId = userId,
                 latitude = location.latitude,
                 longitude = location.longitude,
                 distance = distance

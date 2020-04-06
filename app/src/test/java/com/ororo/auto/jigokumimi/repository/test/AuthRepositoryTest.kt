@@ -47,7 +47,7 @@ class AuthRepositoryTest {
 
         val expectedResponse = LoginResponse(
             message = faker.lorem().word(),
-            data = Token(
+            data = JigokumimiToken(
                 tokenType = faker.lorem().word(),
                 accessToken = faker.random().hex(),
                 expiresIn = faker.number().randomDigit()

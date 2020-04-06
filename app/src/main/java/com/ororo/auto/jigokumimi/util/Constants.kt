@@ -8,6 +8,7 @@ class Constants {
         const val SPOTIFY_SDK_REDIRECT_SCHEME = "yourscheme"
         const val SPOTIFY_SDK_REDIRECT_HOST = "yourhost"
 
+        const val SP_JIGOKUMIMI_USER_ID_KEY = "jigokumimiUserId"
         const val SP_JIGOKUMIMI_EMAIL_KEY = "jigokumimiEmail"
         const val SP_JIGOKUMIMI_PASSWORD_KEY = "jigokumimiPassword"
         const val SP_JIGOKUMIMI_TOKEN_KEY = "jigokumimiToken"

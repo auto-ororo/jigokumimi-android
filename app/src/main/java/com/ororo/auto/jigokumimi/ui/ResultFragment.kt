@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ororo.auto.jigokumimi.R
@@ -21,6 +22,7 @@ import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
+import kotlinx.android.synthetic.main.fragment_result_list.*
 
 /**
  *  検索結果表示画面
@@ -131,6 +133,12 @@ class ResultFragment : BaseFragment() {
         }
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
+
+        // アイテム間に枠線を設定
+        val dividerItemDecoration =
+            DividerItemDecoration(binding.recyclerView.context,DividerItemDecoration.VERTICAL)
+        dividerItemDecoration.setDrawable(activity?.applicationContext?.getDrawable(R.drawable.divider)!!)
+        binding.recyclerView.addItemDecoration(dividerItemDecoration)
 
         baseInit(viewModel)
 
