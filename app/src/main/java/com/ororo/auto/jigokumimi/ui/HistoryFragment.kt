@@ -78,6 +78,11 @@ class HistoryFragment : Fragment() {
             if (it) onSearchFinished()
         }
 
+        // タイトル設定
+        (activity as AppCompatActivity).supportActionBar?.run {
+            title = context?.getString(R.string.title_history)
+        }
+
         return binding.root
     }
 
