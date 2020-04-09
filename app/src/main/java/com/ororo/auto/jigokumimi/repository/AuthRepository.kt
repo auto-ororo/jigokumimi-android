@@ -1,8 +1,6 @@
 package com.ororo.auto.jigokumimi.repository
 
-import android.app.Application
 import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.Dispatchers

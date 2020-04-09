@@ -55,13 +55,13 @@ interface JigokumimiApiService {
     suspend fun postTracks(
         @Header("Authorization") authorization: String,
         @Body songs: List<PostMyFavoriteTracksRequest>
-    ): PostResponse
+    ): CommonResponse
 
     @POST("artists")
     suspend fun postArtists(
         @Header("Authorization") authorization: String,
         @Body songs: List<PostMyFavoriteArtistsRequest>
-    ): PostResponse
+    ): CommonResponse
 
     @GET("tracks")
     suspend fun getTracksAround(
@@ -80,6 +80,31 @@ interface JigokumimiApiService {
         @Query("longitude") longitude: Double,
         @Query("distance") distance: Int?
     ): GetArtistsAroundResponse
+
+    @GET("artists/history")
+    suspend fun getArtistsAroundSearchHistories(
+        @Header("Authorization") authorization: String,
+        @Query("userId") userId: String
+    ): GetArtistSearchHistoryResponse
+
+    @GET("tracks/history")
+    suspend fun getTracksAroundSearchHistories(
+        @Header("Authorization") authorization: String,
+        @Query("userId") userId: String
+    ): GetTrackSearchHistoryResponse
+
+    @DELETE("artists/history")
+    suspend fun deleteArtistsAroundSearchHistories(
+        @Header("Authorization") authorization: String,
+        @Query("historyId") historyId: String
+    ): CommonResponse
+
+    @DELETE("tracks/history")
+    suspend fun deleteTracksAroundSearchHistories(
+        @Header("Authorization") authorization: String,
+        @Query("historyId") historyId: String
+    ): CommonResponse
+
 }
 
 // シングルトンでインターフェースを実装する

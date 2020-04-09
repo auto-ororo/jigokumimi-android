@@ -38,4 +38,15 @@
             android:name="searchType"
             app:argType="com.ororo.auto.jigokumimi.util.Constants$SearchType" />
     </fragment>
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.HistoryFragment"
+        android:label="fragment_history"
+        tools:layout="@layout/fragment_history" >
+        <action
+            android:id="@+id/action_historyFragment_to_resultFragment"
+            app:destination="@id/resultFragment"
+            app:launchSingleTop="false"
+            app:popUpToInclusive="false" />
+    </fragment>
 </navigation>

@@ -8,8 +8,6 @@ import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 
 
 /**
@@ -106,26 +104,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                     showSnackbar(msg)
 
                 } catch (e: Exception) {
-                    val msg = when (e) {
-                        is HttpException -> {
-                            if (e.code() == 401) {
-                                _isTokenExpired.postValue(true)
-                                getApplication<Application>().getString(R.string.token_expired_error_message)
-                            } else {
-                                getMessageFromHttpException(e)
-                            }
-                        }
-                        is IOException -> {
-                            getApplication<Application>().getString(R.string.no_connection_error_message)
-                        }
-                        else -> {
-                            getApplication<Application>().getString(
-                                R.string.general_error_message,
-                                e.javaClass
-                            )
-                        }
-                    }
-                    showMessageDialog(msg)
+                    handleConnectException(e)
                 }
             }
 
@@ -157,26 +136,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                     showSnackbar(msg)
 
                 } catch (e: Exception) {
-                    val msg = when (e) {
-                        is HttpException -> {
-                            if (e.code() == 401) {
-                                _isTokenExpired.postValue(true)
-                                getApplication<Application>().getString(R.string.token_expired_error_message)
-                            } else {
-                                getMessageFromHttpException(e)
-                            }
-                        }
-                        is IOException -> {
-                            getApplication<Application>().getString(R.string.no_connection_error_message)
-                        }
-                        else -> {
-                            getApplication<Application>().getString(
-                                R.string.general_error_message,
-                                e.javaClass
-                            )
-                        }
-                    }
-                    showMessageDialog(msg)
+                    handleConnectException(e)
                 }
 
             }

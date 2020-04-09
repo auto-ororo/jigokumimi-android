@@ -60,3 +60,9 @@ fun setFavIconFromTrackList(view: ImageButton, trackList: List<Track>?, trackInd
         }
     }
 }
+
+
+@BindingAdapter("withInDistance")
+fun withInDistance(view: TextView, distance: Int) {
+    view.text = "周囲${distance}m"
+}

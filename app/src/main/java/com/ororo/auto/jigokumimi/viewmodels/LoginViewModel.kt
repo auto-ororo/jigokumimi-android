@@ -4,12 +4,8 @@ import android.app.Application
 import android.util.Patterns
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.JigokumimiApplication
-import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
 import java.util.regex.Pattern
 
 /**
@@ -87,21 +83,7 @@ class LoginViewModel(application: Application, val authRepository: IAuthReposito
                 authRepository.loginJigokumimi(email.value!!, password.value!!)
                 _isLogin.postValue(true)
             } catch (e: Exception) {
-                val msg = when (e) {
-                    is HttpException -> {
-                        getMessageFromHttpException(e)
-                    }
-                    is IOException -> {
-                        getApplication<Application>().getString(R.string.no_connection_error_message)
-                    }
-                    else -> {
-                        getApplication<Application>().getString(
-                            R.string.general_error_message,
-                            e.javaClass
-                        )
-                    }
-                }
-                showMessageDialog(msg)
+                handleAuthException(e)
             }
         }
     }
@@ -130,7 +112,7 @@ class LoginViewModel(application: Application, val authRepository: IAuthReposito
             if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
                 return LoginViewModel(
-                    app,(app.applicationContext as JigokumimiApplication).authRepository
+                    app, (app.applicationContext as JigokumimiApplication).authRepository
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")

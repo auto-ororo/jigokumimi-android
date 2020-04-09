@@ -5,4 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ILocationRepository {
     fun getCurrentLocation(): Flow<Location>
+
+    fun getPlaceName(latitude: Double, longitude: Double): String
 }

@@ -4,16 +4,15 @@ import android.app.Application
 import android.location.Location
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.JigokumimiApplication
-import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
-import com.ororo.auto.jigokumimi.repository.*
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.repository.ILocationRepository
+import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
-import java.io.IOException
 
 class SearchViewModel(
     application: Application,
@@ -34,12 +33,12 @@ class SearchViewModel(
         get() = _isSearchFinished
 
     /**
-     * 検索種別
+     * 検索種別(Private)
      */
     private val _searchType = MutableLiveData(Constants.SearchType.TRACK)
 
     /**
-     *  検索完了フラグ
+     *  検索種別
      */
     val searchType: LiveData<Constants.SearchType>
         get() = _searchType
@@ -94,9 +93,12 @@ class SearchViewModel(
                         musicRepository.postMyFavoriteArtists(postArtists)
 
                         // 周りのJigokumimiユーザーのお気に入り曲を取得
-                        musicRepository.refreshArtists(jigokumimiUserId, location, _distance.value!!)
+                        musicRepository.refreshArtists(
+                            jigokumimiUserId,
+                            location,
+                            _distance.value!!
+                        )
                     }
-
 
                     // 検索完了フラグをON
                     _isSearchFinished.postValue(true)
@@ -105,27 +107,7 @@ class SearchViewModel(
                 }
 
             } catch (e: Exception) {
-                _isSearchFinished.postValue(false)
-                val msg = when (e) {
-                    is HttpException -> {
-                        if (e.code() == 401) {
-                            _isTokenExpired.postValue(true)
-                            getApplication<Application>().getString(R.string.token_expired_error_message)
-                        } else {
-                            getMessageFromHttpException(e)
-                        }
-                    }
-                    is IOException -> {
-                        getApplication<Application>().getString(R.string.no_connection_error_message)
-                    }
-                    else -> {
-                        getApplication<Application>().getString(
-                            R.string.general_error_message,
-                            e.javaClass
-                        )
-                    }
-                }
-                showMessageDialog(msg)
+                handleConnectException(e)
             }
         }
     }
@@ -156,7 +138,6 @@ class SearchViewModel(
      */
     fun setDistanceFromSelectedSpinnerString(distanceStr: String) {
         _distance.value = distanceStr.removeSuffix("m").toInt()
-
     }
 
     /**

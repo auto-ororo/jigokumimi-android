@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.ororo.auto.jigokumimi.R" />
+
+        <variable
+            name="history"
+            type="com.ororo.auto.jigokumimi.domain.History" />
+
+        <variable
+            name="historyClickCallback"
+            type="com.ororo.auto.jigokumimi.ui.HistoryClick" />
+
+        <variable
+            name="deleteHistoryClickCallback"
+            type="com.ororo.auto.jigokumimi.ui.HistoryClick" />
+
+        <variable
+            name="position"
+            type="Integer" />
+
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp">
+
+        <TextView
+            android:id="@+id/searchPlace"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="@{history.place}"
+            android:textAlignment="viewStart"
+            android:textAllCaps="false"
+            android:textColor="@color/text_black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/deleteButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="東京タワー付近" />
+
+        <TextView
+            android:id="@+id/searchDateTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@{history.createdAt.toString()}"
+            android:textAlignment="viewStart"
+            android:textAllCaps="false"
+            android:textColor="@color/text_light"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchPlace"
+            tools:text="2020年03月31日 14時30分" />
+
+        <TextView
+            android:id="@+id/searchDistance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/searchDateTime"
+            app:layout_constraintEnd_toStartOf="@+id/deleteButton"
+            app:withInDistance="@{history.distance}"
+            tools:text="周囲1000m" />
+
+        <View
+            android:id="@+id/clickableOverlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="?attr/selectableItemBackground"
+            android:onClick="@{() -> historyClickCallback.onClick(position)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@color/colorTransparent"
+            android:onClick="@{() -> deleteHistoryClickCallback.onClick(position)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_delete" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

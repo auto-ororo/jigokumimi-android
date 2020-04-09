@@ -34,9 +34,9 @@ class FakeAndroidTestMusicRepository(
         return testDataUtil.createDummyGetMyFavoriteTracksResponse()
     }
 
-    override suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): PostResponse {
+    override suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): CommonResponse {
         launchExceptionByErrorMode()
-        return PostResponse(
+        return CommonResponse(
             data = null,
             message = faker.lorem().sentence()
         )
@@ -55,9 +55,9 @@ class FakeAndroidTestMusicRepository(
         return testDataUtil.createDummyGetMyFavoriteArtistsResponse()
     }
 
-    override suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): PostResponse {
+    override suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): CommonResponse {
         launchExceptionByErrorMode()
-        return PostResponse(
+        return CommonResponse(
             data = null,
             message = faker.lorem().sentence()
         )

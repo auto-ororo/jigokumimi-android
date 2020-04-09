@@ -7,7 +7,7 @@
         android:icon="@drawable/ic_search"
         android:title="@string/search_text" />
     <item
-        android:id="@+id/resultFragment"
+        android:id="@+id/historyFragment"
         android:icon="@drawable/ic_history"
         android:title="@string/history_text" />
     <item
