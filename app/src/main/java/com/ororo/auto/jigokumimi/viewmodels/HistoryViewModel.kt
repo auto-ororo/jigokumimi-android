@@ -125,7 +125,7 @@ class HistoryViewModel(
 
                         showSnackbar(msg)
                         _deleteDataIndex.postValue(historyIndex)
-                        trackHistoryList.value?.removeAt(historyIndex)
+                        getSearchHistories(searchType)
                     }
                 } else {
                     artistHistoryList.value?.get(historyIndex)?.let { history ->
@@ -137,7 +137,7 @@ class HistoryViewModel(
 
                         showSnackbar(msg)
                         _deleteDataIndex.postValue(historyIndex)
-                        artistHistoryList.value?.removeAt(historyIndex)
+                        getSearchHistories(searchType)
                     }
                 }
 

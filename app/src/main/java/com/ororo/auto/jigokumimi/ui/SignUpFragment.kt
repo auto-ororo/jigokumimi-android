@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -65,6 +66,12 @@ class SignUpFragment : BaseFragment() {
         }
 
         baseInit(viewModel)
+
+        // タイトル設定
+        (activity as AppCompatActivity).supportActionBar?.run {
+            show()
+            title = context?.getString(R.string.title_sign_up)
+        }
 
         return binding.root
     }

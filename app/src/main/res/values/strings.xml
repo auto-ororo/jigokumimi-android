@@ -39,11 +39,11 @@
     <string name="title_history">History</string>
     <string name="title_Setting">Settings</string>
     <string name="splash_text">起動中。。。</string>
-    <string name="search_tracks_button_text">検索</string>
+    <string name="search_tracks_button_text">Search</string>
     <string name="tracks_text">Track</string>
     <string name="artist_text">Artist</string>
-    <string name="select_types_suggest">1. タイプ</string>
-    <string name="select_distance_suggest">2. 範囲</string>
+    <string name="select_types_suggest">1. Search Type</string>
+    <string name="select_distance_suggest">2. Distance</string>
     <string name="get_music_suggest">まわりの音楽を集めよう</string>
     <string name="search_text">Search</string>
     <string name="logout_text">Logout</string>

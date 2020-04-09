@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -76,28 +77,40 @@ class SearchFragment : BaseFragment() {
         }
 
         val adapter = ArrayAdapter(
-                requireContext(),
-                R.layout.custom_spinner,
-                resources.getStringArray(R.array.distance_array)
+            requireContext(),
+            R.layout.custom_spinner,
+            resources.getStringArray(R.array.distance_array)
         )
         adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown)
         binding.distanceSpinner.adapter = adapter
 
         // スピナー内のアイテムが選択されたときの動作を設定
-        binding.distanceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-            }
+        binding.distanceSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+                }
 
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-               viewModel.setDistanceFromSelectedSpinnerString(binding.distanceSpinner.getItemAtPosition(p2).toString())
-            }
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    viewModel.setDistanceFromSelectedSpinnerString(
+                        binding.distanceSpinner.getItemAtPosition(
+                            p2
+                        ).toString()
+                    )
+                }
 
-        }
+            }
 
         setHasOptionsMenu(true)
 
         // ホームメニューアイコンを表示する
         activity?.actionBar?.setDisplayShowHomeEnabled(true);
+
+
+        // タイトル設定
+        (activity as AppCompatActivity).supportActionBar?.run {
+            show()
+            title = context?.getString(R.string.title_search)
+        }
 
         return binding.root
     }
@@ -121,7 +134,7 @@ class SearchFragment : BaseFragment() {
 
     /**
      * 検索種別で「Track」がタップされたときの処理
-      */
+     */
     private fun onTrackTextTapped() {
         viewModel.setSearchTypeToTrack()
     }

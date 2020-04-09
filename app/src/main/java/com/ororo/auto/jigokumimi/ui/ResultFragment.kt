@@ -6,10 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +23,6 @@ import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
-import kotlinx.android.synthetic.main.fragment_result_list.*
 
 /**
  *  検索結果表示画面
@@ -32,7 +32,6 @@ class ResultFragment : BaseFragment() {
     lateinit var viewModel: ResultViewModel
 
     private val args: ResultFragmentArgs by navArgs()
-
 
     /**
      * RecyclerView Track Adapter
@@ -61,7 +60,6 @@ class ResultFragment : BaseFragment() {
                 }
             })
         }
-
     }
 
     override fun onCreateView(
@@ -136,11 +134,16 @@ class ResultFragment : BaseFragment() {
 
         // アイテム間に枠線を設定
         val dividerItemDecoration =
-            DividerItemDecoration(binding.recyclerView.context,DividerItemDecoration.VERTICAL)
+            DividerItemDecoration(binding.recyclerView.context, DividerItemDecoration.VERTICAL)
         dividerItemDecoration.setDrawable(activity?.applicationContext?.getDrawable(R.drawable.divider)!!)
         binding.recyclerView.addItemDecoration(dividerItemDecoration)
 
         baseInit(viewModel)
+
+        // タイトル設定
+        (activity as AppCompatActivity).supportActionBar?.run {
+            title = context?.getString(R.string.title_result)
+        }
 
         return binding.root
     }

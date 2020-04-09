@@ -74,8 +74,7 @@ class LoginFragment : BaseFragment() {
 
         // ドロワーアイコンを非表示･タイトル設定
         (activity as AppCompatActivity).supportActionBar?.run{
-            setDisplayHomeAsUpEnabled(false)
-            title = context?.getString(R.string.title_login)
+            hide()
         }
 
         return binding.root
