@@ -5,6 +5,7 @@ import android.location.Location
 import androidx.lifecycle.MutableLiveData
 import com.ororo.auto.jigokumimi.database.*
 import com.ororo.auto.jigokumimi.domain.Artist
+import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.util.Constants
@@ -37,7 +38,7 @@ class MusicRepository(
     val offset: Int = 0
 
     /**
-     * 周辺曲情報を更新する
+     * 曲情報を更新する
      */
     override suspend fun refreshTracks(userId: String, location: Location, distance: Int) =
         withContext(Dispatchers.IO) {
@@ -56,40 +57,115 @@ class MusicRepository(
             )
 
             val tracksModel = tracksAround.data?.map { trackAround ->
-                val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
-
-                // 詳細な曲情報を取得
-                val trackDetail = spotifyApiService.getTrackDetail(
-                    spotifyToken,
-                    trackAround.spotifyTrackId
-                )
-
-                // 曲がお気に入り登録されているかどうかを取得
-                val isTrackSaved = spotifyApiService.getIfTracksSaved(
-                    spotifyToken,
-                    trackAround.spotifyTrackId
-                )[0]
-
-                // 取得した情報をエンティティに追加
-                return@map Track(
-
-                    id = trackDetail.id,
-                    album = trackDetail.album.name,
-                    name = trackDetail.name,
-                    artists = trackDetail.artists.joinToString(separator = ", ") {
-                        it.name
-                    },
-                    imageUrl = trackDetail.album.images[0].url,
-                    previewUrl = trackDetail.previewUrl,
-                    rank = trackAround.rank,
-                    popularity = trackAround.popularity,
-                    isSaved = isTrackSaved
-                )
+                getTrackDetail(trackAround.spotifyTrackId, trackAround.rank, trackAround.popularity)
             }
 
             tracks.postValue(tracksModel)
 
             return@withContext
+        }
+
+    /**
+     * 検索履歴から曲情報を更新する
+     */
+    override suspend fun refreshTracksFromHistory(history: History): Unit? =
+        withContext(Dispatchers.IO) {
+
+            val tracksModel = history.historyItems?.map { historyItem ->
+                getTrackDetail(historyItem.spotifyItemId, historyItem.rank, historyItem.popularity)
+            }
+
+            tracks.postValue(tracksModel)
+
+            return@withContext
+    }
+
+    /**
+     * 検索履歴からアーティスト情報を更新する
+     */
+    override suspend fun refreshArtistsFromHistory(history: History): Unit? =
+        withContext(Dispatchers.IO) {
+            val artistsModel = history.historyItems?.map { historyItem ->
+                getArtistDetail(historyItem.spotifyItemId, historyItem.rank, historyItem.popularity)
+            }
+
+            artists.postValue(artistsModel)
+
+            return@withContext
+    }
+
+    /**
+     * Jigokumimi APIから取得した周辺曲情報を元に詳細な曲情報を取得する
+     *
+     */
+    private suspend fun getTrackDetail(spotifyTrackId:String, rank:Int, popularity:Int):Track =
+        withContext(Dispatchers.IO) {
+            val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
+
+            // 詳細な曲情報を取得
+            val trackDetail = spotifyApiService.getTrackDetail(
+                spotifyToken,
+                spotifyTrackId
+            )
+
+            // 曲がお気に入り登録されているかどうかを取得
+            val isTrackSaved = spotifyApiService.getIfTracksSaved(
+                spotifyToken,
+                spotifyTrackId
+            )[0]
+
+            // 取得した情報をエンティティに追加
+            return@withContext Track(
+
+                id = trackDetail.id,
+                album = trackDetail.album.name,
+                name = trackDetail.name,
+                artists = trackDetail.artists.joinToString(separator = ", ") {
+                    it.name
+                },
+                imageUrl = trackDetail.album.images[0].url,
+                previewUrl = trackDetail.previewUrl,
+                rank = rank,
+                popularity = popularity,
+                isSaved = isTrackSaved
+            )
+
+        }
+
+
+    /**
+     * Jigokumimi APIから取得した周辺アーティスト情報を元に詳細なアーティスト情報を取得する
+     *
+     */
+    private suspend fun getArtistDetail(spotifyArtistId:String, rank:Int, popularity:Int):Artist =
+        withContext(Dispatchers.IO) {
+            val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
+
+            // 詳細なアーティスト情報を取得
+            val artistDetail = spotifyApiService.getArtistDetail(
+                spotifyToken,
+                spotifyArtistId
+            )
+
+            val type = "artist"
+
+            // 曲がお気に入り登録されているかどうかを取得
+            val isArtistFollowed = spotifyApiService.getIfArtistsOrUsersSaved(
+                spotifyToken,
+                type,
+                spotifyArtistId
+            )[0]
+
+            // 取得したアーティスト情報を元にエンティティを作成
+            return@withContext Artist(
+                id = artistDetail.id,
+                name = artistDetail.name,
+                imageUrl = artistDetail.images[0].url,
+                genres = artistDetail.genres?.joinToString(separator = ", "),
+                rank = rank,
+                popularity = popularity,
+                isFollowed = isArtistFollowed
+            )
         }
 
     /**
@@ -111,7 +187,7 @@ class MusicRepository(
     /**
      * ユーザーのお気に入り曲を位置情報と一緒に登録する
      */
-    override suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): PostResponse =
+    override suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): CommonResponse =
         withContext(Dispatchers.IO) {
             Timber.d("post my favorite tracks is called")
 
@@ -197,7 +273,7 @@ class MusicRepository(
     /**
      * ユーザーのお気に入りアーティストを更新する
      */
-    override suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): PostResponse =
+    override suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): CommonResponse =
         withContext(Dispatchers.IO) {
             Timber.d("post my favorite tracks is called")
 
@@ -272,4 +348,65 @@ class MusicRepository(
 
             return@withContext
         }
+
+    /**
+     * アーティスト情報の検索履歴を取得する
+     */
+    override suspend fun getArtistsAroundSearchHistories(userId: String): GetArtistSearchHistoryResponse =
+        withContext(Dispatchers.IO) {
+            Timber.d("get artist around search histories is called")
+
+            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
+
+            return@withContext jigokumimiApiService.getArtistsAroundSearchHistories(
+                jigokumimiToken,
+                userId
+            )
+        }
+
+    /**
+     * 曲情報の検索履歴を取得する
+     */
+    override suspend fun getTracksAroundSearchHistories(userId: String): GetTrackSearchHistoryResponse =
+        withContext(Dispatchers.IO) {
+            Timber.d("get artist around search histories is called")
+
+            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
+
+            return@withContext jigokumimiApiService.getTracksAroundSearchHistories(
+                jigokumimiToken,
+                userId
+            )
+        }
+
+    /**
+     * アーティスト情報の検索履歴を削除する
+     */
+    override suspend fun deleteArtistsAroundSearchHistories(historyId: String): CommonResponse =
+        withContext(Dispatchers.IO) {
+            Timber.d("delete artist around search histories is called")
+
+            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
+
+            return@withContext jigokumimiApiService.deleteArtistsAroundSearchHistories(
+                jigokumimiToken,
+                historyId
+            )
+        }
+
+    /**
+     * 曲情報の検索履歴を削除する
+     */
+    override suspend fun deleteTracksAroundSearchHistories(historyId: String): CommonResponse =
+        withContext(Dispatchers.IO) {
+            Timber.d("delete artist around search histories is called")
+
+            val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
+
+            return@withContext jigokumimiApiService.deleteTracksAroundSearchHistories(
+                jigokumimiToken,
+                historyId
+            )
+        }
+
 }

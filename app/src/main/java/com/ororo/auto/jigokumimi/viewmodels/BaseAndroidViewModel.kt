@@ -5,9 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_HOST
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_SCHEME
@@ -15,6 +13,7 @@ import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import org.json.JSONObject
 import retrofit2.HttpException
+import java.io.IOException
 
 /**
  * AndroidViewModelベースクラス
@@ -107,6 +106,53 @@ open class BaseAndroidViewModel(
         } else {
             getApplication<Application>().getString(R.string.request_fail_message)
         }
+    }
+
+    /**
+     * ViewModel上で発生する通信系Exceptionのハンドリングを行う
+     */
+    protected fun handleConnectException(e: Exception) {
+        val msg = when (e) {
+            is HttpException -> {
+                if (e.code() == 401) {
+                    _isTokenExpired.postValue(true)
+                    getApplication<Application>().getString(R.string.token_expired_error_message)
+                } else {
+                    getMessageFromHttpException(e)
+                }
+            }
+            is IOException -> {
+                getApplication<Application>().getString(R.string.no_connection_error_message)
+            }
+            else -> {
+                getApplication<Application>().getString(
+                    R.string.general_error_message,
+                    e.javaClass
+                )
+            }
+        }
+        showMessageDialog(msg)
+    }
+
+    /**
+     * ViewModel上で発生する認証系Exceptionのハンドリングを行う
+     */
+    protected fun handleAuthException(e: Exception) {
+        val msg = when (e) {
+            is HttpException -> {
+                getMessageFromHttpException(e)
+            }
+            is IOException -> {
+                getApplication<Application>().getString(R.string.no_connection_error_message)
+            }
+            else -> {
+                getApplication<Application>().getString(
+                    R.string.general_error_message,
+                    e.javaClass
+                )
+            }
+        }
+        showMessageDialog(msg)
     }
 
     /**

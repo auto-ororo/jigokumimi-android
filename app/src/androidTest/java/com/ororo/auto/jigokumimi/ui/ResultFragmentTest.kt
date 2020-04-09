@@ -125,7 +125,7 @@ class ResultFragmentTest {
 
         // キューボタンをタップ
         onView(withId(R.id.recyclerView)).perform(
-            RecyclerViewActions.actionOnItemAtPosition<ResultTrackListViewHolder>(
+            RecyclerViewActions.actionOnItemAtPosition<HistoryListViewHolder>(
                 0,
                 ChildViewAction.clickChildViewWithId(R.id.queueButton)
             )
@@ -173,7 +173,7 @@ class ResultFragmentTest {
             if (view !is RecyclerView) return false
 
             val holder =
-                view.findViewHolderForAdapterPosition(position) as ResultTrackListViewHolder
+                view.findViewHolderForAdapterPosition(position) as HistoryListViewHolder
             innerName = holder.itemView.name.text.toString()
             innerRank = holder.itemView.rank.text.toString()
             innerArtists = holder.itemView.artists.text.toString()

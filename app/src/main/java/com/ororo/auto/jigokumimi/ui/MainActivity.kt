@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         appBarConfiguration = AppBarConfiguration(
             //navigation.xmlに設定したidのセットを渡す
-            setOf(R.id.loginFragment, R.id.searchFragment), drawerLayout
+            setOf(R.id.loginFragment, R.id.searchFragment,R.id.historyFragment), drawerLayout
         )
 
         val navController = Navigation.findNavController(this, R.id.myNavHostFragment).also {

@@ -20,7 +20,7 @@ import androidx.test.internal.util.Checks
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.network.PostResponse
+import com.ororo.auto.jigokumimi.network.CommonResponse
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
@@ -76,7 +76,7 @@ class SearchFragmentTest {
 
         //  処理を通すためにRepositoryモックの振る舞いを定義
         every { runBlocking { musicRepository.getMyFavoriteTracks() } } returns testDataUtil.createDummyGetMyFavoriteTracksResponse()
-        every { runBlocking { musicRepository.postMyFavoriteTracks(any()) } } returns PostResponse(
+        every { runBlocking { musicRepository.postMyFavoriteTracks(any()) } } returns CommonResponse(
             faker.lorem().word(),
             null
         )

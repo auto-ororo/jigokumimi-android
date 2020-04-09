@@ -1,5 +1,7 @@
 package com.ororo.auto.jigokumimi.domain
 
+import java.util.*
+
 /**
  *
  * アプリケーション上で表示、計算されるModel群をデータクラスで定義
@@ -31,4 +33,28 @@ data class Artist(
     val rank: Int,
     val popularity: Int,
     var isFollowed: Boolean
+)
+
+
+/**
+ * domain history
+ */
+data class History(
+    val id: String,
+    val latitude: Double,
+    val longitude: Double,
+    val place: String,
+    val distance: Int,
+    val createdAt: String,
+    val historyItems: List<HistoryItem>?
+)
+
+
+/**
+ * domain history item
+ */
+data class HistoryItem(
+    val rank: Int,
+    val popularity: Int,
+    val spotifyItemId: String
 )

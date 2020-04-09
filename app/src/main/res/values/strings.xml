@@ -27,10 +27,17 @@
     <string name="un_follow_artist_message">%1$s のフォローを解除しました</string>
     <string name="save_track_message">%1$s をお気に入りの曲に追加しました</string>
     <string name="remove_track_message">%1$s をお気に入りの曲から削除しました</string>
+    <string name="remove_history_message">%1$s の検索履歴を削除しました</string>
 
     <!--  title-->
     <string name="title_dialog_error">ERROR</string>
     <string name="title_dialog_info">INFO</string>
+    <string name="title_login">Login</string>
+    <string name="title_sign_up">Sign Up</string>
+    <string name="title_search">Search</string>
+    <string name="title_result">Result</string>
+    <string name="title_history">History</string>
+    <string name="title_Setting">Settings</string>
     <string name="splash_text">起動中。。。</string>
     <string name="search_tracks_button_text">検索</string>
     <string name="tracks_text">Track</string>
@@ -44,6 +51,9 @@
     <string name="test_email_text">test@test.com</string>
     <string name="test_password_text">testtest</string>
     <string name="settings_text">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
 

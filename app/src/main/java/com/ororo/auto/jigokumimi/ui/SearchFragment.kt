@@ -76,7 +76,7 @@ class SearchFragment : BaseFragment() {
         }
 
         val adapter = ArrayAdapter(
-                context!!,
+                requireContext(),
                 R.layout.custom_spinner,
                 resources.getStringArray(R.array.distance_array)
         )

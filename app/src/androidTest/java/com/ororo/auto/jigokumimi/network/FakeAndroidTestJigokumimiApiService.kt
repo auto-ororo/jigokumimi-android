@@ -7,7 +7,7 @@ class FakeAndroidTestJigokumimiApiService : JigokumimiApiService {
     lateinit var logoutResponse: LogoutResponse
     lateinit var getMeResponse: GetMeResponse
     lateinit var refreshResponse: RefreshResponse
-    lateinit var postResponse: PostResponse
+    lateinit var commonResponse: CommonResponse
     lateinit var getTracksAroundResponse: GetTracksAroundResponse
     lateinit var getArtistsAroundResponse: GetArtistsAroundResponse
 
@@ -35,15 +35,15 @@ class FakeAndroidTestJigokumimiApiService : JigokumimiApiService {
     override suspend fun postTracks(
         authorization: String,
         songs: List<PostMyFavoriteTracksRequest>
-    ): PostResponse {
-        return postResponse
+    ): CommonResponse {
+        return commonResponse
     }
 
     override suspend fun postArtists(
         authorization: String,
         songs: List<PostMyFavoriteArtistsRequest>
-    ): PostResponse {
-        return postResponse
+    ): CommonResponse {
+        return commonResponse
     }
 
     override suspend fun getTracksAround(

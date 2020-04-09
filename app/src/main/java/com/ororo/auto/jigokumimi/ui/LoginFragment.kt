@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toolbar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
@@ -69,6 +71,12 @@ class LoginFragment : BaseFragment() {
         // デモ用ログイン情報
         viewModel.email.value = getString(R.string.test_email_text)
         viewModel.password.value = getString(R.string.test_password_text)
+
+        // ドロワーアイコンを非表示･タイトル設定
+        (activity as AppCompatActivity).supportActionBar?.run{
+            setDisplayHomeAsUpEnabled(false)
+            title = context?.getString(R.string.title_login)
+        }
 
         return binding.root
     }
