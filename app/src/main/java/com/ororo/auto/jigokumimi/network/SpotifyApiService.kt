@@ -9,16 +9,16 @@ import retrofit2.http.*
 
 /**
  * Retrofitを用いてSpotifyとのAPI通信を行うサービスを定義
- *
- *
  */
 
-// APIインターフェース
-// 以下を定義
-// ・ホストURL以降のパス
-// ・パラメータ
-// ・HTTPメソッド
-// ・戻り地(エンティティ)
+/**
+ * APIインターフェース
+ * 以下を定義
+ * ・ホストURL以降のパス
+ * ・パラメータ
+ * ・HTTPメソッド
+ * ・戻り地(エンティティ)
+ */
 interface SpotifyApiService {
     @GET("me/top/tracks")
     suspend fun getTracks(
@@ -91,7 +91,9 @@ interface SpotifyApiService {
     ): List<Boolean>
 }
 
-// シングルトンでインターフェースを実装する
+/**
+ * シングルトンでインターフェースを実装
+ */
 object SpotifyApi {
 
     // 通信先ホストのURL

@@ -1,5 +1,6 @@
 package com.ororo.auto.jigokumimi.ui
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,8 +27,8 @@ class SignUpFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
 
+        // ViewModel取得or生成
         activity?.run {
             val viewModelFactory = SignUpViewModel.Factory(this.application)
 
@@ -37,34 +38,36 @@ class SignUpFragment : BaseFragment() {
             ).get(SignUpViewModel::class.java)
         }
 
+        // データバインディング設定
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_sign_up,
             container,
             false
         )
-
         binding.lifecycleOwner = viewLifecycleOwner
-
         binding.viewModel = viewModel
 
+        // リスナー設定
+        binding.signUpButton.setOnClickListener {
+            onSignUpClicked()
+        }
+
+        // LiveDataの監視
+        viewModel.isLogin.observe(viewLifecycleOwner) {
+            if (it) onLoginSucceed()
+        }
+        viewModel.isSignUp.observe(viewLifecycleOwner) {
+            if (it) onSignUpSucceed()
+        }
         viewModel.signUpButtonEnabledState.observe(viewLifecycleOwner) {
             binding.signUpButton.isEnabled = it
         }
 
-        binding.signUpButton.setOnClickListener {
-            viewModel.signUp()
-        }
+        // 入力項目のクリア
+        viewModel.clearInput()
 
-        viewModel.isLogin.observe(viewLifecycleOwner) {
-            if (it) onLoginSucceed()
-        }
-
-        // 新規登録完了後、完了メッセージを表示し、ログインを試みる
-        viewModel.isSignUp.observe(viewLifecycleOwner) {
-            if (it) onSignUpSucceed()
-        }
-
+        // 共通初期化処理
         baseInit(viewModel)
 
         // タイトル設定
@@ -74,6 +77,14 @@ class SignUpFragment : BaseFragment() {
         }
 
         return binding.root
+    }
+
+    /**
+     * 新規登録ボタンタップ時の処理
+     * 新規登録を実行する
+     */
+    private fun onSignUpClicked() {
+        viewModel.signUp()
     }
 
     /**
@@ -102,8 +113,6 @@ class SignUpFragment : BaseFragment() {
     private fun onLoginSucceed() {
         authenticateSpotify(viewModel)
         viewModel.doneLogin()
-        this.findNavController()
-            .navigate(R.id.searchFragment)
     }
 
 }

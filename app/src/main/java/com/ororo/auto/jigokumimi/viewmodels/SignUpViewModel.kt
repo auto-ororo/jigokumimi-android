@@ -16,31 +16,18 @@ class SignUpViewModel(application: Application, private val authRepository: IAut
     BaseAndroidViewModel(application) {
 
     /**
-     *  登録状態(Private)
-     */
-    private var _isSignUp = MutableLiveData(false)
-
-    /**
      *  登録状態
      */
+    private var _isSignUp = MutableLiveData(false)
     val isSignUp: LiveData<Boolean>
         get() = _isSignUp
 
     /**
-     *  ログイン状態(Private)
-     */
-    private var _isLogin = MutableLiveData(false)
-
-    /**
      *  ログイン状態
      */
+    private var _isLogin = MutableLiveData(false)
     val isLogin: LiveData<Boolean>
         get() = _isLogin
-
-    /**
-     * 名前の入力内容を保持
-     */
-    val name = MutableLiveData("")
 
     /**
      * Emailの入力内容を保持
@@ -58,57 +45,62 @@ class SignUpViewModel(application: Application, private val authRepository: IAut
     val passwordConfirmation = MutableLiveData("")
 
     /**
-     * 新規登録ボタンの活性・非活性(Private)
-     */
-    private val _signUpButtonEnabledState = MediatorLiveData<Boolean>()
-
-    /**
      * 新規登録ボタンの活性・非活性
      */
+    private val _signUpButtonEnabledState = MediatorLiveData<Boolean>()
     val signUpButtonEnabledState: LiveData<Boolean>
         get() = _signUpButtonEnabledState
 
+    /**
+     * ViewModel生成時の処理
+     */
     init {
-        // EditTextが変更された時にバリデーションを実行し、新規登録ボタンの活性・非活性制御を行う
-        _signUpButtonEnabledState.addSource(name) { validateSignUp() }
+        // EditTextが変更された時にバリデーションを実行し、新規登録ボタンの活性・非活性制御､サジェストの表示･非表示を行う
         _signUpButtonEnabledState.addSource(email) { validateSignUp() }
         _signUpButtonEnabledState.addSource(password) { validateSignUp() }
         _signUpButtonEnabledState.addSource(passwordConfirmation) { validateSignUp() }
     }
 
     /**
+     * 入力をクリアする
+     */
+    fun clearInput() {
+        email.value = ""
+        password.value = ""
+        passwordConfirmation.value = ""
+    }
+
+    /**
      * 画面全体のバリデーション
      */
     private fun validateSignUp() {
-        _signUpButtonEnabledState.value = validateEmail() && validatePassword() && validateName()
+        _signUpButtonEnabledState.value =
+            validateEmail() && validatePassword() && validateConfirmPassword()
     }
 
     /**
      * Emailのバリデーション
      * ・メールアドレス形式
      */
-    private fun validateEmail() = Patterns.EMAIL_ADDRESS.matcher(email.value ?: "").matches()
+    private fun validateEmail(): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email.value ?: "").matches()
+    }
 
     /**
      * Passwordのバリデーション
      * ・8文字以上
-     * ・再入力パスワードが等しい
      */
     private fun validatePassword(): Boolean {
-        val isOkPattern = Pattern.compile("^.{8,}$")
+        return Pattern.compile("^.{8,}$")
             .matcher(password.value ?: "").matches()
-
-        val isRetyped = password.value == passwordConfirmation.value
-
-        return isOkPattern && isRetyped
     }
 
     /**
-     * 名前のバリデーション
-     * ・空文字以外
+     * 再入力Passwordのバリデーション
+     * パスワードと入力内容が等しい
      */
-    private fun validateName(): Boolean {
-        return name.value != ""
+    private fun validateConfirmPassword(): Boolean {
+        return password.value == passwordConfirmation.value
     }
 
     /**
@@ -119,7 +111,6 @@ class SignUpViewModel(application: Application, private val authRepository: IAut
             try {
                 authRepository.signUpJigokumimi(
                     SignUpRequest(
-                        name = name.value!!,
                         email = email.value!!,
                         password = password.value!!,
                         passwordConfirmation = passwordConfirmation.value!!
@@ -165,7 +156,6 @@ class SignUpViewModel(application: Application, private val authRepository: IAut
      */
     override fun onCleared() {
         super.onCleared()
-        _signUpButtonEnabledState.removeSource(name)
         _signUpButtonEnabledState.removeSource(email)
         _signUpButtonEnabledState.removeSource(password)
         _signUpButtonEnabledState.removeSource(passwordConfirmation)

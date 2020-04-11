@@ -12,15 +12,22 @@
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_searchFragment"
+            app:destination="@id/searchFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.ororo.auto.jigokumimi.ui.SignUpFragment"
-        android:label="SignUpFragment" />
-    <fragment
-        android:id="@+id/splashFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.SplashFragment"
-        android:label="SplashFragment" />
+        android:label="SignUpFragment" >
+        <action
+            android:id="@+id/action_signUpFragment_to_searchFragment"
+            app:destination="@id/searchFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.ororo.auto.jigokumimi.ui.SearchFragment"
@@ -48,5 +55,20 @@
             app:destination="@id/resultFragment"
             app:launchSingleTop="false"
             app:popUpToInclusive="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.SettingFragment"
+        android:label="SettingFragment" >
+        <action
+            android:id="@+id/action_settingFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_settingFragment_to_searchFragment"
+            app:destination="@id/searchFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

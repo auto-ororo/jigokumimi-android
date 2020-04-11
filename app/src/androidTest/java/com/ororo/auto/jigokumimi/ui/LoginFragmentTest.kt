@@ -97,7 +97,7 @@ class LoginFragmentTest {
         onView(withId(R.id.passwordEdit)).perform(replaceText(samplePassword))
         onView(withId(R.id.login_button)).perform(click())
 
-        onView(withId(R.id.title_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.titleText)).check(matches(isDisplayed()));
     }
 
     @Test

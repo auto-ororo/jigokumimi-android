@@ -113,6 +113,52 @@ class AuthRepository(
         }
 
     /**
+     * Jigokumiminiのパスワードを変更する
+     */
+    override suspend fun changeJigokumimiPassword(changePasswordRequest: ChangePasswordRequest): CommonResponse =
+        withContext(Dispatchers.IO) {
+            Timber.d("get jigokumimi user profile is called")
+
+            val token = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
+
+            // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
+            return@withContext jigokumimiApiService.changePassword(
+                token,
+                changePasswordRequest
+            )
+
+        }
+
+    /**
+     * Jigokumiminiのユーザーを登録解除する
+     */
+    override suspend fun unregisterJigokumimiUser(): CommonResponse =
+        withContext(Dispatchers.IO) {
+            Timber.d("get jigokumimi user profile is called")
+
+            val token = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
+
+            // 登録解除
+            val res = jigokumimiApiService.unregisterUser(
+                token
+            )
+
+            // 端末内に保存したログイン情報を削除
+            prefData.edit().let {
+                it.putString(Constants.SP_JIGOKUMIMI_USER_ID_KEY, "")
+                it.putString(Constants.SP_JIGOKUMIMI_EMAIL_KEY, "")
+                it.putString(Constants.SP_JIGOKUMIMI_PASSWORD_KEY, "")
+                it.putString(
+                    Constants.SP_JIGOKUMIMI_TOKEN_KEY, ""
+                )
+                it.putInt(Constants.SP_JIGOKUMIMI_TOKEN_EXPIRE_KEY, 0)
+                it.apply()
+            }
+
+            return@withContext res
+        }
+
+    /**
      * 端末に保存したSpotifyのアクセストークンを更新する
      */
     override suspend fun refreshSpotifyAuthToken(token: String) =
