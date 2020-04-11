@@ -21,7 +21,7 @@ open class BaseFragment() : Fragment() {
     protected fun baseInit(viewModel: BaseAndroidViewModel) {
 
         // エラー時にメッセージダイアログを表示
-        // 表示時に｢OK｣タップ時の処理を併せて設定する
+        // ｢OK｣タップ時の処理を併せて設定する
         viewModel.isErrorDialogShown.observe(
             viewLifecycleOwner,
             Observer<Boolean> { isErrorDialogShown ->
@@ -36,7 +36,7 @@ open class BaseFragment() : Fragment() {
                             dialog.dismiss()
                         }
                     )
-                    dialog.show(parentFragmentManager, "test")
+                    dialog.show(parentFragmentManager, "onFragment")
                 }
             }
         )
@@ -46,7 +46,7 @@ open class BaseFragment() : Fragment() {
             viewLifecycleOwner,
             Observer {
                 if (it != ""){
-                    Snackbar.make(this.view!!, it, Snackbar.LENGTH_SHORT).show()
+                    Snackbar.make(this.requireView(), it, Snackbar.LENGTH_SHORT).show()
                     viewModel.showedSnackbar()
                 }
             }

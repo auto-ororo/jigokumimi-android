@@ -1,10 +1,5 @@
 package com.ororo.auto.jigokumimi.network
 
-/**
- * Retrofitを用いてJigokumimiバックエンドとのAPI通信を行うサービスを定義
- *
- *
- */
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
@@ -14,17 +9,17 @@ import retrofit2.http.*
 import java.util.concurrent.TimeUnit
 
 /**
- * Retrofitを用いてSpotifyとのAPI通信を行うサービスを定義
- *
- *
+ * Retrofitを用いてJigokumimiバックエンドとのAPI通信を行うサービスを定義
  */
 
-// APIインターフェース
-// 以下を定義
-// ・ホストURL以降のパス
-// ・パラメータ
-// ・HTTPメソッド
-// ・戻り地(エンティティ)
+/**
+ * APIインターフェース
+ * 以下を定義
+ * ・ホストURL以降のパス
+ * ・パラメータ
+ * ・HTTPメソッド
+ * ・戻り地(エンティティ)
+ */
 interface JigokumimiApiService {
     @POST("auth/create")
     suspend fun signUp(
@@ -50,6 +45,17 @@ interface JigokumimiApiService {
     suspend fun refreshToken(
         @Header("Authorization") authorization: String
     ): RefreshResponse
+
+    @PUT("auth/changePassword")
+    suspend fun changePassword(
+        @Header("Authorization") authorization: String,
+        @Body info: ChangePasswordRequest
+    ): CommonResponse
+
+    @DELETE("auth/delete")
+    suspend fun unregisterUser(
+        @Header("Authorization") authorization: String
+    ): CommonResponse
 
     @POST("tracks")
     suspend fun postTracks(
@@ -105,9 +111,12 @@ interface JigokumimiApiService {
         @Query("historyId") historyId: String
     ): CommonResponse
 
+
 }
 
-// シングルトンでインターフェースを実装する
+/**
+ * シングルトンでインターフェースを実装
+ */
 object JigokumimiApi {
 
     // 通信先ホストのURL
@@ -133,10 +142,7 @@ object JigokumimiApi {
                         .build();
                     it.proceed(request)
                 }
-                // タイムアウトを60秒に設定(開発用)
-                // TODO リリース時に外す
-                .readTimeout(60, TimeUnit.SECONDS)
-                .connectTimeout(60, TimeUnit.SECONDS).build()
+                .build()
         )
         .build()
 

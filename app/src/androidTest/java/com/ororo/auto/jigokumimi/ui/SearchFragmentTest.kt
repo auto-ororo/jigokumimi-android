@@ -179,7 +179,7 @@ class SearchFragmentTest {
         } throws exception
 
         onView(withId(R.id.searchTracksButton)).perform(click())
-        onView(withId(R.id.title_text)).check(matches(isDisplayed()))
+        onView(withId(R.id.titleText)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -204,7 +204,7 @@ class SearchFragmentTest {
         onView(withId(R.id.searchTracksButton)).perform(click())
 
         // 表示されたエラーメッセージダイアログのOKボタンタップ
-        onView(withId(R.id.ok_button)).perform(click())
+        onView(withId(R.id.okButton)).perform(click())
 
         // ログイン画面に遷移することを確認
         verify {

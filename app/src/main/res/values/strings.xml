@@ -8,30 +8,53 @@
     <string name="refresh_button_text">Refresh</string>
     <string name="track_count_button_text">Count</string>
     <string name="location_button_text">Location</string>
+    <string name="login_button">Login</string>
+    <string name="demo_button">Demo</string>
+    <string name="unregister_button">Unregister</string>
+    <string name="sign_up_button">SignUp</string>
+    <string name="change_password_button">Change Password</string>
+    <string name="sign_up_text">新規登録</string>
+
+
+    <!--  hint-->
+    <string name="name_hint">Name</string>
     <string name="email_hint">Email</string>
     <string name="password_hint">Password</string>
-    <string name="login_button">Login</string>
-    <string name="sign_up_button">SignUp</string>
-    <string name="name_hint">Name</string>
-    <string name="sign_up_text">新規登録</string>
-    <string name="password_retype_hint">Retype Password</string>
+    <string name="password_retype_hint">Confirm Password</string>
+    <string name="current_password_hint">Current Password</string>
+    <string name="new_password_hint">New Password</string>
+    <string name="new_password_retype_hint">Confirm New Password</string>
+
+    <!--  suggest-->
+    <string name="name_edit_suggest">お名前を入力して下さい｡</string>
+    <string name="email_edit_suggest">メールアドレスを入力して下さい｡</string>
+    <string name="password_edit_suggest">8文字以上のパスワードを入力して下さい｡</string>
+    <string name="password_confirmation_edit_suggest">パスワードを再入力して下さい｡</string>
+    <string name="current_password_edit_suggest">現在のパスワードを入力して下さい｡</string>
+    <string name="new_password_edit_suggest">8文字以上の新しいパスワードを入力して下さい｡</string>
+    <string name="new_password_confirmation_edit_suggest">新しいパスワードを再入力して下さい｡</string>
 
     <!--  message-->
     <string name="general_error_message">エラーが発生しました｡:%1$s</string>
     <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nお使いの端末がインターネットに繋がっていない可能性があります｡</string>
-    <string name="token_expired_error_message">しばらく操作されていなかったため、認証期限が切れました。\n再ログインを行って下さい</string>
-    <string name="request_success_message">通信に成功しました</string>
+    <string name="spotify_auth_error_message">Spotifyとの連携に失敗しました｡\nログイン画面から再度やり直して下さい｡</string>
+    <string name="token_expired_error_message">しばらく操作されていなかったため、認証期限が切れました。\n再ログインを行って下さい｡</string>
+    <string name="request_success_message">通信に成功しました｡</string>
     <string name="request_fail_message">サーバー側に予期せぬエラーが発生しました。\nしばらく時間を置いて再度お試しください。</string>
     <string name="success_sign_up">新規登録が完了しました。</string>
-    <string name="follow_artist_message">%1$s をフォローしました</string>
-    <string name="un_follow_artist_message">%1$s のフォローを解除しました</string>
-    <string name="save_track_message">%1$s をお気に入りの曲に追加しました</string>
-    <string name="remove_track_message">%1$s をお気に入りの曲から削除しました</string>
-    <string name="remove_history_message">%1$s の検索履歴を削除しました</string>
+    <string name="follow_artist_message">%1$s をフォローしました｡</string>
+    <string name="un_follow_artist_message">%1$s のフォローを解除しました｡</string>
+    <string name="save_track_message">%1$s をお気に入りの曲に追加しました｡</string>
+    <string name="remove_track_message">%1$s をお気に入りの曲から削除しました｡</string>
+    <string name="remove_history_message">%1$s の検索履歴を削除しました｡</string>
+    <string name="confirm_unregister_message">ログイン中のユーザーを削除します｡\nよろしいですか?</string>
+    <string name="success_unregister_message">ログイン中のユーザーを削除しました｡</string>
+    <string name="success_change_password_message">パスワードを変更しました｡</string>
 
     <!--  title-->
     <string name="title_dialog_error">ERROR</string>
     <string name="title_dialog_info">INFO</string>
+    <string name="title_dialog_confirm">CONFIRM</string>
     <string name="title_login">Login</string>
     <string name="title_sign_up">Sign Up</string>
     <string name="title_search">Search</string>

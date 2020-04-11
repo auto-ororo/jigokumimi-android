@@ -12,7 +12,6 @@ import com.squareup.moshi.JsonClass
  */
 @JsonClass(generateAdapter = true)
 data class SignUpRequest(
-    val name: String,
     val email: String,
     val password: String,
     @Json(name = "password_confirmation") val passwordConfirmation: String
@@ -52,6 +51,16 @@ data class LoginResponse(
 data class LogoutResponse(
     val message: String,
     val data: Map<String, String>?
+)
+
+/**
+ * Put for [auth/changePassword] Request
+ */
+@JsonClass(generateAdapter = true)
+data class ChangePasswordRequest(
+    @Json(name = "current_password") val currentPassword: String,
+    @Json(name = "new_password") val newPassword: String,
+    @Json(name = "new_password_confirmation") val newPasswordConfirmation: String
 )
 
 /**

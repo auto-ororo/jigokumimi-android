@@ -17,28 +17,47 @@
         tools:context=".ui.SignUpFragment">
 
 
-        <EditText
-            android:id="@+id/nameEdit"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/passwordConfirmSuggest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/password_confirmation_edit_suggest"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/passwordEdit" />
+
+        <TextView
+            android:id="@+id/emailSuggest"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:ems="10"
-            android:hint="@string/name_hint"
-            android:inputType="textEmailAddress"
-            android:text="@={viewModel.name}"
-            android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/email_edit_suggest"
+            android:textSize="14sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/passwordSuggest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/password_edit_suggest"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/emailEdit" />
 
         <EditText
             android:id="@+id/emailEdit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="@string/email_hint"
@@ -46,15 +65,15 @@
             android:text="@={viewModel.email}"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nameEdit" />
+            app:layout_constraintTop_toBottomOf="@+id/emailSuggest" />
 
         <EditText
             android:id="@+id/passwordEdit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="@string/password_hint"
@@ -62,15 +81,15 @@
             android:text="@={viewModel.password}"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/emailEdit" />
+            app:layout_constraintTop_toBottomOf="@+id/passwordSuggest" />
 
         <EditText
             android:id="@+id/passwordConfirmationEdit"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ems="10"
             android:hint="@string/password_retype_hint"
@@ -78,8 +97,9 @@
             android:text="@={viewModel.passwordConfirmation}"
             android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordEdit" />
+            app:layout_constraintTop_toBottomOf="@+id/passwordConfirmSuggest" />
 
         <Button
             android:id="@+id/sign_up_button"

@@ -1,10 +1,7 @@
 package com.ororo.auto.jigokumimi.repository
 
 import android.app.Application
-import com.ororo.auto.jigokumimi.network.GetMeResponse
-import com.ororo.auto.jigokumimi.network.SignUpRequest
-import com.ororo.auto.jigokumimi.network.SignUpResponse
-import com.ororo.auto.jigokumimi.network.SpotifyUserResponse
+import com.ororo.auto.jigokumimi.network.*
 
 interface IAuthRepository {
     /**
@@ -36,6 +33,16 @@ interface IAuthRepository {
      * Jigokumiminiのユーザー情報の取得リクエストを行う
      */
     suspend fun getJigokumimiUserProfile(): GetMeResponse
+
+    /**
+     * Jigokumiminiのユーザーを登録解除する
+     */
+    suspend fun unregisterJigokumimiUser(): CommonResponse
+
+    /**
+     * Jigokumiminiのパスワードを変更する
+     */
+    suspend fun changeJigokumimiPassword(changePasswordRequest: ChangePasswordRequest): CommonResponse
 
     /**
      * 端末に保存したSpotifyのアクセストークンを更新する

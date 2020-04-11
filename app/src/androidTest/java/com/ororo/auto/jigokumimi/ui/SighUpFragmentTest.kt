@@ -62,7 +62,7 @@ class SighUpFragmentTest {
         onView(withId(R.id.sign_up_button)).perform(click())
 
         // 新規登録に成功したダイアログのOKをタップ
-        onView(withId(R.id.ok_button)).perform(click())
+        onView(withId(R.id.okButton)).perform(click())
 
         // 検索画面に遷移することを確認
         verify {
@@ -105,7 +105,7 @@ class SighUpFragmentTest {
         onView(withId(R.id.sign_up_button)).perform(click())
 
         // エラーメッセージが表示されることを確認
-        onView(withId(R.id.title_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.titleText)).check(matches(isDisplayed()));
     }
 
     @Test
