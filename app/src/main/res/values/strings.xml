@@ -50,6 +50,7 @@
     <string name="confirm_unregister_message">ログイン中のユーザーを削除します｡\nよろしいですか?</string>
     <string name="success_unregister_message">ログイン中のユーザーを削除しました｡</string>
     <string name="success_change_password_message">パスワードを変更しました｡</string>
+    <string name="permission_denied_message">権限が不十分なため､アプリを実行できません｡</string>
 
     <!--  title-->
     <string name="title_dialog_error">ERROR</string>

@@ -1,9 +1,13 @@
 package com.ororo.auto.jigokumimi.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
@@ -11,6 +15,7 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentLoginBinding
+import com.ororo.auto.jigokumimi.util.Constants.Companion.REQUEST_PERMISSION
 import com.ororo.auto.jigokumimi.viewmodels.LoginViewModel
 
 /**
@@ -69,13 +74,54 @@ class LoginFragment : BaseFragment() {
         // 共通初期化処理
         baseInit(viewModel)
 
-
         // ドロワーアイコンを非表示
         (activity as AppCompatActivity).supportActionBar?.run {
             hide()
         }
 
+        // Android 6, API 23以上でパーミッションの確認
+        if (Build.VERSION.SDK_INT >= 23) {
+            requestPermission()
+        }
+
         return binding.root
+    }
+
+    /**
+     * パーミッションのリクエスト
+     */
+    private fun requestPermission() {
+        requestPermissions(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ),
+            REQUEST_PERMISSION
+        )
+    }
+
+    /**
+     * パーミッションのリクエスト結果を捕捉
+     * 権限が不十分の場合はエラーメッセージを表示してアプリを終了する
+     */
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == REQUEST_PERMISSION) {
+            for (grantResult in grantResults) {
+                if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(activity, getString(R.string.permission_denied_message), Toast.LENGTH_SHORT).show()
+                    activity?.finish()
+                    return
+                }
+            }
+        } else {
+            Toast.makeText(activity, getString(R.string.permission_denied_message), Toast.LENGTH_SHORT).show()
+            activity?.finish()
+        }
     }
 
     /**

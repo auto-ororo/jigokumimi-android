@@ -29,10 +29,6 @@
             app:popUpToInclusive="false" />
     </fragment>
     <fragment
-        android:id="@+id/splashFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.SplashFragment"
-        android:label="SplashFragment" />
-    <fragment
         android:id="@+id/searchFragment"
         android:name="com.ororo.auto.jigokumimi.ui.SearchFragment"
         android:label="SearchFragment">
