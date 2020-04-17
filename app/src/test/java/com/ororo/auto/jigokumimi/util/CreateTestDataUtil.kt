@@ -2,6 +2,8 @@ package com.ororo.auto.jigokumimi.util
 
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.domain.Artist
+import com.ororo.auto.jigokumimi.domain.History
+import com.ororo.auto.jigokumimi.domain.HistoryItem
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
 import java.util.*
@@ -49,6 +51,82 @@ class CreateTestDataUtil {
             rank = rank,
             popularity = faker.number().randomDigit(),
             spotifyArtistId = spotifyArtistId
+        )
+    }
+
+    fun createDummyHistoryItem(
+        rank: Int = faker.number().randomDigit(),
+        spotifyItemId: String = faker.random().hex()
+    ): HistoryItem {
+        return HistoryItem(
+            rank = rank,
+            popularity = faker.number().randomDigit(),
+            spotifyItemId = spotifyItemId
+        )
+    }
+
+
+    fun createDummyHistory(): History {
+        return History(
+            id = faker.random().hex(),
+            latitude = faker.number().randomDouble(10, 2, 5),
+            longitude = faker.number().randomDouble(10, 2, 5),
+            distance = faker.number().randomDigit(),
+            place = faker.lorem().characters(),
+            createdAt = faker.date().toString(),
+            historyItems = listOf(
+                createDummyHistoryItem(),
+                createDummyHistoryItem(),
+                createDummyHistoryItem()
+            )
+        )
+    }
+
+    fun createDummyTrackHistoryItem(): TrackHistoryItem {
+        return TrackHistoryItem(
+            rank = faker.number().randomDigit(),
+            popularity = faker.number().randomDigit(),
+            spotifyTrackId = faker.random().hex()
+        )
+    }
+
+    fun createDummyArtistHistoryItem(): ArtistHistoryItem {
+        return ArtistHistoryItem(
+            rank = faker.number().randomDigit(),
+            popularity = faker.number().randomDigit(),
+            spotifyArtistId = faker.random().hex()
+        )
+    }
+
+    fun createDummyTrackHistory(): TrackHistory {
+        return TrackHistory(
+            id = faker.random().hex(),
+            latitude = faker.number().randomDouble(10, 2, 5),
+            longitude = faker.number().randomDouble(10, 2, 5),
+            distance = faker.number().randomDigit(),
+            createdAt = faker.date().toString(),
+            tracksAroundHistories = listOf(
+                createDummyTrackHistoryItem(),
+                createDummyTrackHistoryItem(),
+                createDummyTrackHistoryItem()
+            ),
+            userId = faker.random().hex()
+        )
+    }
+
+    fun createDummyArtistHistory(): ArtistHistory {
+        return ArtistHistory(
+            id = faker.random().hex(),
+            latitude = faker.number().randomDouble(10, 2, 5),
+            longitude = faker.number().randomDouble(10, 2, 5),
+            distance = faker.number().randomDigit(),
+            createdAt = faker.date().toString(),
+            artistsAroundHistories = listOf(
+                createDummyArtistHistoryItem(),
+                createDummyArtistHistoryItem(),
+                createDummyArtistHistoryItem()
+            ),
+            userId = faker.random().hex()
         )
     }
 
@@ -268,8 +346,8 @@ class CreateTestDataUtil {
         )
     }
 
-    fun createDummyTrack() : Track {
-       return Track(
+    fun createDummyTrack(): Track {
+        return Track(
             album = faker.lorem().word(),
             artists = faker.name().fullName(),
             id = faker.random().hex(),
@@ -277,18 +355,26 @@ class CreateTestDataUtil {
             name = faker.name().fullName(),
             popularity = faker.number().randomDigit(),
             previewUrl = faker.internet().url(),
-            rank = faker.number().randomDigit()
+            rank = faker.number().randomDigit(),
+            isSaved = faker.bool().bool()
         )
     }
 
-    fun createDummyArtist() : Artist {
+    fun createDummyArtist(): Artist {
         return Artist(
             id = faker.random().hex(),
             imageUrl = faker.internet().url(),
             name = faker.name().fullName(),
             popularity = faker.number().randomDigit(),
             rank = faker.number().randomDigit(),
-            genres = faker.lorem().word()
+            genres = faker.lorem().word(),
+            isFollowed = faker.bool().bool()
+        )
+    }
+
+    fun createDummySavedList(): List<Boolean> {
+        return listOf(
+            faker.bool().bool()
         )
     }
 }

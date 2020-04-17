@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import retrofit2.HttpException
 import retrofit2.Response
+import java.io.IOException
 import java.util.*
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
@@ -61,6 +62,36 @@ class BaseAndroidViewModelTest {
         assertThat(message, IsEqual(messageLiveDataValue))
         // フラグがtrueであることを確認
         assertThat(afterDialogShownLiveDataValue, IsEqual(true))
+    }
+
+    @Test
+    fun showSnackBar_Snackbarメッセージが設定されること() {
+
+        // 引数に渡すメッセージ
+        val message = faker.lorem().sentence()
+
+        // メソッド呼び出し
+        viewModel.showSnackbar(message)
+
+        // 引数で渡したメッセージが設定されていることを確認
+        val messageLiveDataValue = viewModel.snackbarMessage.getOrAwaitValue()
+        assertThat(message, IsEqual(messageLiveDataValue))
+    }
+
+    @Test
+    fun showedSnackBar_Snackbarメッセージが初期化されること() {
+
+        // SnackBarメッセージを設定
+        val message = faker.lorem().sentence()
+        viewModel.showSnackbar(message)
+
+        // メソッド呼び出し
+        viewModel.showedSnackbar()
+
+        val messageLiveDataValue = viewModel.snackbarMessage.getOrAwaitValue()
+
+        // 引数で渡したメッセージが設定されていることを確認
+        assertThat(messageLiveDataValue, IsEqual(""))
     }
 
     @Test
@@ -112,11 +143,227 @@ class BaseAndroidViewModelTest {
         }
 
         val message =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(R.string.request_fail_message)
+            InstrumentationRegistry.getInstrumentation()
+                .context.resources.getString(R.string.request_fail_message)
 
         // 汎用メッセージが取得できることを確認
         assertThat(message, IsEqual(retMessage))
     }
 
+    @Test
+    fun handleConnectException_レスポンスコード401のHttpException_トークン認証切れのメッセージが表示されること() {
 
+        val errorMessage = faker.lorem().sentence()
+
+        // ステータスコード401を持つレスポンスを作成
+        val response = Response.error<Any>(
+            401, ResponseBody.create(
+                MediaType.parse("application/json"),
+                "{\"message\":\"$errorMessage\"}"
+            )
+        )
+
+        // privateメソッドを取得
+        val method =
+            viewModel::class.memberFunctions.find { it.name == "handleConnectException" }
+        // メソッド実行
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel, HttpException(response))
+        }
+
+        // トークン認証切れメッセージが設定されていることを確認
+        val messageLiveDataValue = viewModel.errorMessage.getOrAwaitValue()
+        val expectedMessage =
+            InstrumentationRegistry.getInstrumentation().context.resources.getString(
+                R.string.token_expired_error_message
+            )
+        assertThat(messageLiveDataValue, IsEqual(expectedMessage))
+
+        // メッセージ表示フラグがtrueであることを確認
+        val afterDialogShownLiveDataValue = viewModel.isErrorDialogShown.getOrAwaitValue()
+        assertThat(afterDialogShownLiveDataValue, IsEqual(true))
+    }
+
+
+    @Test
+    fun handleConnectException_レスポンスコード401以外のHttpException_レスポンスBody内のmessageがエラーメッセージとして表示されること() {
+
+        val errorMessage = faker.lorem().sentence()
+
+        // ステータスコード400を持つレスポンスを作成
+        val response = Response.error<Any>(
+            400, ResponseBody.create(
+                MediaType.parse("application/json"),
+                "{\"message\":\"$errorMessage\"}"
+            )
+        )
+
+        // privateメソッドを取得
+        val method =
+            viewModel::class.memberFunctions.find { it.name == "handleConnectException" }
+        // メソッド実行
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel, HttpException(response))
+        }
+
+        // レスポンスBody内のmessageが設定されていることを確認
+        val messageLiveDataValue = viewModel.errorMessage.getOrAwaitValue()
+        assertThat(messageLiveDataValue, IsEqual(errorMessage))
+
+        // メッセージ表示フラグがtrueであることを確認
+        val afterDialogShownLiveDataValue = viewModel.isErrorDialogShown.getOrAwaitValue()
+        assertThat(afterDialogShownLiveDataValue, IsEqual(true))
+    }
+
+    @Test
+    fun handleConnectException_IOException_通信エラーが表示されること() {
+
+        // IOExceptionを生成
+        val exception = IOException()
+
+        // privateメソッドを取得
+        val method =
+            viewModel::class.memberFunctions.find { it.name == "handleConnectException" }
+        // メソッド実行
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel,exception)
+        }
+
+        // 通信エラーメッセージが設定されていることを確認
+        val messageLiveDataValue = viewModel.errorMessage.getOrAwaitValue()
+        val expectedMessage =
+            InstrumentationRegistry.getInstrumentation().context.resources.getString(
+                R.string.no_connection_error_message
+            )
+        assertThat(messageLiveDataValue, IsEqual(expectedMessage))
+
+        // メッセージ表示フラグがtrueであることを確認
+        val afterDialogShownLiveDataValue = viewModel.isErrorDialogShown.getOrAwaitValue()
+        assertThat(afterDialogShownLiveDataValue, IsEqual(true))
+    }
+
+    @Test
+    fun handleConnectException_Exception_汎用エラーが表示されること() {
+
+        // Exceptionを生成
+        val exception = Exception()
+
+        // privateメソッドを取得
+        val method =
+            viewModel::class.memberFunctions.find { it.name == "handleConnectException" }
+        // メソッド実行
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel,exception)
+        }
+
+        // 通信エラーメッセージが設定されていることを確認
+        val messageLiveDataValue = viewModel.errorMessage.getOrAwaitValue()
+        val expectedMessage =
+            InstrumentationRegistry.getInstrumentation().context.resources.getString(
+                R.string.general_error_message, exception.javaClass
+            )
+        assertThat(messageLiveDataValue, IsEqual(expectedMessage))
+
+        // メッセージ表示フラグがtrueであることを確認
+        val afterDialogShownLiveDataValue = viewModel.isErrorDialogShown.getOrAwaitValue()
+        assertThat(afterDialogShownLiveDataValue, IsEqual(true))
+    }
+
+     @Test
+    fun handleAuthException_HttpException_レスポンスBody内のmessageがエラーメッセージとして表示されること() {
+
+        val errorMessage = faker.lorem().sentence()
+
+        // ステータスコード400を持つレスポンスを作成
+        val response = Response.error<Any>(
+            400, ResponseBody.create(
+                MediaType.parse("application/json"),
+                "{\"message\":\"$errorMessage\"}"
+            )
+        )
+
+        // privateメソッドを取得
+        val method =
+            viewModel::class.memberFunctions.find { it.name == "handleAuthException" }
+        // メソッド実行
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel, HttpException(response))
+        }
+
+        // レスポンスBody内のmessageが設定されていることを確認
+        val messageLiveDataValue = viewModel.errorMessage.getOrAwaitValue()
+        assertThat(messageLiveDataValue, IsEqual(errorMessage))
+
+        // メッセージ表示フラグがtrueであることを確認
+        val afterDialogShownLiveDataValue = viewModel.isErrorDialogShown.getOrAwaitValue()
+        assertThat(afterDialogShownLiveDataValue, IsEqual(true))
+    }
+
+    @Test
+    fun handleAuthException_IOException_通信エラーが表示されること() {
+
+        // IOExceptionを生成
+        val exception = IOException()
+
+        // privateメソッドを取得
+        val method =
+            viewModel::class.memberFunctions.find { it.name == "handleAuthException" }
+        // メソッド実行
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel,exception)
+        }
+
+        // 通信エラーメッセージが設定されていることを確認
+        val messageLiveDataValue = viewModel.errorMessage.getOrAwaitValue()
+        val expectedMessage =
+            InstrumentationRegistry.getInstrumentation().context.resources.getString(
+                R.string.no_connection_error_message
+            )
+        assertThat(messageLiveDataValue, IsEqual(expectedMessage))
+
+        // メッセージ表示フラグがtrueであることを確認
+        val afterDialogShownLiveDataValue = viewModel.isErrorDialogShown.getOrAwaitValue()
+        assertThat(afterDialogShownLiveDataValue, IsEqual(true))
+    }
+
+    @Test
+    fun handleAuthException_Exception_汎用エラーが表示されること() {
+
+        // Exceptionを生成
+        val exception = Exception()
+
+        // privateメソッドを取得
+        val method =
+            viewModel::class.memberFunctions.find { it.name == "handleAuthException" }
+        // メソッド実行
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel,exception)
+        }
+
+        // 通信エラーメッセージが設定されていることを確認
+        val messageLiveDataValue = viewModel.errorMessage.getOrAwaitValue()
+        val expectedMessage =
+            InstrumentationRegistry.getInstrumentation().context.resources.getString(
+                R.string.general_error_message, exception.javaClass
+            )
+        assertThat(messageLiveDataValue, IsEqual(expectedMessage))
+
+        // メッセージ表示フラグがtrueであることを確認
+        val afterDialogShownLiveDataValue = viewModel.isErrorDialogShown.getOrAwaitValue()
+        assertThat(afterDialogShownLiveDataValue, IsEqual(true))
+    }
 }

@@ -26,4 +26,8 @@ class FakeLocationRepository(
         awaitClose {
         }
     }
+
+    override fun getPlaceName(latitude: Double, longitude: Double): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

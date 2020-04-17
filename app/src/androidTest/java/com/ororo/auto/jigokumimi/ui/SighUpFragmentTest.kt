@@ -177,7 +177,6 @@ class SighUpFragmentTest {
         samplePassword: String,
         samplePasswordConfirmation: String
     ) {
-        onView(withId(R.id.nameEdit)).perform(replaceText(sampleName))
         onView(withId(R.id.emailEdit)).perform(replaceText(sampleMail))
         onView(withId(R.id.passwordEdit)).perform(replaceText(samplePassword))
         onView(withId(R.id.passwordConfirmationEdit)).perform(replaceText(samplePasswordConfirmation))

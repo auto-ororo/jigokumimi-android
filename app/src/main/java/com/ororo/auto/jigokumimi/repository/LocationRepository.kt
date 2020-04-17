@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.util.*
 
-class LocationRepository(application: Application) : ILocationRepository {
+class LocationRepository(
+    application: Application
+) : ILocationRepository {
 
     val fusedLocationClient: FusedLocationProviderClient = FusedLocationProviderClient(application)
 
@@ -50,7 +52,7 @@ class LocationRepository(application: Application) : ILocationRepository {
 
         addresses.map {
             result.append(it.adminArea)
-            it.subAdminArea?.let {subAdminArea ->
+            it.subAdminArea?.let { subAdminArea ->
                 result.append(subAdminArea)
             }
             result.append(' ')

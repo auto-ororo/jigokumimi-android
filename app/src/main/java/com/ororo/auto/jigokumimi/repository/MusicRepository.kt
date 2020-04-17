@@ -18,7 +18,6 @@ import timber.log.Timber
  */
 
 class MusicRepository(
-    private val musicDao: MusicDao,
     private val prefData: SharedPreferences,
     private val spotifyApiService: SpotifyApiService,
     private val jigokumimiApiService: JigokumimiApiService

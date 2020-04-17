@@ -6,20 +6,17 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.repository.faker.FakeAuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import getOrAwaitValue
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType
-import okhttp3.ResponseBody
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import retrofit2.HttpException
-import retrofit2.Response
-import java.io.IOException
 import java.util.*
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
@@ -28,6 +25,7 @@ import kotlin.reflect.jvm.isAccessible
 class LoginViewModelTest {
 
     lateinit var viewModel: LoginViewModel
+    lateinit var authRepository: IAuthRepository
 
     val faker = Faker(Locale("jp_JP"))
 
@@ -37,9 +35,10 @@ class LoginViewModelTest {
 
     @Before
     fun createViewModel() {
+        authRepository = mockk(relaxed = true)
         viewModel = LoginViewModel(
             ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository()
+            authRepository
         )
     }
 
@@ -165,88 +164,11 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun login_HTTPExceprion発生_ログインフラグが立たずレスポンスBody内のmessageがダイアログメッセージに設定されること() {
+    fun login_例外発生_ログインフラグが立たずエラーメッセージが設定されること() {
 
-        // エラーメッセージを追加
-        val message = faker.lorem().sentence()
-        // 発生させるExceptionを生成
-        val exception = HttpException(
-            Response.error<Any>(
-                400, ResponseBody.create(
-                    MediaType.parse("application/json"),
-                    "{\"message\":\"$message\"}"
-                )
-            )
-        )
-
-        //  Repositoryに発生させる例外を指定してViewModelを生成
-        viewModel = LoginViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(exception)
-        )
-
-        // フラグをoff
-        viewModel.isLogin.value = false
-
-        // ログイン情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-
-        // メソッド呼び出し
-        viewModel.login()
-
-        val ret = viewModel.isLogin.getOrAwaitValue()
-        assertThat(ret, IsEqual(false))
-
-        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(message))
-        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
-    }
-
-    @Test
-    fun login_IOExceprion発生_ログインフラグが立たず定型メッセージがダイアログメッセージに設定されること() {
-
-        // 発生させるExceptionを生成
-        val exception = IOException()
-
-        //  Repositoryに発生させる例外を指定してViewModelを生成
-        viewModel = LoginViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(exception)
-        )
-
-        // フラグをoff
-        viewModel.isLogin.value = false
-
-        // ログイン情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-
-        // メソッド呼び出し
-        viewModel.login()
-
-        val ret = viewModel.isLogin.getOrAwaitValue()
-        assertThat(ret, IsEqual(false))
-
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.no_connection_error_message
-            )
-
-        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
-    }
-
-    @Test
-    fun login_Exceprion発生_ログインフラグが立たず定型メッセージがダイアログメッセージに設定されること() {
-
-        // 発生させるExceptionを生成
+        // Exceptionを生成
         val exception = Exception()
-
-        //  Repositoryに発生させる例外を指定してViewModelを生成
-        viewModel = LoginViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(exception)
-        )
+        every { runBlocking { authRepository.loginJigokumimi(any(), any()) } } throws exception
 
         // フラグをoff
         viewModel.isLogin.value = false
