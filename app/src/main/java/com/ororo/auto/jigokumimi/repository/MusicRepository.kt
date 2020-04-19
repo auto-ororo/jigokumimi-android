@@ -307,7 +307,6 @@ class MusicRepository(
                         it.id
                     )
                 }
-                it.isSaved = state
             }
 
             return@withContext
@@ -340,9 +339,6 @@ class MusicRepository(
                         artist.id
                     )
                 }
-
-                artist.isFollowed = state
-
             }
 
             return@withContext

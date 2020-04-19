@@ -79,9 +79,12 @@ class HistoryFragment : Fragment() {
         }
 
         // タイトル設定
-        (activity as AppCompatActivity).supportActionBar?.run {
-            title = context?.getString(R.string.title_history)
+        if (activity is AppCompatActivity) {
+            (activity as AppCompatActivity).supportActionBar?.run {
+                title = context?.getString(R.string.title_history)
+            }
         }
+
 
         return binding.root
     }

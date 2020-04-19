@@ -7,10 +7,12 @@ import androidx.navigation.Navigation
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import io.mockk.every
@@ -39,17 +41,16 @@ class LoginFragmentTest {
         repository = mockk(relaxed = true)
         ServiceLocator.authRepository = repository
 
-        // 検索画面を起動し、NavControllerを設定
+        // ログイン画面を起動し、NavControllerを設定
         val scenario = launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
         navController = mockk<NavController>(relaxed = true)
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)
         }
-
     }
 
     @Test
-    fun ログインボタンタップ_サーバー接続成功_検索画面に遷移すること() {
+    fun ログインボタンタップ_ログイン成功_エラーメッセージが表示されないこと() {
 
         // サンプルEmail
         val sampleMail = "test@test.com"
@@ -60,12 +61,7 @@ class LoginFragmentTest {
         onView(withId(R.id.passwordEdit)).perform(replaceText(samplePassword))
         onView(withId(R.id.login_button)).perform(click())
 
-        verify {
-            navController.navigate(
-                R.id.searchFragment
-            )
-        }
-
+        onView(withId(R.id.titleText)).check(doesNotExist());
     }
 
     @Test
@@ -87,11 +83,11 @@ class LoginFragmentTest {
             )
         )
 
-       every {
-           runBlocking {
-               repository.loginJigokumimi(any(), any())
-           }
-       } throws exception
+        every {
+            runBlocking {
+                repository.loginJigokumimi(any(), any())
+            }
+        } throws exception
 
         onView(withId(R.id.emailEdit)).perform(replaceText(sampleMail))
         onView(withId(R.id.passwordEdit)).perform(replaceText(samplePassword))
@@ -124,6 +120,16 @@ class LoginFragmentTest {
         onView(withId(R.id.emailEdit)).perform(replaceText(sampleMail))
         onView(withId(R.id.passwordEdit)).perform(replaceText(samplePassword))
         onView(withId(R.id.login_button)).check(matches(not(isEnabled())))
+    }
+
+    @Test
+    fun Demoボタンタップ_テスト用ユーザーのメールアドレスとパスワードが設定されること() {
+
+        onView(withId(R.id.demoButton)).perform(click())
+
+        onView(withId(R.id.emailEdit)).check(matches(withText("test@test.com")))
+        onView(withId(R.id.passwordEdit)).check(matches(withText("testtest")))
+
     }
 
     @Test

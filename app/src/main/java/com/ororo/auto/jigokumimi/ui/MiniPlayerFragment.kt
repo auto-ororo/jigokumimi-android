@@ -89,12 +89,12 @@ class MiniPlayerFragment : Fragment() {
 
         viewModel.changeDataIndex.observe(viewLifecycleOwner) {
             if (it == viewModel.playingTrackIndex.value) {
-                setFavIconFromTrackList(binding.saveTrackButton, viewModel.tracklist.value, it)
+                setFavIconFromTrackList(binding.miniPlayerSaveTrackButton, viewModel.tracklist.value, it)
             }
         }
 
         // お気にり曲追加ボタン
-        binding.saveTrackButton.setOnClickListener {
+        binding.miniPlayerSaveTrackButton.setOnClickListener {
             viewModel.playingTrackIndex.value?.let {
                 viewModel.changeTrackFavoriteState(it)
             }

@@ -1,7 +1,6 @@
 package com.ororo.auto.jigokumimi.ui
 
 import ServiceLocator
-import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.view.View
 import android.widget.TextView
@@ -96,11 +95,7 @@ class SearchFragmentTest {
     fun Trackタップ_検索ボタンタップ_Trackの検索処理が実行されること() {
 
         // Track選択
-        onView(withId(R.id.trackText)).perform(click())
-
-        // Trackが選択状態になり、Artistが非選択状態になることを確認
-        onView(withId(R.id.trackText)).check(matches(withBackGround(R.color.colorPrimary)))
-        onView(withId(R.id.artistButton)).check(matches(withBackGround(R.color.colorGrey)))
+        onView(withId(R.id.trackButton)).perform(click())
 
         onView(withId(R.id.searchTracksButton)).perform(click())
 
@@ -117,10 +112,6 @@ class SearchFragmentTest {
         // Artistタップ
         onView(withId(R.id.artistButton)).perform(click())
 
-        // Trackが非選択状態になり、Artistが選択状態になることを確認
-        onView(withId(R.id.trackText)).check(matches(withBackGround(R.color.colorGrey)))
-        onView(withId(R.id.artistButton)).check(matches(withBackGround(R.color.colorPrimary)))
-
         // 検索ボタンタップ
         onView(withId(R.id.searchTracksButton)).perform(click())
 
@@ -136,7 +127,7 @@ class SearchFragmentTest {
     fun Track選択_距離選択_検索ボタンタップ_スピナーで選択した距離内でのTrack検索が行われ結果画面に遷移すること() {
 
         // Track選択
-        onView(withId(R.id.trackText)).perform(click())
+        onView(withId(R.id.trackButton)).perform(click())
 
         // スピナーで500mを選択
         onView(withId(R.id.distanceSpinner)).perform(click())
@@ -211,25 +202,6 @@ class SearchFragmentTest {
             navController.navigate(
                 R.id.loginFragment
             )
-        }
-    }
-
-    /**
-     * TextViewの背景色を評価するカスタムMatcher
-     */
-    private fun withBackGround(color: Int): Matcher<View?>? {
-        Checks.checkNotNull(color)
-        return object : BoundedMatcher<View?, TextView>(TextView::class.java) {
-            override fun matchesSafely(warning: TextView): Boolean {
-                return ContextCompat.getColor(
-                    InstrumentationRegistry.getInstrumentation().targetContext,
-                    color
-                ) == (warning.background as ColorDrawable).color;
-            }
-
-            override fun describeTo(description: Description) {
-                description.appendText("with text background: ")
-            }
         }
     }
 }

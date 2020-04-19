@@ -72,9 +72,11 @@ class SettingFragment : BaseFragment() {
         baseInit(viewModel)
 
         // タイトル設定
-        (activity as AppCompatActivity).supportActionBar?.run {
-            show()
-            title = context?.getString(R.string.title_Setting)
+        if (activity is AppCompatActivity) {
+            (activity as AppCompatActivity).supportActionBar?.run {
+                show()
+                title = context?.getString(R.string.title_Setting)
+            }
         }
         return binding.root
     }

@@ -73,11 +73,9 @@ class FakeMusicRepository(
     }
 
     override suspend fun changeTrackFavoriteState(trackIndex: Int, state: Boolean) {
-        _tracks[trackIndex].isSaved = state
     }
 
     override suspend fun changeArtistFollowState(artistIndex: Int, state: Boolean) {
-        _artists[artistIndex].isFollowed = state
     }
 
     override suspend fun getArtistsAroundSearchHistories(userId: String): GetArtistSearchHistoryResponse {

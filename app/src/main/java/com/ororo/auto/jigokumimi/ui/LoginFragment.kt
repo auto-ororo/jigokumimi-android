@@ -75,8 +75,10 @@ class LoginFragment : BaseFragment() {
         baseInit(viewModel)
 
         // ドロワーアイコンを非表示
-        (activity as AppCompatActivity).supportActionBar?.run {
-            hide()
+        if (activity is AppCompatActivity) {
+            (activity as AppCompatActivity).supportActionBar?.run {
+                hide()
+            }
         }
 
         // Android 6, API 23以上でパーミッションの確認
