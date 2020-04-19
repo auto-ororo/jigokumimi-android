@@ -2,34 +2,46 @@ package com.ororo.auto.jigokumimi.repository.test
 
 import android.content.SharedPreferences
 import android.location.Location
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.preference.PreferenceManager
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.github.javafaker.Faker
-import com.ororo.auto.jigokumimi.database.DisplayedArtist
-import com.ororo.auto.jigokumimi.database.FakeMusicDao
-import com.ororo.auto.jigokumimi.database.DisplayedTrack
+import com.ororo.auto.jigokumimi.domain.Artist
+import com.ororo.auto.jigokumimi.domain.History
+import com.ororo.auto.jigokumimi.domain.HistoryItem
+import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
+import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.repository.MusicRepository
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
+import com.ororo.auto.jigokumimi.util.MockitoHelper.Companion.any
+import getOrAwaitValue
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
-import org.junit.Test
-
 import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
+import kotlin.collections.HashMap
 
 @RunWith(AndroidJUnit4::class)
 class MusicRepositoryTest {
     lateinit var prefData: SharedPreferences
-    lateinit var musicDao: FakeMusicDao
     lateinit var jigokumimiApiService: FakeJigokumimiApiService
     lateinit var spotifyApiService: FakeSpotifyApiService
-    lateinit var musicRepository: MusicRepository
+    lateinit var musicRepository: IMusicRepository
     lateinit var faker: Faker
     lateinit var ct: CreateTestDataUtil
+
+    // LiveDataのテストに必要なルールを設定
+    @get:Rule
+    var instantExecutorRule = InstantTaskExecutorRule()
 
     @Before
     fun createRepository() {
@@ -37,10 +49,8 @@ class MusicRepositoryTest {
             PreferenceManager.getDefaultSharedPreferences(ApplicationProvider.getApplicationContext())
         jigokumimiApiService = FakeJigokumimiApiService()
         spotifyApiService = FakeSpotifyApiService()
-        musicDao = FakeMusicDao()
         // Get a reference to the class under test
         musicRepository = MusicRepository(
-            musicDao,
             prefData,
             spotifyApiService,
             jigokumimiApiService
@@ -50,7 +60,7 @@ class MusicRepositoryTest {
     }
 
     @Test
-    fun refreshTracks_周辺曲情報と詳細曲情報を元にローカルDBにレコードが保存されること() = runBlocking {
+    fun refreshTracks_周辺曲情報と詳細曲情報を元にLivedataが更新されること() = runBlocking {
         // テスト対象のメソッドの引数を設定
         val spotifyUserId = faker.random().hex()
         val location = Location("test")
@@ -62,7 +72,8 @@ class MusicRepositoryTest {
         // ダミーデータ、及び期待されるDBレコードを作成
         val tracksAroundNetWork: MutableList<TrackAroundNetwork> = mutableListOf()
         val tracksDetail: MutableList<GetTrackDetailResponse> = mutableListOf()
-        val expectedDatabase: MutableList<DisplayedTrack> = mutableListOf()
+        val expectedTrackList: MutableList<Track> = mutableListOf()
+        val trackSavedList: HashMap<String, Boolean> = HashMap()
         for (i in 1..10) {
             // 曲情報を紐付けるID
             // このIDを元にJigokumimiから取得する周辺曲情報、Spotifyから取得する曲詳細情報、ローカルDBに保存する曲情報を紐つける
@@ -75,19 +86,22 @@ class MusicRepositoryTest {
             tracksDetail.add(
                 ct.createDummyGetTrackDetailResponse(spotifyTrackId)
             )
+            // 曲保存情報を生成
+            trackSavedList[spotifyTrackId] = faker.bool().bool()
             // メソッド呼び出し後に期待されるDBのレコードを作成
-            expectedDatabase.add(
-                DisplayedTrack(
+            expectedTrackList.add(
+                Track(
                     id = spotifyTrackId,
                     popularity = tracksAroundNetWork.last().popularity,
                     album = tracksDetail.last().album.name,
                     artists = tracksDetail.last().artists.joinToString(separator = ", ") {
                         it.name
                     },
-                    imageUrl = tracksDetail.last().album.images.get(0).url,
+                    imageUrl = tracksDetail.last().album.images[0].url,
                     name = tracksDetail.last().name,
                     previewUrl = tracksDetail.last().previewUrl,
-                    rank = tracksAroundNetWork.last().rank
+                    rank = tracksAroundNetWork.last().rank,
+                    isSaved = trackSavedList[spotifyTrackId]!!
                 )
             )
         }
@@ -97,24 +111,89 @@ class MusicRepositoryTest {
         )
         jigokumimiApiService.getTracksAroundResponse = getTracksAroundResponse
         spotifyApiService.tracksDetail = tracksDetail
-        expectedDatabase.sortBy { it.rank }
+        spotifyApiService.tracksSaveList = trackSavedList
+        expectedTrackList.sortBy { it.rank }
 
         //メソッド呼び出し
         musicRepository.refreshTracks(spotifyUserId, location, distance)
 
-        // ローカルDBを取得
-        val actualDatabase = musicDao.getTracks()
-
-        // レスポンスが期待値と等しいことを確認
-        actualDatabase.value!!.mapIndexed { i, actualTrackAround ->
-            assertThat(actualTrackAround, IsEqual(expectedDatabase.get(i)) )
+        musicRepository.tracks.getOrAwaitValue().mapIndexed { i, actualTrackAround ->
+            assertThat(expectedTrackList[i], IsEqual(actualTrackAround))
         }
 
         return@runBlocking
     }
 
     @Test
-    fun refreshArtists_周辺アーティスト情報と詳細アーティスト情報を元にローカルDBにレコードが保存されること() = runBlocking {
+    fun refreshTracksFromHistory_履歴情報のLivedataが更新されること() = runBlocking {
+        // テスト対象のメソッドの引数を設定
+        val spotifyUserId = faker.random().hex()
+        val location = Location("test")
+        location.latitude = faker.number().randomDouble(10, 2, 5)
+        location.longitude = faker.number().randomDouble(10, 2, 5)
+        val distance = faker.number().randomDigit()
+
+        // ダミーデータ、及び期待されるDBレコードを作成
+        val historyItem: MutableList<HistoryItem> = mutableListOf()
+        val tracksDetail: MutableList<GetTrackDetailResponse> = mutableListOf()
+        val expectedTrackList: MutableList<Track> = mutableListOf()
+        val trackSavedList: HashMap<String, Boolean> = HashMap()
+        for (i in 1..10) {
+            // 曲情報を紐付けるID
+            // このIDを元に履歴情報、Spotifyから取得する曲詳細情報、ローカルDBに保存する曲情報を紐つける
+            val spotifyTrackId = faker.random().hex()
+            // 履歴詳細情報を作成
+            historyItem.add(
+                ct.createDummyHistoryItem(rank = i, spotifyItemId = spotifyTrackId)
+            )
+            // 曲詳細情報を作成
+            tracksDetail.add(
+                ct.createDummyGetTrackDetailResponse(spotifyTrackId)
+            )
+            // 曲保存情報を生成
+            trackSavedList[spotifyTrackId] = faker.bool().bool()
+            // メソッド呼び出し後に期待されるDBのレコードを作成
+            expectedTrackList.add(
+                Track(
+                    id = spotifyTrackId,
+                    popularity = historyItem.last().popularity,
+                    album = tracksDetail.last().album.name,
+                    artists = tracksDetail.last().artists.joinToString(separator = ", ") {
+                        it.name
+                    },
+                    imageUrl = tracksDetail.last().album.images[0].url,
+                    name = tracksDetail.last().name,
+                    previewUrl = tracksDetail.last().previewUrl,
+                    rank = historyItem.last().rank,
+                    isSaved = trackSavedList[spotifyTrackId]!!
+                )
+            )
+        }
+        spotifyApiService.tracksDetail = tracksDetail
+        spotifyApiService.tracksSaveList = trackSavedList
+        expectedTrackList.sortBy { it.rank }
+
+        val history = History(
+            spotifyUserId,
+            latitude = location.latitude,
+            longitude = location.longitude,
+            distance = distance,
+            place = faker.lorem().characters(),
+            historyItems = historyItem,
+            createdAt = faker.date().toString()
+        )
+
+        //メソッド呼び出し
+        musicRepository.refreshTracksFromHistory(history)
+
+        musicRepository.tracks.getOrAwaitValue().mapIndexed { i, actualTrackAround ->
+            assertThat(expectedTrackList[i], IsEqual(actualTrackAround))
+        }
+        return@runBlocking
+    }
+
+    @Test
+    fun refreshArtists_周辺アーティスト情報と詳細アーティスト情報を元にLivedataが更新されること() = runBlocking {
         // テスト対象のメソッドの引数を設定
         val spotifyUserId = faker.random().hex()
         val location = Location("test")
@@ -126,7 +205,8 @@ class MusicRepositoryTest {
         // ダミーデータ、及び期待されるDBレコードを作成
         val artistsAroundNetWork: MutableList<ArtistAroundNetwork> = mutableListOf()
         val artistsDetail: MutableList<SpotifyArtistFull> = mutableListOf()
-        val expectedDatabase: MutableList<DisplayedArtist> = mutableListOf()
+        val expectedArtistList: MutableList<Artist> = mutableListOf()
+        val artistsFollowList: HashMap<String, Boolean> = HashMap()
         for (i in 1..10) {
             // アーティスト情報を紐付けるID
             // このIDを元にJigokumimiから取得する周辺アーティスト情報、Spotifyから取得するアーティスト詳細情報、ローカルDBに保存するアーティスト情報を紐つける
@@ -139,15 +219,18 @@ class MusicRepositoryTest {
             artistsDetail.add(
                 ct.createDummySpotifyArtistFull(spotifyArtistId)
             )
+            // アーティスト保存情報を生成
+            artistsFollowList[spotifyArtistId] = faker.bool().bool()
             // メソッド呼び出し後に期待されるDBレコードを作成
-            expectedDatabase.add(
-                DisplayedArtist(
+            expectedArtistList.add(
+                Artist(
                     id = spotifyArtistId,
                     popularity = artistsAroundNetWork.last().popularity,
-                    imageUrl = artistsDetail.last().images.get(0).url,
+                    imageUrl = artistsDetail.last().images[0].url,
                     name = artistsDetail.last().name,
                     rank = artistsAroundNetWork.last().rank,
-                    genres = artistsDetail.last().genres?.joinToString(separator = ", ")
+                    genres = artistsDetail.last().genres?.joinToString(separator = ", "),
+                    isFollowed = artistsFollowList[spotifyArtistId]!!
                 )
             )
         }
@@ -157,19 +240,215 @@ class MusicRepositoryTest {
         )
         jigokumimiApiService.getArtistsAroundResponse = getArtistsAroundResponse
         spotifyApiService.artistsDetail = artistsDetail
-        expectedDatabase.sortBy { it.rank }
+        spotifyApiService.artistsFollowList = artistsFollowList
+        expectedArtistList.sortBy { it.rank }
 
         //メソッド呼び出し
         musicRepository.refreshArtists(spotifyUserId, location, distance)
 
-        // ローカルDBを取得
-        val actualDatabase = musicDao.getArtists()
-
         // レスポンスが期待値と等しいことを確認
-        actualDatabase.value!!.mapIndexed { i, actualArtistAround ->
-            assertThat(actualArtistAround, IsEqual(expectedDatabase.get(i)) )
+        musicRepository.artists.getOrAwaitValue().mapIndexed { i, actualArtistAround ->
+            assertThat(actualArtistAround, IsEqual(expectedArtistList.get(i)))
         }
 
         return@runBlocking
     }
+
+    @Test
+    fun refreshArtistsFromHistory_履歴情報を元にLivedataが更新されること() = runBlocking {
+        // テスト対象のメソッドの引数を設定
+        val spotifyUserId = faker.random().hex()
+        val location = Location("test")
+        location.latitude = faker.number().randomDouble(10, 2, 5)
+        location.longitude = faker.number().randomDouble(10, 2, 5)
+        val distance = faker.number().randomDigit()
+
+
+        // ダミーデータ、及び期待されるDBレコードを作成
+        val historyItems: MutableList<HistoryItem> = mutableListOf()
+        val artistsDetail: MutableList<SpotifyArtistFull> = mutableListOf()
+        val expectedArtistList: MutableList<Artist> = mutableListOf()
+        val artistsFollowList: HashMap<String, Boolean> = HashMap()
+        for (i in 1..10) {
+            // アーティスト情報を紐付けるID
+            // このIDを元にJigokumimiから取得する周辺アーティスト情報、Spotifyから取得するアーティスト詳細情報、ローカルDBに保存するアーティスト情報を紐つける
+            val spotifyArtistId = faker.random().hex()
+            // 周辺アーティスト情報を作成
+            historyItems.add(
+                ct.createDummyHistoryItem(rank = i, spotifyItemId = spotifyArtistId)
+            )
+            // アーティスト詳細情報を作成
+            artistsDetail.add(
+                ct.createDummySpotifyArtistFull(spotifyArtistId)
+            )
+            // アーティスト保存情報を生成
+            artistsFollowList[spotifyArtistId] = faker.bool().bool()
+            // メソッド呼び出し後に期待されるDBレコードを作成
+            expectedArtistList.add(
+                Artist(
+                    id = spotifyArtistId,
+                    popularity = historyItems.last().popularity,
+                    imageUrl = artistsDetail.last().images[0].url,
+                    name = artistsDetail.last().name,
+                    rank = historyItems.last().rank,
+                    genres = artistsDetail.last().genres?.joinToString(separator = ", "),
+                    isFollowed = artistsFollowList[spotifyArtistId]!!
+                )
+            )
+        }
+        spotifyApiService.artistsDetail = artistsDetail
+        spotifyApiService.artistsFollowList = artistsFollowList
+        expectedArtistList.sortBy { it.rank }
+
+        val history = History(
+            spotifyUserId,
+            latitude = location.latitude,
+            longitude = location.longitude,
+            distance = distance,
+            place = faker.lorem().characters(),
+            historyItems = historyItems,
+            createdAt = faker.date().toString()
+        )
+
+        //メソッド呼び出し
+        musicRepository.refreshArtistsFromHistory(history)
+
+        // レスポンスが期待値と等しいことを確認
+        musicRepository.artists.getOrAwaitValue().mapIndexed { i, actualArtistAround ->
+            assertThat(actualArtistAround, IsEqual(expectedArtistList.get(i)))
+        }
+
+        return@runBlocking
+    }
+
+    @Test
+    fun getMyFavoriteTracks_APIリクエストが呼ばれること() = runBlocking {
+
+        // モック化
+        jigokumimiApiService = mockk(relaxed = true)
+        spotifyApiService = mockk(relaxed = true)
+        musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
+        every { runBlocking { spotifyApiService.getTracks(any(), any(), any()) } } returns any()
+
+        // メソッド呼び出し
+        musicRepository.getMyFavoriteTracks()
+
+        // APIリクエストが呼ばれることを確認
+        verify { runBlocking { spotifyApiService.getTracks(any(), any(), any()) } }
+    }
+
+    @Test
+    fun postMyFavoriteTracks_APIリクエストが呼ばれること() = runBlocking {
+
+        // モック化
+        jigokumimiApiService = mockk(relaxed = true)
+        spotifyApiService = mockk(relaxed = true)
+        musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
+        every { runBlocking { jigokumimiApiService.postTracks(any(), any()) } } returns any()
+
+        // メソッド呼び出し
+        musicRepository.postMyFavoriteTracks(any())
+
+        // APIリクエストが呼ばれることを確認
+        verify { runBlocking { jigokumimiApiService.postTracks(any(), any()) } }
+    }
+
+    @Test
+    fun getMyFavoriteArtists_APIリクエストが呼ばれること() = runBlocking {
+
+        // モック化
+        jigokumimiApiService = mockk(relaxed = true)
+        spotifyApiService = mockk(relaxed = true)
+        musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
+        every { runBlocking { spotifyApiService.getArtists(any(), any(), any()) } } returns any()
+
+        // メソッド呼び出し
+        musicRepository.getMyFavoriteArtists()
+
+        // APIリクエストが呼ばれることを確認
+        verify { runBlocking { spotifyApiService.getArtists(any(), any(), any()) } }
+    }
+
+    @Test
+    fun postMyFavoriteArtists_APIリクエストが呼ばれること() = runBlocking {
+
+        // モック化
+        jigokumimiApiService = mockk(relaxed = true)
+        spotifyApiService = mockk(relaxed = true)
+        musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
+        every { runBlocking { jigokumimiApiService.postArtists(any(), any()) } } returns any()
+
+        // メソッド呼び出し
+        musicRepository.postMyFavoriteArtists(any())
+
+        // APIリクエストが呼ばれることを確認
+        verify { runBlocking { jigokumimiApiService.postArtists(any(), any()) } }
+    }
+
+
+    @Test
+    fun getTracksAroundSearchHistories_APIリクエストが呼ばれること() = runBlocking {
+
+        // モック化
+        jigokumimiApiService = mockk(relaxed = true)
+        spotifyApiService = mockk(relaxed = true)
+        musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
+        every { runBlocking { jigokumimiApiService.getTracksAroundSearchHistories(any(), any()) } } returns any()
+
+        // メソッド呼び出し
+        musicRepository.getTracksAroundSearchHistories(any())
+
+        // APIリクエストが呼ばれることを確認
+        verify { runBlocking { jigokumimiApiService.getTracksAroundSearchHistories(any(), any()) } }
+    }
+
+    @Test
+    fun getArtistsAroundSearchHistories_APIリクエストが呼ばれること() = runBlocking {
+
+        // モック化
+        jigokumimiApiService = mockk(relaxed = true)
+        spotifyApiService = mockk(relaxed = true)
+        musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
+        every { runBlocking { jigokumimiApiService.getArtistsAroundSearchHistories(any(), any()) } } returns any()
+
+        // メソッド呼び出し
+        musicRepository.getArtistsAroundSearchHistories(any())
+
+        // APIリクエストが呼ばれることを確認
+        verify { runBlocking { jigokumimiApiService.getArtistsAroundSearchHistories(any(), any()) } }
+    }
+
+
+    @Test
+    fun deleteTracksAroundSearchHistories_APIリクエストが呼ばれること() = runBlocking {
+
+        // モック化
+        jigokumimiApiService = mockk(relaxed = true)
+        spotifyApiService = mockk(relaxed = true)
+        musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
+        every { runBlocking { jigokumimiApiService.deleteTracksAroundSearchHistories(any(), any()) } } returns any()
+
+        // メソッド呼び出し
+        musicRepository.deleteTracksAroundSearchHistories(any())
+
+        // APIリクエストが呼ばれることを確認
+        verify { runBlocking { jigokumimiApiService.deleteTracksAroundSearchHistories(any(), any()) } }
+    }
+
+    @Test
+    fun deleteArtistsAroundSearchHistories_APIリクエストが呼ばれること() = runBlocking {
+
+        // モック化
+        jigokumimiApiService = mockk(relaxed = true)
+        spotifyApiService = mockk(relaxed = true)
+        musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
+        every { runBlocking { jigokumimiApiService.deleteArtistsAroundSearchHistories(any(), any()) } } returns any()
+
+        // メソッド呼び出し
+        musicRepository.deleteArtistsAroundSearchHistories(any())
+
+        // APIリクエストが呼ばれることを確認
+        verify { runBlocking { jigokumimiApiService.deleteArtistsAroundSearchHistories(any(), any()) } }
+    }
+
 }

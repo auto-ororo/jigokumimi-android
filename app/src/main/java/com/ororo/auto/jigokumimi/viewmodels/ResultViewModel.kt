@@ -88,6 +88,8 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                 try {
                     musicRepository.changeTrackFavoriteState(trackIndex, !track.isSaved)
 
+                    track.isSaved = !track.isSaved
+
                     val msg = if (track.isSaved) {
                         getApplication<Application>().getString(
                             R.string.save_track_message,
@@ -120,6 +122,8 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                 try {
                     musicRepository.changeArtistFollowState(artistIndex, !artist.isFollowed)
 
+                    artist.isFollowed = !artist.isFollowed
+
                     val msg = if (artist.isFollowed) {
                         getApplication<Application>().getString(
                             R.string.follow_artist_message,
@@ -131,6 +135,7 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                             artist.name
                         )
                     }
+
 
                     _changeDataIndex.postValue(artistIndex)
                     showSnackbar(msg)

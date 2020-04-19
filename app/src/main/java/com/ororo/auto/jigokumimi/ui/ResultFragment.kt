@@ -140,10 +140,14 @@ class ResultFragment : BaseFragment() {
 
         baseInit(viewModel)
 
+
         // タイトル設定
-        (activity as AppCompatActivity).supportActionBar?.run {
-            title = context?.getString(R.string.title_result)
+        if (activity is AppCompatActivity) {
+            (activity as AppCompatActivity).supportActionBar?.run {
+                title = context?.getString(R.string.title_result)
+            }
         }
+
 
         return binding.root
     }

@@ -23,6 +23,10 @@ class FakeAuthRepository(exception: Exception? = null) : IAuthRepository, BaseFa
         return Pair(faker.internet().url(), faker.random().hex())
     }
 
+    override fun getSavedJigokumimiUserId(): String {
+        return faker.random().hex()
+    }
+
     override suspend fun logoutJigokumimi() {
         launchExceptionByErrorMode()
     }
@@ -30,6 +34,20 @@ class FakeAuthRepository(exception: Exception? = null) : IAuthRepository, BaseFa
     override suspend fun getJigokumimiUserProfile(): GetMeResponse {
         launchExceptionByErrorMode()
         return testDataUtil.createDummyGetMeResponse()
+    }
+
+    override suspend fun unregisterJigokumimiUser(): CommonResponse {
+        return CommonResponse(
+            data = null,
+            message = faker.lorem().characters()
+        )
+    }
+
+    override suspend fun changeJigokumimiPassword(changePasswordRequest: ChangePasswordRequest): CommonResponse {
+        return CommonResponse(
+            data = null,
+            message = faker.lorem().characters()
+        )
     }
 
     override suspend fun refreshSpotifyAuthToken(token: String) {

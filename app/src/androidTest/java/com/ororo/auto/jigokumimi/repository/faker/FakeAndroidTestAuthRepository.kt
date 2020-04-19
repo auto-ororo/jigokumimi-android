@@ -23,6 +23,10 @@ class FakeAndroidTestAuthRepository(exception: Exception? = null) : IAuthReposit
         return Pair(faker.internet().url(), faker.random().hex())
     }
 
+    override fun getSavedJigokumimiUserId(): String {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override suspend fun logoutJigokumimi() {
         launchExceptionByErrorMode()
     }
@@ -30,6 +34,14 @@ class FakeAndroidTestAuthRepository(exception: Exception? = null) : IAuthReposit
     override suspend fun getJigokumimiUserProfile(): GetMeResponse {
         launchExceptionByErrorMode()
         return testDataUtil.createDummyGetMeResponse()
+    }
+
+    override suspend fun unregisterJigokumimiUser(): CommonResponse {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override suspend fun changeJigokumimiPassword(changePasswordRequest: ChangePasswordRequest): CommonResponse {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override suspend fun refreshSpotifyAuthToken(token: String) {

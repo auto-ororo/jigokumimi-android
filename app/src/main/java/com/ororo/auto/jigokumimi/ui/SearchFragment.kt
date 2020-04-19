@@ -107,9 +107,11 @@ class SearchFragment : BaseFragment() {
 
 
         // タイトル設定
-        (activity as AppCompatActivity).supportActionBar?.run {
-            show()
-            title = context?.getString(R.string.title_search)
+        if (activity is AppCompatActivity) {
+            (activity as AppCompatActivity).supportActionBar?.run {
+                show()
+                title = context?.getString(R.string.title_search)
+            }
         }
 
         return binding.root

@@ -4,6 +4,7 @@ import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ororo.auto.jigokumimi.domain.Artist
+import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
@@ -27,6 +28,14 @@ class FakeMusicRepository(
     ): Unit? {
         launchExceptionByErrorMode()
         return null
+    }
+
+    override suspend fun refreshTracksFromHistory(history: History): Unit? {
+        return Unit
+    }
+
+    override suspend fun refreshArtistsFromHistory(history: History): Unit? {
+        return Unit
     }
 
     override suspend fun getMyFavoriteTracks(): GetMyFavoriteTracksResponse {
@@ -60,6 +69,40 @@ class FakeMusicRepository(
         return CommonResponse(
             data = null,
             message = faker.lorem().sentence()
+        )
+    }
+
+    override suspend fun changeTrackFavoriteState(trackIndex: Int, state: Boolean) {
+    }
+
+    override suspend fun changeArtistFollowState(artistIndex: Int, state: Boolean) {
+    }
+
+    override suspend fun getArtistsAroundSearchHistories(userId: String): GetArtistSearchHistoryResponse {
+        return GetArtistSearchHistoryResponse(
+            data = null,
+            message = faker.lorem().characters()
+        )
+    }
+
+    override suspend fun getTracksAroundSearchHistories(userId: String): GetTrackSearchHistoryResponse {
+        return GetTrackSearchHistoryResponse(
+            data = null,
+            message = faker.lorem().characters()
+        )
+    }
+
+    override suspend fun deleteArtistsAroundSearchHistories(userId: String): CommonResponse {
+        return CommonResponse(
+            data = null,
+            message = faker.lorem().characters()
+        )
+    }
+
+    override suspend fun deleteTracksAroundSearchHistories(userId: String): CommonResponse {
+        return CommonResponse(
+            data = null,
+            message = faker.lorem().characters()
         )
     }
 }

@@ -87,7 +87,7 @@ open class BaseAndroidViewModel(
 
 
     /**
-     * Snackbarメッセージを表示する
+     * Snackbarメッセージを初期化する
      */
     fun showedSnackbar() {
         _snackbarMessage.postValue("")

@@ -6,20 +6,20 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.repository.faker.FakeAuthRepository
+import com.ororo.auto.jigokumimi.network.SignUpRequest
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import getOrAwaitValue
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType
-import okhttp3.ResponseBody
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import retrofit2.HttpException
-import retrofit2.Response
-import java.io.IOException
 import java.util.*
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
@@ -28,6 +28,7 @@ import kotlin.reflect.jvm.isAccessible
 class SignUpViewModelTest {
 
     lateinit var viewModel: SignUpViewModel
+    lateinit var authRepository: IAuthRepository
 
     val faker = Faker(Locale("jp_JP"))
 
@@ -37,9 +38,13 @@ class SignUpViewModelTest {
 
     @Before
     fun createViewModel() {
-        viewModel = SignUpViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository()
+        authRepository = mockk(relaxed = true)
+
+        viewModel = spyk(
+            SignUpViewModel(
+                ApplicationProvider.getApplicationContext(),
+                authRepository
+            )
         )
     }
 
@@ -116,7 +121,6 @@ class SignUpViewModelTest {
 
         // テスト用文字列を設定
         viewModel.password.value = faker.random().hex(8)
-        viewModel.passwordConfirmation.value = viewModel.password.value
 
         // privateメソッドを取得
         val method = viewModel::class.memberFunctions.find { it.name == "validatePassword" }
@@ -134,7 +138,6 @@ class SignUpViewModelTest {
 
         // テスト用文字列を設定
         viewModel.password.value = faker.random().hex(7)
-        viewModel.passwordConfirmation.value = viewModel.password.value
 
         // privateメソッドを取得
         val method = viewModel::class.memberFunctions.find { it.name == "validatePassword" }
@@ -148,32 +151,32 @@ class SignUpViewModelTest {
     }
 
     @Test
-    fun validatePassword_確認用パスワードの入力値が異なる_falseとなること() {
+    fun validateConfirmPassword_確認用パスワードの入力値が等しい_trueとなること() {
+
+        // テスト用文字列を設定
+        viewModel.password.value = faker.random().hex(8)
+        viewModel.passwordConfirmation.value = viewModel.password.value
+
+        // privateメソッドを取得
+        val method = viewModel::class.memberFunctions.find { it.name == "validateConfirmPassword" }
+        val ret = method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel) as Boolean
+        }
+
+        assertThat(ret, IsEqual(true))
+    }
+
+    @Test
+    fun validateConfirmPassword_確認用パスワードの入力値が異なる_falseとなること() {
 
         // テスト用文字列を設定
         viewModel.password.value = faker.random().hex(8)
         viewModel.passwordConfirmation.value = faker.random().hex(9)
 
         // privateメソッドを取得
-        val method = viewModel::class.memberFunctions.find { it.name == "validatePassword" }
-        val ret = method?.let {
-            it.isAccessible = true
-            // メソッド呼び出し
-            it.call(viewModel) as Boolean
-        }
-
-        assertThat(ret, IsEqual(false))
-    }
-
-
-    @Test
-    fun validateName_空文字_falseとなること() {
-
-        // テスト用文字列を設定
-        viewModel.name.value = ""
-
-        // privateメソッドを取得
-        val method = viewModel::class.memberFunctions.find { it.name == "validateName" }
+        val method = viewModel::class.memberFunctions.find { it.name == "validateConfirmPassword" }
         val ret = method?.let {
             it.isAccessible = true
             // メソッド呼び出し
@@ -184,244 +187,107 @@ class SignUpViewModelTest {
     }
 
     @Test
-    fun validateName_空文字以外_trueとなること() {
+    fun signUp__サインアップフラグがtrueになること() = runBlocking {
 
-        // テスト用文字列を設定
-        viewModel.name.value = faker.name().fullName()
+        val email = faker.internet().safeEmailAddress()
 
-        // privateメソッドを取得
-        val method = viewModel::class.memberFunctions.find { it.name == "validateName" }
-        val ret = method?.let {
-            it.isAccessible = true
-            // メソッド呼び出し
-            it.call(viewModel) as Boolean
+        val password = faker.random().hex()
+
+        val passwordConfirmation = password
+        // 登録情報設定
+        viewModel.email.value = email
+        viewModel.password.value = password
+        viewModel.passwordConfirmation.value = passwordConfirmation
+
+        // メソッド呼び出し
+        viewModel.signUp()
+
+        //Repositoryのメソッドが呼ばれることを確認
+        verify {
+            runBlocking {
+                authRepository.signUpJigokumimi(
+                    SignUpRequest(
+                        email,
+                        password,
+                        passwordConfirmation
+                    )
+                )
+            }
         }
 
+        // サインアップフラグがtrueになること
+        val ret = viewModel.isSignUp.getOrAwaitValue()
         assertThat(ret, IsEqual(true))
     }
 
     @Test
-    fun login_例外が発生しない_ログインフラグが立つこと() = runBlocking {
+    fun signup_例外発生_ダイアログメッセージが設定されること() = runBlocking {
 
-        // ログイン情報設定
+        // 例外が発生するように設定
+        val exception = Exception()
+        every { runBlocking { authRepository.signUpJigokumimi(any()) } } throws exception
+
+        // 登録情報設定
         viewModel.email.value = faker.internet().safeEmailAddress()
         viewModel.password.value = faker.random().hex()
+        viewModel.passwordConfirmation.value = viewModel.password.value
+
+        // メソッド呼び出し
+        viewModel.signUp()
+
+        // エラーメッセージが設定されることを確認
+        val extectedMessage =
+            InstrumentationRegistry.getInstrumentation().context.resources.getString(
+                R.string.general_error_message, exception.javaClass
+            )
+        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
+        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
+    }
+
+    @Test
+    fun login_ログインフラグがTrueになること() = runBlocking {
+
+        val email = faker.internet().safeEmailAddress()
+        val password = faker.random().hex()
+
+        // ログイン情報設定
+        viewModel.email.value = email
+        viewModel.password.value = password
 
         viewModel.doneLogin()
 
         viewModel.login()
 
-        val ret = viewModel.isLogin.getOrAwaitValue()
-        assertThat(ret, IsEqual(true))
-    }
-
-    @Test
-    fun login_HTTPExceprion発生_ログインフラグが立たずレスポンスBody内のmessageがダイアログメッセージに設定されること() = runBlocking {
-
-        // エラーメッセージを追加
-        val message = faker.lorem().sentence()
-        // 発生させるExceptionを生成
-        val exception = HttpException(
-            Response.error<Any>(
-                400, ResponseBody.create(
-                    MediaType.parse("application/json"),
-                    "{\"message\":\"$message\"}"
+        // Repositoryのメソッドが呼ばれることを確認
+        verify {
+            runBlocking {
+                authRepository.loginJigokumimi(
+                    email,
+                    password
                 )
-            )
-        )
-
-        //  Repositoryに発生させる例外を指定してViewModelを生成
-        viewModel = SignUpViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(exception)
-        )
-
-        // ログイン情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-
-        // メソッド呼び出し
-        viewModel.login()
-
-        val ret = viewModel.isLogin.getOrAwaitValue()
-        assertThat(ret, IsEqual(false))
-
-        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(message))
-        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
-    }
-
-    @Test
-    fun login_IOExceprion発生_ログインフラグが立たず定型メッセージがダイアログメッセージに設定されること() = runBlocking {
-
-        // 発生させるExceptionを生成
-        val exception = IOException()
-
-        //  Repositoryに発生させる例外を指定してViewModelを生成
-        viewModel = SignUpViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(exception)
-        )
-
-        // ログイン情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-
-        // メソッド呼び出し
-        viewModel.login()
-
-        val ret = viewModel.isLogin.getOrAwaitValue()
-        assertThat(ret, IsEqual(false))
-
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.no_connection_error_message
-            )
-
-        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
-    }
-
-    @Test
-    fun login_Exceprion発生_ログインフラグが立たず定型メッセージがダイアログメッセージに設定されること() = runBlocking {
-
-        // 発生させるExceptionを生成
-        val exception = Exception()
-
-        //  Repositoryに発生させる例外を指定してViewModelを生成
-        viewModel = SignUpViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(exception)
-        )
-
-
-        // ログイン情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-
-        // メソッド呼び出し
-        viewModel.login()
-
-        val ret = viewModel.isLogin.getOrAwaitValue()
-        assertThat(ret, IsEqual(false))
-
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.general_error_message, exception.javaClass
-            )
-
-        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
-    }
-
-    @Test
-    fun signUp_例外が発生しない_サインアップフラグがtrueになること() = runBlocking {
-
-        // 登録情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-        viewModel.passwordConfirmation.value = viewModel.password.value
-        viewModel.name.value = faker.name().fullName()
-
-        // メソッド呼び出し
-        viewModel.signUp()
-
-        val ret = viewModel.isSignUp.getOrAwaitValue()
-        assertThat(ret, IsEqual(true))
-    }
-
-    @Test
-    fun signup_HTTPExceprion発生_ログインフラグがfalseとなりレスポンスBody内のmessageがダイアログメッセージに設定されること() =
-        runBlocking {
-
-            // エラーメッセージを追加
-            val message = faker.lorem().sentence()
-            // 発生させるExceptionを生成
-            val exception = HttpException(
-                Response.error<Any>(
-                    400, ResponseBody.create(
-                        MediaType.parse("application/json"),
-                        "{\"message\":\"$message\"}"
-                    )
-                )
-            )
-
-            //  Repositoryに発生させる例外を指定してViewModelを生成
-            viewModel = SignUpViewModel(
-                ApplicationProvider.getApplicationContext(),
-                FakeAuthRepository(exception)
-            )
-
-            // 登録情報設定
-            viewModel.email.value = faker.internet().safeEmailAddress()
-            viewModel.password.value = faker.random().hex()
-            viewModel.passwordConfirmation.value = viewModel.password.value
-            viewModel.name.value = faker.random().hex()
-
-            // メソッド呼び出し
-            viewModel.signUp()
-
-            val ret = viewModel.isSignUp.getOrAwaitValue()
-            assertThat(ret, IsEqual(false))
-
-            assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(message))
-            assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
+            }
         }
 
-    @Test
-    fun signup_IOExceprion発生_サインアップフラグがfalseとなり定型メッセージがダイアログメッセージに設定されること() = runBlocking {
-
-        // 発生させるExceptionを生成
-        val exception = IOException()
-
-        //  Repositoryに発生させる例外を指定してViewModelを生成
-        viewModel = SignUpViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(exception)
-        )
-
-        // 登録情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-        viewModel.passwordConfirmation.value = viewModel.password.value
-        viewModel.name.value = faker.random().hex()
-
-        // メソッド呼び出し
-        viewModel.signUp()
-
-        val ret = viewModel.isSignUp.getOrAwaitValue()
-        assertThat(ret, IsEqual(false))
-
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.no_connection_error_message
-            )
-
-        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
+        // ログインフラグがTrueになることを確認
+        val ret = viewModel.isLogin.getOrAwaitValue()
+        assertThat(ret, IsEqual(true))
     }
 
     @Test
-    fun signup_Exceprion発生_サインアップフラグがoffになり定型メッセージがダイアログメッセージに設定されること() = runBlocking {
+    fun login_例外発生_ダイアログメッセージが設定されること() = runBlocking {
 
-        // 発生させるExceptionを生成
+        // 例外が発生するように設定
         val exception = Exception()
+        every { runBlocking { authRepository.loginJigokumimi(any(), any()) } } throws exception
 
-        //  Repositoryに発生させる例外を指定してViewModelを生成
-        viewModel = SignUpViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(exception)
-        )
-
-        // 登録情報設定
+        // ログイン情報設定
         viewModel.email.value = faker.internet().safeEmailAddress()
         viewModel.password.value = faker.random().hex()
-        viewModel.passwordConfirmation.value = viewModel.password.value
-        viewModel.name.value = faker.random().hex()
 
         // メソッド呼び出し
-        viewModel.signUp()
+        viewModel.login()
 
-        val ret = viewModel.isSignUp.getOrAwaitValue()
+        val ret = viewModel.isLogin.getOrAwaitValue()
         assertThat(ret, IsEqual(false))
 
         val extectedMessage =
@@ -432,4 +298,5 @@ class SignUpViewModelTest {
         assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
         assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
     }
+
 }

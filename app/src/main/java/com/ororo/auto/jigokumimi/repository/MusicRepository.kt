@@ -18,7 +18,6 @@ import timber.log.Timber
  */
 
 class MusicRepository(
-    private val musicDao: MusicDao,
     private val prefData: SharedPreferences,
     private val spotifyApiService: SpotifyApiService,
     private val jigokumimiApiService: JigokumimiApiService
@@ -308,7 +307,6 @@ class MusicRepository(
                         it.id
                     )
                 }
-                it.isSaved = state
             }
 
             return@withContext
@@ -341,9 +339,6 @@ class MusicRepository(
                         artist.id
                     )
                 }
-
-                artist.isFollowed = state
-
             }
 
             return@withContext

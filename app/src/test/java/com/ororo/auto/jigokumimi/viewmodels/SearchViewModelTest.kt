@@ -12,18 +12,16 @@ import com.ororo.auto.jigokumimi.repository.faker.FakeAuthRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeLocationRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeMusicRepository
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
+import getOrAwaitValue
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType
-import okhttp3.ResponseBody
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import retrofit2.HttpException
-import retrofit2.Response
-import java.io.IOException
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -34,6 +32,10 @@ class SearchViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     lateinit var viewModel: SearchViewModel
+    lateinit var authRepository: FakeAuthRepository
+    lateinit var musicRepository: FakeMusicRepository
+    lateinit var locationRepository: FakeLocationRepository
+
 
     val faker = Faker(Locale("jp_JP"))
 
@@ -53,21 +55,38 @@ class SearchViewModelTest {
         val latitude = faker.number().randomDouble(10, 2, 6)
         val longitude = faker.number().randomDouble(10, 2, 6)
 
-        viewModel = SearchViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(),
-            FakeMusicRepository(_tracks = tracks, _artists = artists),
-            FakeLocationRepository(latitude, longitude)
+        authRepository = spyk(FakeAuthRepository())
+        musicRepository = spyk(FakeMusicRepository(_tracks = tracks, _artists = artists))
+        locationRepository = spyk(FakeLocationRepository(latitude, longitude))
+
+        viewModel = spyk(
+            SearchViewModel(
+                ApplicationProvider.getApplicationContext(),
+                authRepository,
+                musicRepository,
+                locationRepository
+            )
         )
     }
 
     @Test
     fun searchMusic_Artist_アーティスト情報が送受信され検索完了フラグがtrueになること() = runBlocking {
 
+        // アーティストに設定
         viewModel.setSearchTypeToArtist()
+        // メソッド呼び出し
         viewModel.searchMusic()
 
-        assertThat(viewModel.isSearchFinished.value, IsEqual(true))
+        // 処理内のRepositoryメソッドが呼ばれることを確認
+        verify { runBlocking { locationRepository.getCurrentLocation() } }
+        verify { runBlocking { authRepository.getSavedJigokumimiUserId() } }
+        verify { runBlocking { musicRepository.getMyFavoriteArtists() } }
+        verify { runBlocking { musicRepository.postMyFavoriteArtists(any()) } }
+        verify { runBlocking { musicRepository.refreshArtists(any(), any(), any()) } }
+
+
+        // 検索完了フラグがTrueになることを確認
+        assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(true))
     }
 
     @Test
@@ -76,110 +95,19 @@ class SearchViewModelTest {
         viewModel.setSearchTypeToTrack()
         viewModel.searchMusic()
 
-        assertThat(viewModel.isSearchFinished.value, IsEqual(true))
+        // 処理内のRepositoryメソッドが呼ばれることを確認
+        verify { runBlocking { locationRepository.getCurrentLocation() } }
+        verify { runBlocking { authRepository.getSavedJigokumimiUserId() } }
+        verify { runBlocking { musicRepository.getMyFavoriteTracks() } }
+        verify { runBlocking { musicRepository.postMyFavoriteTracks(any()) } }
+        verify { runBlocking { musicRepository.refreshTracks(any(), any(), any()) } }
+
+        // 検索完了フラグがTrueになることを確認
+        assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(true))
     }
 
     @Test
-    fun searchMusic_HTTPException400_レスポンスのメッセージが設定され検索完了フラグがfalseになること() = runBlocking {
-
-        val message = faker.lorem().sentence()
-
-        // 発生させるExceptionを生成
-        val exception = HttpException(
-            Response.error<Any>(
-                400, ResponseBody.create(
-                    MediaType.parse("application/json"),
-                    "{\"message\":\"$message\"}"
-                )
-            )
-        )
-
-        val latitude = faker.number().randomDouble(10, 2, 6)
-        val longitude = faker.number().randomDouble(10, 2, 6)
-
-        viewModel = SearchViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(),
-            FakeMusicRepository(exception = exception),
-            FakeLocationRepository(latitude, longitude)
-        )
-
-        viewModel.searchMusic()
-
-        assertThat(viewModel.errorMessage.value, IsEqual(message))
-        assertThat(viewModel.isErrorDialogShown.value, IsEqual(true))
-        assertThat(viewModel.isSearchFinished.value, IsEqual(false))
-    }
-
-
-    @Test
-    fun searchMusic_HTTPException401_定型メッセージが設定され検索完了フラグがfalseになること() = runBlocking {
-
-        val message = faker.lorem().sentence()
-
-        // 発生させるExceptionを生成
-        val exception = HttpException(
-            Response.error<Any>(
-                401, ResponseBody.create(
-                    MediaType.parse("application/json"),
-                    "{\"message\":\"$message\"}"
-                )
-            )
-        )
-
-        val latitude = faker.number().randomDouble(10, 2, 6)
-        val longitude = faker.number().randomDouble(10, 2, 6)
-
-        viewModel = SearchViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(),
-            FakeMusicRepository(exception = exception),
-            FakeLocationRepository(latitude, longitude)
-        )
-
-        viewModel.searchMusic()
-
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.token_expired_error_message
-            )
-
-        assertThat(viewModel.errorMessage.value, IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.value, IsEqual(true))
-        assertThat(viewModel.isSearchFinished.value, IsEqual(false))
-    }
-
-    @Test
-    fun searchMusic_IOException_定型メッセージが設定され検索完了フラグがfalseになること() = runBlocking {
-
-        // 発生させるExceptionを生成
-        val exception = IOException()
-
-        val latitude = faker.number().randomDouble(10, 2, 6)
-        val longitude = faker.number().randomDouble(10, 2, 6)
-
-        viewModel = SearchViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(),
-            FakeMusicRepository(exception = exception),
-            FakeLocationRepository(latitude, longitude)
-        )
-
-        viewModel.searchMusic()
-
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.no_connection_error_message
-            )
-
-        assertThat(viewModel.errorMessage.value, IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.value, IsEqual(true))
-        assertThat(viewModel.isSearchFinished.value, IsEqual(false))
-    }
-
-
-    @Test
-    fun searchMusic_Exception_定型メッセージが設定され検索完了フラグがfalseになること() = runBlocking {
+    fun searchMusic_例外発生_エラーメッセージが設定され検索完了フラグがfalseになること() = runBlocking {
 
         // 発生させるExceptionを生成
         val exception = Exception()

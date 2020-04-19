@@ -15,7 +15,6 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.ResponseBody
@@ -48,11 +47,10 @@ class SighUpFragmentTest {
     }
 
     @Test
-    fun サインアップボタンタップ_新規登録成功_OKダイアログタップ後検索画面に遷移すること() {
+    fun サインアップボタンタップ_新規登録成功_新規登録完了ダイアログが表示されること() {
 
         // 登録フォーム入力
         inputSignUpForm(
-            sampleName = "hogehoge",
             sampleMail = "test@test.com",
             samplePassword = "12345678",
             samplePasswordConfirmation = "12345678"
@@ -61,19 +59,13 @@ class SighUpFragmentTest {
         // サインアップボタンをタップ
         onView(withId(R.id.sign_up_button)).perform(click())
 
-        // 新規登録に成功したダイアログのOKをタップ
-        onView(withId(R.id.okButton)).perform(click())
-
-        // 検索画面に遷移することを確認
-        verify {
-            navController.navigate(SignUpFragmentDirections.actionSignUpFragmentToSearchFragment())
-        }
+        // 新規登録に成功したダイアログが表示されることを確認
+        onView(withId(R.id.okButton)).check(matches(isDisplayed()));
     }
 
     @Test
     fun サインアップボタンタップ_登録失敗_エラーメッセージが表示されること() {
 
-        val sampleName = "hogehoge"
         val sampleMail = "test@test.com"
         val samplePassword = "12345678"
         val samplePasswordConfirmation = "12345678"
@@ -95,7 +87,6 @@ class SighUpFragmentTest {
 
         // 登録フォーム入力
         inputSignUpForm(
-            sampleName,
             sampleMail,
             samplePassword,
             samplePasswordConfirmation
@@ -109,26 +100,10 @@ class SighUpFragmentTest {
     }
 
     @Test
-    fun 名前が空文字_サインアップボタンが非活性となること() {
-
-        // 登録フォーム入力
-        inputSignUpForm(
-            sampleName = "",
-            sampleMail = "test@test.com",
-            samplePassword = "12345678",
-            samplePasswordConfirmation = "12345678"
-        )
-
-        // サインアップボタンが非活性になることを確認
-        onView(withId(R.id.sign_up_button)).check(matches(not(isEnabled())))
-    }
-
-    @Test
     fun メールアドレスが不正_サインアップボタンが非活性となること() {
 
         // 登録フォーム入力
         inputSignUpForm(
-            sampleName = "hogehoge",
             sampleMail = "testcom",
             samplePassword = "12345678",
             samplePasswordConfirmation = "12345678"
@@ -143,7 +118,6 @@ class SighUpFragmentTest {
 
         // 登録フォーム入力
         inputSignUpForm(
-            sampleName = "hogehoge",
             sampleMail = "test@test.com",
             samplePassword = "1234567",
             samplePasswordConfirmation = "1234567"
@@ -158,7 +132,6 @@ class SighUpFragmentTest {
 
         // 登録フォーム入力
         inputSignUpForm(
-            sampleName = "hogehoge",
             sampleMail = "test@test.com",
             samplePassword = "12345678",
             samplePasswordConfirmation = "87654321"
@@ -172,12 +145,10 @@ class SighUpFragmentTest {
      * フォーム入力
      */
     private fun inputSignUpForm(
-        sampleName: String,
         sampleMail: String,
         samplePassword: String,
         samplePasswordConfirmation: String
     ) {
-        onView(withId(R.id.nameEdit)).perform(replaceText(sampleName))
         onView(withId(R.id.emailEdit)).perform(replaceText(sampleMail))
         onView(withId(R.id.passwordEdit)).perform(replaceText(samplePassword))
         onView(withId(R.id.passwordConfirmationEdit)).perform(replaceText(samplePasswordConfirmation))

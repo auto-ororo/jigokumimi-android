@@ -21,6 +21,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.platform.app.InstrumentationRegistry
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.Artist
@@ -70,7 +71,12 @@ class ResultFragmentTest {
         val dummyTracks = mutableListOf<Track>()
         for (i in 1..10) {
             // 再生可能な音源を設定
-            dummyTracks.add(testDataUtil.createDummyTrack(previewUrl = "http://www.ne.jp/asahi/music/myuu/wave/menuettm.mp3"))
+            dummyTracks.add(
+                testDataUtil.createDummyTrack(
+                    previewUrl = "http://www.ne.jp/asahi/music/myuu/wave/menuettm.mp3",
+                    isSaved = false
+                )
+            )
         }
         every { runBlocking { musicRepository.tracks } } returns MutableLiveData(dummyTracks)
 
@@ -141,8 +147,8 @@ class ResultFragmentTest {
 
         // 選択したTrack情報が表示されることを確認
         var targetTrack = musicRepository.tracks.value!!.get(0)
-        onView(withId(R.id.rankTrackNameText)).check(matches(withText("${targetTrack.rank}.${targetTrack.name}")))
-        onView(withId(R.id.artistAlbumText)).check(matches(withText("${targetTrack.artists}-${targetTrack.album}")))
+        onView(withId(R.id.rankTrackNameText)).check(matches(withText("${targetTrack.rank} . ${targetTrack.name}")))
+        onView(withId(R.id.artistAlbumText)).check(matches(withText("${targetTrack.artists} - ${targetTrack.album}")))
 
         // キューボタンに停止アイコンが表示されることを確認
         onView(withId(R.id.playStopButton)).check(matches(withDrawable(R.drawable.ic_pause)))
@@ -152,8 +158,35 @@ class ResultFragmentTest {
 
         // キューボタンに再生アイコンが表示されることを確認
         onView(withId(R.id.playStopButton)).check(matches(withDrawable(R.drawable.ic_play_arrow)))
-    }
 
+        // お気に入り登録ボタンをタップ
+        onView(withId(R.id.miniPlayerSaveTrackButton)).perform(click())
+
+        // お気に入り登録ボタンが登録状態になることを確認
+        onView(withId(R.id.miniPlayerSaveTrackButton)).check(matches(withDrawable(R.drawable.ic_favorite)))
+
+        // Snackbarが表示されることを確認
+        val expectedSaveMessage =
+            InstrumentationRegistry.getInstrumentation().targetContext.resources.getString(
+                R.string.save_track_message, targetTrack.name
+            )
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+            .check(matches(withText(expectedSaveMessage)))
+
+        // お気に入り登録ボタンをタップ
+        onView(withId(R.id.miniPlayerSaveTrackButton)).perform(click())
+
+        // お気に入り登録ボタンが登録解除状態になることを確認
+        onView(withId(R.id.miniPlayerSaveTrackButton)).check(matches(withDrawable(R.drawable.ic_favorite_border)))
+
+        // Snackbarが表示されることを確認
+        val expectedRemoveMessage =
+            InstrumentationRegistry.getInstrumentation().targetContext.resources.getString(
+                R.string.remove_track_message, targetTrack.name
+            )
+        onView(withId(com.google.android.material.R.id.snackbar_text))
+            .check(matches(withText(expectedRemoveMessage)))
+    }
 
 
     /**
@@ -173,7 +206,7 @@ class ResultFragmentTest {
             if (view !is RecyclerView) return false
 
             val holder =
-                view.findViewHolderForAdapterPosition(position) as HistoryListViewHolder
+                view.findViewHolderForAdapterPosition(position) as ResultTrackListViewHolder
             innerName = holder.itemView.name.text.toString()
             innerRank = holder.itemView.rank.text.toString()
             innerArtists = holder.itemView.artists.text.toString()
