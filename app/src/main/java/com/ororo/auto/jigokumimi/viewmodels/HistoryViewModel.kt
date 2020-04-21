@@ -15,10 +15,10 @@ import kotlinx.coroutines.launch
 class HistoryViewModel(
     application: Application,
     private val musicRepository: IMusicRepository,
-    private val authRepository: IAuthRepository,
+    authRepository: IAuthRepository,
     private val locationRepository: ILocationRepository
 ) :
-    BaseAndroidViewModel(application) {
+    BaseAndroidViewModel(application, authRepository) {
 
     /**
      * 曲検索履歴情報の一覧

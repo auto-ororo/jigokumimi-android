@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // ドロワーアイコンの表示設定
         appBarConfiguration = AppBarConfiguration(
             //Set内に格納したFragment上でドロワーアイコンを表示する
-            setOf(R.id.loginFragment, R.id.searchFragment, R.id.historyFragment), drawerLayout
+            setOf(R.id.loginFragment, R.id.searchFragment, R.id.historyFragment, R.id.settingFragment), drawerLayout
         )
         val navController = Navigation.findNavController(this, R.id.myNavHostFragment).also {
             setupActionBarWithNavController(

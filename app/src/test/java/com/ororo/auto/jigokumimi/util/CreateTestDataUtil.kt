@@ -250,7 +250,7 @@ class CreateTestDataUtil {
 
     fun createDummyJigokumimiUserProfile(): JigokumimiUserProfile {
         return JigokumimiUserProfile(
-            id = faker.number().randomDigit(),
+            id = faker.random().hex(),
             email = faker.internet().safeEmailAddress(),
             emailVerifiedAt = null,
             name = faker.name().fullName(),

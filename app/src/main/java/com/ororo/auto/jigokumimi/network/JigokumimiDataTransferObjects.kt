@@ -240,7 +240,7 @@ data class JigokumimiToken(
  */
 @JsonClass(generateAdapter = true)
 data class JigokumimiUserProfile(
-    val id: Int,
+    val id: String,
     val name: String?,
     val email: String,
     @Json(name = "email_verified_at") val emailVerifiedAt: String?,

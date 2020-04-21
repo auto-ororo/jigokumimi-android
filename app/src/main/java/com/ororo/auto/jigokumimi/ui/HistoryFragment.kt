@@ -81,7 +81,8 @@ class HistoryFragment : Fragment() {
         // タイトル設定
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
-                title = context?.getString(R.string.title_history)
+                val titleStr = "${context?.getString(R.string.title_history)} ${if(viewModel.isDemo()) context?.getString(R.string.title_demo) else ""}"
+                title = titleStr
             }
         }
 

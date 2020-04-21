@@ -16,10 +16,10 @@ import timber.log.Timber
 
 class SearchViewModel(
     application: Application,
-    private val authRepository: IAuthRepository,
+    authRepository: IAuthRepository,
     private val musicRepository: IMusicRepository,
     private val locationRepository: ILocationRepository
-) : BaseAndroidViewModel(application) {
+) : BaseAndroidViewModel(application, authRepository) {
 
     /**
      *  検索完了フラグ(Private)
