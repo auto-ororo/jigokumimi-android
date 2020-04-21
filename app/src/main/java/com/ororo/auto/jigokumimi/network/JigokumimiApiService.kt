@@ -1,12 +1,13 @@
 package com.ororo.auto.jigokumimi.network
 
+import com.ororo.auto.jigokumimi.BuildConfig
+import com.ororo.auto.jigokumimi.util.Constants
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.*
-import java.util.concurrent.TimeUnit
 
 /**
  * Retrofitを用いてJigokumimiバックエンドとのAPI通信を行うサービスを定義
@@ -119,8 +120,12 @@ interface JigokumimiApiService {
  */
 object JigokumimiApi {
 
-    // 通信先ホストのURL
-    private const val BASE_URL = "http://192.168.0.4:10080/api/"
+    // 通信先ホストのURL(ビルドタイプによって切り替え)
+    private val baseUrl = if (BuildConfig.DEBUG) {
+        Constants.DEBUG_JIGOKUMIMI_BASE_URL
+    } else {
+        Constants.RELEASE_JIGOKUMIMI_BASE_URL
+    }
 
     // Moshi(レスポンスJSONをエンティティに詰め込むライブラリ)を初期化
     private val moshi = Moshi.Builder()
@@ -131,7 +136,7 @@ object JigokumimiApi {
     // Moshi、ホストURLを設定
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .baseUrl(BASE_URL)
+        .baseUrl(baseUrl)
         .client(
             OkHttpClient.Builder()
                 .addInterceptor {

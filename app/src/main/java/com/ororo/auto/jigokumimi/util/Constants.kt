@@ -2,10 +2,10 @@ package com.ororo.auto.jigokumimi.util
 
 class Constants {
     companion object {
-        const val CLIENT_ID = "664aaf9b8611444ba447fd77e2faa0fc"
+        const val CLIENT_ID = "66c88d5613964babb7d6ef7d63ffe5c2"
         const val AUTH_TOKEN_REQUEST_CODE = 0x10
-        const val SPOTIFY_SDK_REDIRECT_SCHEME = "yourscheme"
-        const val SPOTIFY_SDK_REDIRECT_HOST = "yourhost"
+        const val SPOTIFY_SDK_REDIRECT_SCHEME = "jigokumimi"
+        const val SPOTIFY_SDK_REDIRECT_HOST = "main"
 
         const val SP_JIGOKUMIMI_USER_ID_KEY = "jigokumimiUserId"
         const val SP_JIGOKUMIMI_EMAIL_KEY = "jigokumimiEmail"
@@ -18,6 +18,10 @@ class Constants {
         const val SP_SPOTIFY_TOKEN_KEY = "spotifyToken"
 
         const val REQUEST_PERMISSION = 1000
+
+        const val DEBUG_JIGOKUMIMI_BASE_URL = "http://192.168.0.4:10080/api/"
+        const val RELEASE_JIGOKUMIMI_BASE_URL = "https://jigokumimi.net/api/"
+
 
 
     }
