@@ -6,5 +6,8 @@
         <item>100m</item>
         <item>500m</item>
         <item>1000m</item>
+        <item>3000m</item>
+        <item>5000m</item>
+        <item>10000m</item>
     </string-array>
 </resources>

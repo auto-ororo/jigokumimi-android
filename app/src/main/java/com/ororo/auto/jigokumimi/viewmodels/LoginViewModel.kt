@@ -26,24 +26,16 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
     BaseAndroidViewModel(app, authRepository) {
 
     /**
-     *  ログイン状態(Private)
-     */
-    private var _isLogin = MutableLiveData(false)
-
-    /**
      *  ログイン状態
      */
+    private var _isLogin = MutableLiveData(false)
     val isLogin: MutableLiveData<Boolean>
         get() = _isLogin
 
     /**
-     *  デモモード状態(Private)
-     */
-    private var _isDemo = MutableLiveData(false)
-
-    /**
      *  デモモード状態
      */
+    private var _isDemo = MutableLiveData(false)
     val isDemo: MutableLiveData<Boolean>
         get() = _isDemo
 
@@ -58,13 +50,9 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
     val password = MutableLiveData<String>()
 
     /**
-     * ログインボタンの活性・非活性(Private)
-     */
-    private val _loginButtonEnabledState = MediatorLiveData<Boolean>()
-
-    /**
      * ログインボタンの活性・非活性
      */
+    private val _loginButtonEnabledState = MediatorLiveData<Boolean>()
     val loginButtonEnabledState: LiveData<Boolean>
         get() = _loginButtonEnabledState
 

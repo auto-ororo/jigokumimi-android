@@ -103,16 +103,9 @@ class HistoryFragment : Fragment() {
     private fun onSearchFinished() {
         viewModel.doneSearchMusic()
 
-        // Tabレイアウトの位置に応じて検索種別を設定
-        val searchType = if (binding.tabLayout.selectedTabPosition == 0) {
-            Constants.SearchType.TRACK
-        } else {
-            Constants.SearchType.ARTIST
-        }
-
         // 結果画面に遷移する
         this.findNavController()
-            .navigate(HistoryFragmentDirections.actionHistoryFragmentToResultFragment(searchType))
+            .navigate(HistoryFragmentDirections.actionHistoryFragmentToResultFragment(viewModel.searchType.value!!,viewModel.distance.value!!,viewModel.searchDateTime.value!!))
     }
 }
 
@@ -150,7 +143,7 @@ class TabAdapter(fm: FragmentManager, private val context: Context) :
     override fun getPageTitle(position: Int): CharSequence? {
         return when (position) {
             0 -> {
-                context.getString(R.string.tracks_text)
+                context.getString(R.string.track_text)
             }
             else -> {
                 context.getString(R.string.artist_text)

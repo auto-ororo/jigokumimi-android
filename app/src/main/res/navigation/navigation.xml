@@ -44,6 +44,12 @@
         <argument
             android:name="searchType"
             app:argType="com.ororo.auto.jigokumimi.util.Constants$SearchType" />
+        <argument
+            android:name="distance"
+            app:argType="integer" />
+        <argument
+            android:name="searchDateTime"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/historyFragment"

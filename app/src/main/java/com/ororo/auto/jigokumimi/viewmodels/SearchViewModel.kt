@@ -4,6 +4,7 @@ import android.app.Application
 import android.location.Location
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.JigokumimiApplication
+import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
 import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
@@ -22,35 +23,23 @@ class SearchViewModel(
 ) : BaseAndroidViewModel(application, authRepository) {
 
     /**
-     *  検索完了フラグ(Private)
-     */
-    private var _isSearchFinished = MutableLiveData(false)
-
-    /**
      *  検索完了フラグ
      */
+    private var _isSearchFinished = MutableLiveData(false)
     val isSearchFinished: LiveData<Boolean>
         get() = _isSearchFinished
 
     /**
-     * 検索種別(Private)
+     * 検索種別
      */
     private val _searchType = MutableLiveData(Constants.SearchType.TRACK)
-
-    /**
-     *  検索種別
-     */
     val searchType: LiveData<Constants.SearchType>
         get() = _searchType
 
     /**
-     *  検索距離(Private)
-     */
-    private val _distance = MutableLiveData(0)
-
-    /**
      *  検索距離
      */
+    private val _distance = MutableLiveData(0)
     val distance: LiveData<Int>
         get() = _distance
 
@@ -82,6 +71,14 @@ class SearchViewModel(
                         // 周りのJigokumimiユーザーのお気に入り曲を取得
                         musicRepository.refreshTracks(jigokumimiUserId, location, _distance.value!!)
 
+                        // 取得件数が0件の場合はエラー表示
+                        if (musicRepository.tracks.value?.size == 0) {
+                            showMessageDialog(getApplication<Application>().getString(R.string.no_tracks_error_message))
+                        } else {
+                            // 検索完了フラグをON
+                            _isSearchFinished.postValue(true)
+                        }
+
                     } else {
                         // 検索種別がアーティストの場合
 
@@ -98,10 +95,16 @@ class SearchViewModel(
                             location,
                             _distance.value!!
                         )
+
+                        // 取得件数が0件の場合はエラー表示
+                        if (musicRepository.artists.value?.size == 0) {
+                            showMessageDialog(getApplication<Application>().getString(R.string.no_artists_error_message))
+                        } else {
+                            // 検索完了フラグをON
+                            _isSearchFinished.postValue(true)
+                        }
                     }
 
-                    // 検索完了フラグをON
-                    _isSearchFinished.postValue(true)
 
                     Timber.d("Search Music Succeeded")
                 }
