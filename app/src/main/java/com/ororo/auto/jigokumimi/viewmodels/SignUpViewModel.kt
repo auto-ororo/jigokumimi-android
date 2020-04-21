@@ -12,8 +12,8 @@ import java.util.regex.Pattern
 /**
  * 新規登録画面のViewModel
  */
-class SignUpViewModel(application: Application, private val authRepository: IAuthRepository) :
-    BaseAndroidViewModel(application) {
+class SignUpViewModel(application: Application, authRepository: IAuthRepository) :
+    BaseAndroidViewModel(application, authRepository) {
 
     /**
      *  登録状態

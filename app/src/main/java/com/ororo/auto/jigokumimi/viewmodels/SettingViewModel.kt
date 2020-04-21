@@ -11,8 +11,8 @@ import java.util.regex.Pattern
 /**
  * 設定画面のViewModel
  */
-class SettingViewModel(application: Application, private val authRepository: IAuthRepository) :
-    BaseAndroidViewModel(application) {
+class SettingViewModel(application: Application, authRepository: IAuthRepository) :
+    BaseAndroidViewModel(application , authRepository) {
 
     /**
      *  パスワード変更状態

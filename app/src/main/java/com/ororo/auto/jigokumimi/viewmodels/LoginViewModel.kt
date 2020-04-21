@@ -1,18 +1,29 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
+import android.app.Service
 import android.util.Patterns
 import androidx.lifecycle.*
+import androidx.preference.PreferenceManager
 import com.ororo.auto.jigokumimi.JigokumimiApplication
+import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.network.JigokumimiApi
+import com.ororo.auto.jigokumimi.network.SpotifyApi
+import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.repository.LocationRepository
+import com.ororo.auto.jigokumimi.repository.MusicRepository
+import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
+import com.ororo.auto.jigokumimi.repository.demo.DemoLocationRepository
+import com.ororo.auto.jigokumimi.repository.demo.DemoMusicRepository
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
 /**
  * ログイン画面のViewModel
  */
-class LoginViewModel(application: Application, val authRepository: IAuthRepository) :
-    BaseAndroidViewModel(application) {
+class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
+    BaseAndroidViewModel(app, authRepository) {
 
     /**
      *  ログイン状態(Private)
@@ -24,6 +35,17 @@ class LoginViewModel(application: Application, val authRepository: IAuthReposito
      */
     val isLogin: MutableLiveData<Boolean>
         get() = _isLogin
+
+    /**
+     *  デモモード状態(Private)
+     */
+    private var _isDemo = MutableLiveData(false)
+
+    /**
+     *  デモモード状態
+     */
+    val isDemo: MutableLiveData<Boolean>
+        get() = _isDemo
 
     /**
      * Emailの入力内容を保持
@@ -80,8 +102,21 @@ class LoginViewModel(application: Application, val authRepository: IAuthReposito
     fun login() {
         viewModelScope.launch {
             try {
-                authRepository.loginJigokumimi(email.value!!, password.value!!)
-                _isLogin.postValue(true)
+
+                // デモ用ユーザーのEmail､パスワードの場合はデモ用リポジトリに切り替え
+                if (email.value == getApplication<Application>().getString(R.string.test_email_text) &&
+                    password.value == getApplication<Application>().getString(R.string.test_password_text)
+                ) {
+                    ServiceLocator.authRepository = DemoAuthRepository(app)
+                    ServiceLocator.locationRepository = DemoLocationRepository(app)
+                    ServiceLocator.musicRepository = DemoMusicRepository(app)
+
+                    _isDemo.postValue(true)
+                } else {
+                    authRepository.loginJigokumimi(email.value!!, password.value!!)
+                    _isLogin.postValue(true)
+                }
+
             } catch (e: Exception) {
                 handleAuthException(e)
             }
@@ -96,12 +131,39 @@ class LoginViewModel(application: Application, val authRepository: IAuthReposito
     }
 
     /**
+     * デモモード切り替え後にフラグリセット
+     */
+    fun doneDemo() {
+        _isDemo.postValue(false)
+    }
+
+    /**
      * Vidwmodel破棄時にリソース開放
      */
     override fun onCleared() {
         super.onCleared()
         _loginButtonEnabledState.removeSource(email)
         _loginButtonEnabledState.removeSource(password)
+    }
+
+
+    /**
+     * Ripositoryをリセット
+     */
+    fun initRepository(){
+        ServiceLocator.authRepository = AuthRepository(
+            PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
+            JigokumimiApi.retrofitService,
+            SpotifyApi.retrofitService
+        )
+        ServiceLocator.locationRepository = LocationRepository(
+            app
+        )
+        ServiceLocator.musicRepository = MusicRepository(
+            PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
+            SpotifyApi.retrofitService,
+            JigokumimiApi.retrofitService
+        )
     }
 
     /**

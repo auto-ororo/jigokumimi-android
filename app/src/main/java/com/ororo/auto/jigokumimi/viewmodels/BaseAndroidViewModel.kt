@@ -6,6 +6,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.repository.AuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_HOST
 import com.ororo.auto.jigokumimi.util.Constants.Companion.SPOTIFY_SDK_REDIRECT_SCHEME
@@ -21,7 +24,8 @@ import java.io.IOException
  *
  */
 open class BaseAndroidViewModel(
-    application: Application
+    application: Application,
+    val authRepository: IAuthRepository
 ) : AndroidViewModel(application) {
 
     /**
@@ -132,6 +136,13 @@ open class BaseAndroidViewModel(
             }
         }
         showMessageDialog(msg)
+    }
+
+    /**
+     * デモ用ユーザーでログインしているかどうかを判別する
+     */
+    fun isDemo(): Boolean {
+        return (authRepository is DemoAuthRepository)
     }
 
     /**

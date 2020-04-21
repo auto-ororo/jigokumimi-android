@@ -1,3 +1,4 @@
+import ServiceLocator.musicRepository
 import android.app.Application
 import android.location.Geocoder
 import android.system.Os.close
@@ -59,5 +60,4 @@ object ServiceLocator {
             }
         }
     }
-
 }

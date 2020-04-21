@@ -75,7 +75,8 @@ class SettingFragment : BaseFragment() {
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
                 show()
-                title = context?.getString(R.string.title_Setting)
+                val titleStr = "${context?.getString(R.string.title_setting)} ${if(viewModel.isDemo()) context?.getString(R.string.title_demo) else ""}"
+                title = titleStr
             }
         }
         return binding.root

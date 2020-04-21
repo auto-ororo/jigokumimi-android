@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     application: Application,
-    private val authRepository: IAuthRepository
+    authRepository: IAuthRepository
 ) :
-    BaseAndroidViewModel(application) {
+    BaseAndroidViewModel(application, authRepository) {
 
     /**
      * ログアウト実行

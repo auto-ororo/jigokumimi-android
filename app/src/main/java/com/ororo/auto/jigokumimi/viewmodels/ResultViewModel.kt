@@ -6,6 +6,8 @@ import android.media.MediaPlayer
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.repository.AuthRepository
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import kotlinx.coroutines.launch
 
@@ -15,8 +17,12 @@ import kotlinx.coroutines.launch
  *
  *
  */
-class ResultViewModel(application: Application, private val musicRepository: IMusicRepository) :
-    BaseAndroidViewModel(application), MediaPlayer.OnCompletionListener {
+class ResultViewModel(
+    application: Application,
+    authRepository: IAuthRepository,
+    private val musicRepository: IMusicRepository
+) :
+    BaseAndroidViewModel(application, authRepository), MediaPlayer.OnCompletionListener {
 
     /**
      * 音楽再生クラス
@@ -308,7 +314,8 @@ class ResultViewModel(application: Application, private val musicRepository: IMu
                 @Suppress("UNCHECKED_CAST")
                 return ResultViewModel(
                     app,
-                    (app.applicationContext as JigokumimiApplication).musicRepository
+                    (app.applicationContext as JigokumimiApplication).authRepository,
+                        (app.applicationContext as JigokumimiApplication).musicRepository
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")

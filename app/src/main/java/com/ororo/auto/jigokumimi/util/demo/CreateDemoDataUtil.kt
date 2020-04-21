@@ -1,15 +1,21 @@
-package com.ororo.auto.jigokumimi.util
+package com.ororo.auto.jigokumimi.util.demo
 
+import android.content.Context
+import android.content.res.AssetManager
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.HistoryItem
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
+import timber.log.Timber
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.util.*
 
-class CreateAndroidTestDataUtil {
 
+class CreateDemoDataUtil(val context: Context) {
     val faker = Faker(Locale("jp_JP"))
 
     fun createDummySpotifyArtist(): SpotifyArtist {
@@ -347,7 +353,7 @@ class CreateAndroidTestDataUtil {
         )
     }
 
-    fun createDummyTrack(previewUrl: String = faker.internet().url(), isSaved: Boolean = faker.bool().bool()): Track {
+    fun createDummyTrack(): Track {
         return Track(
             album = faker.lorem().word(),
             artists = faker.name().fullName(),
@@ -355,9 +361,9 @@ class CreateAndroidTestDataUtil {
             imageUrl = faker.internet().url(),
             name = faker.name().fullName(),
             popularity = faker.number().randomDigit(),
-            previewUrl = previewUrl,
+            previewUrl = faker.internet().url(),
             rank = faker.number().randomDigit(),
-            isSaved = isSaved
+            isSaved = faker.bool().bool()
         )
     }
 
@@ -377,5 +383,157 @@ class CreateAndroidTestDataUtil {
         return listOf(
             faker.bool().bool()
         )
+    }
+
+    fun createDummyTrackList(): List<Track> {
+
+        val trackList = mutableListOf<Track>()
+
+        // Csv読み込み
+        val assetManager: AssetManager = context.resources.assets
+        val inputStream: InputStream = assetManager.open("demoTrackList.csv")
+        val inputStreamReader = InputStreamReader(inputStream)
+        val bufferReader = BufferedReader(inputStreamReader)
+        var line: String
+
+        // 読み込んだCSVを元にデモ用Trackリストを作成
+        try {
+            while (bufferReader.readLine().also { line = it } != null) {
+                val rowData = line.split(",").toTypedArray()
+
+                trackList.add(
+                    Track(
+                        rank = rowData[0].toInt(),
+                        name = rowData[1],
+                        album = rowData[2],
+                        artists = rowData[3],
+                        imageUrl = rowData[4],
+                        previewUrl = rowData[5],
+                        popularity = faker.number().randomDigit(),
+                        id = faker.random().hex(),
+                        isSaved = false
+                    )
+                )
+            }
+            bufferReader.close()
+
+        } catch (e: Exception) {
+            Timber.d(e.message)
+        }
+
+        return trackList
+    }
+
+
+    fun createDummyArtistList(): List<Artist> {
+
+        val artistList = mutableListOf<Artist>()
+
+        // Csv読み込み
+        val assetManager: AssetManager = context.resources.assets
+        val inputStream: InputStream = assetManager.open("demoArtistList.csv")
+        val inputStreamReader = InputStreamReader(inputStream)
+        val bufferReader = BufferedReader(inputStreamReader)
+        var line: String
+
+        // 読み込んだCSVを元にデモ用Trackリストを作成
+        try {
+            while (bufferReader.readLine().also { line = it } != null) {
+                val rowData = line.split(",").toTypedArray()
+
+                artistList.add(
+                    Artist(
+                        rank = rowData[0].toInt(),
+                        name = rowData[1],
+                        genres = rowData[2],
+                        imageUrl = rowData[3],
+                        popularity = faker.number().randomDigit(),
+                        id = faker.random().hex(),
+                        isFollowed = false
+
+                    )
+                )
+            }
+            bufferReader.close()
+
+        } catch (e: Exception) {
+            Timber.d(e.message)
+        }
+
+        return artistList
+    }
+
+     fun createDummyTrackHistoryList(): List<TrackHistory> {
+
+        val trackHistoryList = mutableListOf<TrackHistory>()
+
+        // Csv読み込み
+        val assetManager: AssetManager = context.resources.assets
+        val inputStream: InputStream = assetManager.open("demoTrackHistoryList.csv")
+        val inputStreamReader = InputStreamReader(inputStream)
+        val bufferReader = BufferedReader(inputStreamReader)
+        var line: String
+
+        // 読み込んだCSVを元にデモ用履歴リストを作成
+        try {
+            while (bufferReader.readLine().also { line = it } != null) {
+                val rowData = line.split(",").toTypedArray()
+
+                trackHistoryList.add(
+                    TrackHistory(
+                        id = rowData[0],
+                        userId = rowData[1],
+                        latitude = rowData[2].toDouble(),
+                        longitude = rowData[3].toDouble(),
+                        distance = rowData[4].toInt(),
+                        createdAt = rowData[5],
+                        tracksAroundHistories = listOf()
+                    )
+                )
+            }
+            bufferReader.close()
+
+        } catch (e: Exception) {
+            Timber.d(e.message)
+        }
+
+        return trackHistoryList
+    }
+
+    fun createDummyArtistHistoryList(): List<ArtistHistory> {
+
+        val artistHistoryList = mutableListOf<ArtistHistory>()
+
+        // Csv読み込み
+        val assetManager: AssetManager = context.resources.assets
+        val inputStream: InputStream = assetManager.open("demoArtistHistoryList.csv")
+        val inputStreamReader = InputStreamReader(inputStream)
+        val bufferReader = BufferedReader(inputStreamReader)
+        var line: String
+
+        // 読み込んだCSVを元にデモ用履歴リストを作成
+        try {
+            while (bufferReader.readLine().also { line = it } != null) {
+                val rowData = line.split(",").toTypedArray()
+
+                artistHistoryList.add(
+                    ArtistHistory(
+                        id = rowData[0],
+                        userId = rowData[1],
+                        latitude = rowData[2].toDouble(),
+                        longitude = rowData[3].toDouble(),
+                        distance = rowData[4].toInt(),
+                        createdAt = rowData[5],
+                        artistsAroundHistories = listOf()
+                    )
+                )
+            }
+            bufferReader.close()
+
+        } catch (e: Exception) {
+            Timber.d(e.message)
+        }
+
+        return artistHistoryList
     }
 }

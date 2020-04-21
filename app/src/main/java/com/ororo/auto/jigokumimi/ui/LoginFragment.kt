@@ -34,6 +34,8 @@ class LoginFragment : BaseFragment() {
 
         // ViewModel取得or生成
         activity?.run {
+            viewModelStore.clear()
+
             val viewModelFactory = LoginViewModel.Factory(this.application)
 
             viewModel = ViewModelProvider(
@@ -67,12 +69,18 @@ class LoginFragment : BaseFragment() {
         viewModel.isLogin.observe(viewLifecycleOwner) {
             if (it) onLoginSucceed()
         }
+        viewModel.isDemo.observe(viewLifecycleOwner) {
+            if (it) onDemoSucceed()
+        }
         viewModel.loginButtonEnabledState.observe(viewLifecycleOwner) {
             binding.loginButton.isEnabled = it
         }
 
         // 共通初期化処理
         baseInit(viewModel)
+
+        // リポジトリを初期化
+        viewModel.initRepository()
 
         // ドロワーアイコンを非表示
         if (activity is AppCompatActivity) {
@@ -143,6 +151,16 @@ class LoginFragment : BaseFragment() {
         // デモ用ログイン情報
         viewModel.email.value = getString(R.string.test_email_text)
         viewModel.password.value = getString(R.string.test_password_text)
+    }
+
+    /**
+     *  デモモード切り替え成功時の処理
+     *  検索画面に遷移する
+     */
+    private fun onDemoSucceed() {
+        this.findNavController()
+            .navigate(LoginFragmentDirections.actionLoginFragmentToSearchFragment())
+        viewModel.doneDemo()
     }
 
     /**

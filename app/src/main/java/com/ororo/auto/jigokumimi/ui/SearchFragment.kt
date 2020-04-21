@@ -110,7 +110,8 @@ class SearchFragment : BaseFragment() {
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
                 show()
-                title = context?.getString(R.string.title_search)
+                val titleStr = "${context?.getString(R.string.title_search)} ${if(viewModel.isDemo()) context?.getString(R.string.title_demo) else ""}"
+                title = titleStr
             }
         }
 

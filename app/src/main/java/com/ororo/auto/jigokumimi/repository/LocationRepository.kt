@@ -10,6 +10,8 @@ import com.google.android.gms.location.LocationResult
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import timber.log.Timber
+import java.lang.Exception
 import java.util.*
 
 class LocationRepository(
@@ -48,15 +50,20 @@ class LocationRepository(
     override fun getPlaceName(latitude: Double, longitude: Double): String {
         val result = StringBuilder();
 
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1);
+        try {
+            val addresses = geocoder.getFromLocation(latitude, longitude, 1);
 
-        addresses.map {
-            result.append(it.adminArea)
-            it.subAdminArea?.let { subAdminArea ->
-                result.append(subAdminArea)
+            addresses.map {
+                result.append(it.adminArea)
+                it.subAdminArea?.let { subAdminArea ->
+                    result.append(subAdminArea)
+                }
+                result.append(' ')
+                result.append(it.locality)
             }
-            result.append(' ')
-            result.append(it.locality)
+
+        } catch (e:Exception) {
+           Timber.d(e.message)
         }
 
         return result.toString()

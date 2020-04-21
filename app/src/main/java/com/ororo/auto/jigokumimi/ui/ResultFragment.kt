@@ -144,7 +144,8 @@ class ResultFragment : BaseFragment() {
         // タイトル設定
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
-                title = context?.getString(R.string.title_result)
+                val titleStr = "${context?.getString(R.string.title_result)} ${if(viewModel.isDemo()) context?.getString(R.string.title_demo) else ""}"
+                title = titleStr
             }
         }
 
