@@ -26,8 +26,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data
-                    android:host="yourhost"
-                    android:scheme="yourscheme" />
+                    android:host="main"
+                    android:scheme="jigokumimi" />
             </intent-filter>
         </activity>
     </application>
