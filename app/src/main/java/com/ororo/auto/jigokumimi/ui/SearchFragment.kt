@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSearchBinding
 import com.ororo.auto.jigokumimi.util.Constants
+import com.ororo.auto.jigokumimi.util.Util
 import com.ororo.auto.jigokumimi.viewmodels.SearchViewModel
 import timber.log.Timber
 
@@ -132,7 +133,7 @@ class SearchFragment : BaseFragment() {
         Timber.d(this.findNavController().currentDestination.toString())
         viewModel.doneSearchTracks()
         this.findNavController()
-            .navigate(SearchFragmentDirections.actionSearchFragmentToResultFragment(viewModel.searchType.value!!))
+            .navigate(SearchFragmentDirections.actionSearchFragmentToResultFragment(viewModel.searchType.value!!, viewModel.distance.value!!, Util.getNowDate()))
     }
 
     /**

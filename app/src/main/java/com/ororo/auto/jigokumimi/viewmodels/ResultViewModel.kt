@@ -9,6 +9,7 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
+import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.launch
 
 
@@ -51,38 +52,69 @@ class ResultViewModel(
         get() = _playingTrackIndex
 
     /**
-     * 再生状態(Private)
-     */
-    private var _isPlaying = MutableLiveData(false)
-
-    /**
      * 再生状態
      */
+    private var _isPlaying = MutableLiveData(false)
     val isPlaying: LiveData<Boolean>
         get() = _isPlaying
 
     /**
-     * 再生プレーヤーの表示状態(Private)
-     */
-    private val _isMiniPlayerShown = MutableLiveData(false)
-
-    /**
      * 再生プレーヤーの表示状態
      */
+    private val _isMiniPlayerShown = MutableLiveData(false)
     val isMiniPlayerShown: LiveData<Boolean>
         get() = _isMiniPlayerShown
 
 
     /**
-     * 変更されたデータ位置(Private)
+     * 検索種別
      */
-    private val _changeDataIndex = MutableLiveData<Int>()
+    private val _searchType = MutableLiveData(Constants.SearchType.TRACK)
+    val searchType: LiveData<Constants.SearchType>
+        get() = _searchType
+
+    /**
+     *  検索距離
+     */
+    private val _distance = MutableLiveData(0)
+    val distance: LiveData<Int>
+        get() = _distance
+
+    /**
+     *  検索日時
+     */
+    private val _searchDateTime = MutableLiveData("")
+    val searchDateTime: LiveData<String>
+        get() = _searchDateTime
+
 
     /**
      * 変更されたデータ位置
      */
+    private val _changeDataIndex = MutableLiveData<Int>()
     val changeDataIndex: LiveData<Int>
         get() = _changeDataIndex
+
+    /**
+     * 検索種別を設定
+     */
+    fun setSearchType(searchType: Constants.SearchType) {
+        _searchType.value = searchType
+    }
+
+    /**
+     * 検索距離を設定
+     */
+    fun setDistance(distance: Int) {
+        _distance.value = distance
+    }
+
+    /**
+     * 検索日時を設定
+     */
+    fun setSearchDateTime(searchDateTime: String) {
+        _searchDateTime.value = searchDateTime
+    }
 
     /**
      * Spitify上の曲お気に入り状態を変更する
@@ -315,7 +347,7 @@ class ResultViewModel(
                 return ResultViewModel(
                     app,
                     (app.applicationContext as JigokumimiApplication).authRepository,
-                        (app.applicationContext as JigokumimiApplication).musicRepository
+                    (app.applicationContext as JigokumimiApplication).musicRepository
                 ) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")

@@ -87,6 +87,11 @@ class ResultFragment : BaseFragment() {
 
         binding.viewModel = viewModel
 
+        viewModel.setDistance(args.distance)
+        viewModel.setSearchDateTime(args.searchDateTime)
+        viewModel.setSearchType(args.searchType)
+
+
         // 検索種別に応じてアダプター(リストに表示する項目)を切り替え
         if (args.searchType == Constants.SearchType.TRACK) {
 
@@ -144,7 +149,10 @@ class ResultFragment : BaseFragment() {
         // タイトル設定
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
-                val titleStr = "${context?.getString(R.string.title_result)} ${if(viewModel.isDemo()) context?.getString(R.string.title_demo) else ""}"
+                val titleStr =
+                    "${context?.getString(R.string.title_result)} ${if (viewModel.isDemo()) context?.getString(
+                        R.string.title_demo
+                    ) else ""}"
                 title = titleStr
             }
         }

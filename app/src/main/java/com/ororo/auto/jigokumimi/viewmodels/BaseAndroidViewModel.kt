@@ -34,35 +34,23 @@ open class BaseAndroidViewModel(
     var isErrorDialogShown = MutableLiveData<Boolean>(false)
 
     /**
-     * エラーメッセージの内容(Private)
-     */
-    protected var _errorMessage = MutableLiveData<String>()
-
-    /**
      * エラーメッセージの内容
      */
+    protected var _errorMessage = MutableLiveData<String>()
     val errorMessage: MutableLiveData<String>
         get() = _errorMessage
 
     /**
-     * Snackbarのメッセージ内容(Private)
+     * Snackbarのメッセージ内容
      */
     protected var _snackbarMessage = MutableLiveData<String>()
-
-    /**
-     * SnackBarのメッセージ内容
-     */
     val snackbarMessage: MutableLiveData<String>
         get() = _snackbarMessage
 
     /**
-     *  トークン認証切れ状態(Private)
-     */
-    protected var _isTokenExpired = MutableLiveData(false)
-
-    /**
      *  トークン認証切れ状態
      */
+    protected var _isTokenExpired = MutableLiveData(false)
     val isTokenExpired: LiveData<Boolean>
         get() = _isTokenExpired
 

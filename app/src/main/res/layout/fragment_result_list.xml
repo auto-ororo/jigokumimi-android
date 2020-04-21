@@ -6,6 +6,8 @@
 
     <data>
 
+        <import type="com.ororo.auto.jigokumimi.util.Constants" />
+
         <variable
             name="viewModel"
             type="com.ororo.auto.jigokumimi.viewmodels.ResultViewModel" />
@@ -20,11 +22,12 @@
             android:id="@+id/recyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toTopOf="@+id/miniPlayerLayoutContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/distance"
             tools:listitem="@layout/result_track_item" />
 
         <fragment
@@ -37,6 +40,45 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:layout="@layout/fragment_mini_player" />
 
+        <TextView
+            android:id="@+id/searchType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text='@{viewModel.searchType == Constants.SearchType.TRACK ? @string/track_text : @string/artist_text}'
+            android:textColor="@color/colorGreyDark"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/track_text" />
+
+        <TextView
+            android:id="@+id/distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:text='@{@string/distance_text(viewModel.distance)}'
+            android:textColor="@color/colorGreyDark"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@+id/searchType"
+            app:layout_constraintTop_toTopOf="@+id/searchType"
+            tools:text="10000m" />
+
+        <TextView
+            android:id="@+id/searchDateTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text='@{viewModel.searchDateTime}'
+            android:textColor="@color/colorGreyDark"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/distance"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="9999-99-99 99:99:99" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,26 +31,39 @@ class HistoryViewModel(
     val trackHistoryList = MutableLiveData<MutableList<History>>()
 
     /**
-     *  検索完了フラグ(Private)
-     */
-    private var _isSearchFinished = MutableLiveData(false)
-
-    /**
      *  検索完了フラグ
      */
+    private var _isSearchFinished = MutableLiveData(false)
     val isSearchFinished: LiveData<Boolean>
         get() = _isSearchFinished
 
     /**
-     * 削除されたデータ位置(Private)
-     */
-    private val _deleteDataIndex = MutableLiveData<Int>()
-
-    /**
      * 削除されたデータ位置
      */
+    private val _deleteDataIndex = MutableLiveData<Int>()
     val deleteDataIndex: LiveData<Int>
         get() = _deleteDataIndex
+
+    /**
+     * 検索種別
+     */
+    private val _searchType = MutableLiveData(Constants.SearchType.TRACK)
+    val searchType: LiveData<Constants.SearchType>
+        get() = _searchType
+
+    /**
+     *  検索距離
+     */
+    private val _distance = MutableLiveData(0)
+    val distance: LiveData<Int>
+        get() = _distance
+
+    /**
+     *  検索日時
+     */
+    private val _searchDateTime = MutableLiveData("")
+    val searchDateTime: LiveData<String>
+        get() = _searchDateTime
 
     /**
      * 検索履歴を取得する
@@ -154,15 +167,19 @@ class HistoryViewModel(
     fun searchHistoryDetails(searchType: Constants.SearchType, historyIndex: Int) {
         viewModelScope.launch {
             try {
-
+                _searchType.postValue(searchType)
                 if (searchType == Constants.SearchType.TRACK) {
                     trackHistoryList.value?.get(historyIndex)?.let { history ->
                         musicRepository.refreshTracksFromHistory(history)
+                        _distance.value = history.distance
+                        _searchDateTime.value = history.createdAt
                         _isSearchFinished.postValue(true)
                     }
                 } else {
                     artistHistoryList.value?.get(historyIndex)?.let { history ->
                         musicRepository.refreshArtistsFromHistory(history)
+                        _distance.value = history.distance
+                        _searchDateTime.value = history.createdAt
                         _isSearchFinished.postValue(true)
                     }
                 }

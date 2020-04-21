@@ -54,7 +54,7 @@
             android:layout_marginBottom="16dp"
             android:background="@drawable/shape_rounded_corners_color_primary"
             android:gravity="center_horizontal|center_vertical"
-            android:text="@string/tracks_text"
+            android:text="@string/track_text"
             android:textColor="@color/colorWhite"
             android:textSize="36sp"
             app:layout_constraintBottom_toTopOf="@+id/selectDistanceSuggest"
@@ -113,17 +113,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.4" />
 
-<!--        <TextView-->
-<!--            android:id="@+id/getMusicSuggest"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="16dp"-->
-<!--            android:text="@string/get_music_suggest"-->
-<!--            android:textSize="30sp"-->
-<!--            android:textStyle="bold"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
+        <TextView
+            android:id="@+id/searchSuggest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/search_suggest"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@+id/searchTracksButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/distanceSpinner" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
