@@ -3,7 +3,6 @@ package com.ororo.auto.jigokumimi.repository
 import android.content.SharedPreferences
 import android.location.Location
 import androidx.lifecycle.MutableLiveData
-import com.ororo.auto.jigokumimi.database.*
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.Track
