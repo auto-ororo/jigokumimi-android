@@ -1,17 +1,9 @@
-import ServiceLocator.musicRepository
 import android.app.Application
-import android.location.Geocoder
-import android.system.Os.close
 import androidx.annotation.VisibleForTesting
 import androidx.preference.PreferenceManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.ororo.auto.jigokumimi.database.MusicDao
-import com.ororo.auto.jigokumimi.database.getDatabase
 import com.ororo.auto.jigokumimi.network.JigokumimiApi
 import com.ororo.auto.jigokumimi.network.SpotifyApi
 import com.ororo.auto.jigokumimi.repository.*
-import kotlinx.coroutines.runBlocking
-import java.util.*
 
 object ServiceLocator {
 
