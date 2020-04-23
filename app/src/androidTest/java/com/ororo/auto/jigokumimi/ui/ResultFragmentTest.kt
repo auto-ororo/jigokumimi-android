@@ -97,6 +97,14 @@ class ResultFragmentTest {
             "searchType",
             Serializable::class.java.cast(Constants.SearchType.TRACK)
         )
+        bundle.putInt(
+            "distance",
+            500
+        )
+        bundle.putString(
+            "searchDateTime",
+            "9999-99-99 99:99:99"
+        )
         launchFragmentInContainer<ResultFragment>(bundle, R.style.AppTheme)
 
         onView(withId(R.id.recyclerView))
@@ -112,6 +120,14 @@ class ResultFragmentTest {
             "searchType",
             Serializable::class.java.cast(Constants.SearchType.ARTIST)
         )
+        bundle.putInt(
+            "distance",
+            500
+        )
+        bundle.putString(
+            "searchDateTime",
+            "9999-99-99 99:99:99"
+        )
         launchFragmentInContainer<ResultFragment>(bundle, R.style.AppTheme)
 
         onView(withId(R.id.recyclerView))
@@ -126,6 +142,14 @@ class ResultFragmentTest {
         bundle.putSerializable(
             "searchType",
             Serializable::class.java.cast(Constants.SearchType.TRACK)
+        )
+        bundle.putInt(
+            "distance",
+            500
+        )
+        bundle.putString(
+            "searchDateTime",
+            "9999-99-99 99:99:99"
         )
         launchFragmentInContainer<ResultFragment>(bundle, R.style.AppTheme)
 

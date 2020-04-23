@@ -146,7 +146,7 @@ class SearchFragmentTest {
         // 結果画面に遷移することを確認
         verify {
             navController.navigate(
-                SearchFragmentDirections.actionSearchFragmentToResultFragment(Constants.SearchType.TRACK)
+                SearchFragmentDirections.actionSearchFragmentToResultFragment(Constants.SearchType.TRACK, 500, any())
             )
         }
     }

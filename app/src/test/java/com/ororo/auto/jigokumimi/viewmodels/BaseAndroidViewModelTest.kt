@@ -5,7 +5,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import getOrAwaitValue
+import io.mockk.mockk
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.hamcrest.core.IsEqual
@@ -24,12 +26,14 @@ import kotlin.reflect.jvm.isAccessible
 class BaseAndroidViewModelTest {
 
     lateinit var viewModel: BaseAndroidViewModel
+    lateinit var authRepository: IAuthRepository
 
     val faker = Faker(Locale("jp_JP"))
 
     @Before
     fun createViewModel() {
-        viewModel = BaseAndroidViewModel(ApplicationProvider.getApplicationContext())
+        authRepository = mockk(relaxed = true)
+        viewModel = BaseAndroidViewModel(ApplicationProvider.getApplicationContext(), authRepository)
 
     }
 
