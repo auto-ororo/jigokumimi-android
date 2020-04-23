@@ -55,12 +55,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
-
-    // Room
-    implementation "androidx.room:room-runtime:$roomVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
@@ -80,9 +75,6 @@ dependencies {
     // Timber
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
-    // WorkManager dependency
-    implementation "androidx.work:work-runtime-ktx:$workVersion"
-
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
@@ -99,17 +91,18 @@ dependencies {
     kapt "com.github.bumptech.glide:compiler:$glideVersion"
 
     // Spotify SDK
-    implementation 'com.spotify.android:auth:1.2.3'
+    implementation "com.spotify.android:auth:$spotifyAuthVersion"
 
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation "com.android.support:multidex:$multidexVersion"
 
     // Location
-    implementation "com.google.android.gms:play-services-location:17.0.0"
+    implementation "com.google.android.gms:play-services-location:$locationVersion"
 
     // Shared Preferences
-    implementation 'androidx.preference:preference:1.1.0'
+    implementation "androidx.preference:preference:$sharedPreferencesVersion"
 
 
+    // hamcrest
     testImplementation "org.hamcrest:hamcrest-all:$hamcrestVersion"
 
     // AndroidX Test - JVM testing
@@ -121,9 +114,9 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$androidXTestCoreVersion"
     androidTestImplementation "androidx.test:rules:$androidXTestCoreVersion"
     androidTestImplementation "androidx.test:monitor:$androidXTestCoreVersion"
-    androidTestImplementation 'androidx.test:rules:1.3.0-alpha05'
+    androidTestImplementation"androidx.test:rules:$androidXTestCoreVersion"
 
-    debugImplementation('androidx.fragment:fragment-testing:1.2.4') {
+    debugImplementation("androidx.fragment:fragment-testing:$androidXTestCoreVersion") {
         exclude group: 'androidx.test', module: 'core'
     }
 
@@ -131,9 +124,9 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineVersion"
 
     // Faker
-    implementation  'com.github.javafaker:javafaker:1.0.2'
-    testImplementation 'com.github.javafaker:javafaker:1.0.2'
-    androidTestImplementation 'com.github.javafaker:javafaker:1.0.2'
+    implementation  "com.github.javafaker:javafaker:$fakerVersion"
+    testImplementation "com.github.javafaker:javafaker:$fakerVersion"
+    androidTestImplementation "com.github.javafaker:javafaker:$fakerVersion"
 
     // mockk
     androidTestImplementation "io.mockk:mockk-android:$mockkVersion"

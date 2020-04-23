@@ -127,8 +127,8 @@ class LoginFragmentTest {
 
         onView(withId(R.id.demoButton)).perform(click())
 
-        onView(withId(R.id.emailEdit)).check(matches(withText("test@test.com")))
-        onView(withId(R.id.passwordEdit)).check(matches(withText("testtest")))
+        onView(withId(R.id.emailEdit)).check(matches(withText("demo@demo.com")))
+        onView(withId(R.id.passwordEdit)).check(matches(withText("demodemo")))
 
     }
 

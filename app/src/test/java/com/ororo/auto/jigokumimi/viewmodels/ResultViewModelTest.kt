@@ -9,6 +9,7 @@ import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeMusicRepository
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
 import getOrAwaitValue
@@ -37,6 +38,8 @@ class ResultViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     lateinit var viewModel: ResultViewModel
+
+    lateinit var authRepository: IAuthRepository
     lateinit var musicRepository: FakeMusicRepository
 
     val faker = Faker(Locale("jp_JP"))
@@ -60,12 +63,13 @@ class ResultViewModelTest {
         }
 
         musicRepository = spyk(FakeMusicRepository(_tracks = tracks, _artists = artists))
+        authRepository = mockk(relaxed = true)
 
         viewModel = spyk(
             ResultViewModel(
                 ApplicationProvider.getApplicationContext(),
+                authRepository,
                 musicRepository
-
             )
         )
 
