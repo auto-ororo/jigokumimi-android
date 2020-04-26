@@ -48,7 +48,7 @@ class SearchViewModel(
      * 周辺曲情報を更新する
      */
     fun searchMusic() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             Timber.d("Search Music called")
             try {
                 // 位置情報を取得する
