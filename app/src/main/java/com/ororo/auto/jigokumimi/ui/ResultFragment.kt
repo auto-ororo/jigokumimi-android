@@ -161,6 +161,13 @@ class ResultFragment : BaseFragment() {
         return binding.root
     }
 
+    override fun onPause() {
+        super.onPause()
+        // 再生曲を停止し､音楽プレーヤーを隠す
+        viewModel.stopTrack()
+        viewModel.hideMiniPlayer()
+    }
+
     private fun onQueueButtonClicked(trackIndex: Int) {
         viewModel.setPlayingTrack(trackIndex)
         viewModel.playTrack()
