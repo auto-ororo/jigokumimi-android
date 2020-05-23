@@ -42,7 +42,7 @@ data class GetTrackDetailResponse(
     @Json(name = "is_local") val isLocal: Boolean,
     val name: String,
     val popularity: Int,
-    @Json(name = "preview_url") val previewUrl: String,
+    @Json(name = "preview_url") val previewUrl: String?,
     @Json(name = "track_number") val trackNumber: Int,
     val type: String,
     val uri: String
@@ -130,7 +130,7 @@ data class SpotifyTrack(
     @Json(name = "is_local") val isLocal: Boolean,
     val name: String,
     val popularity: Int,
-    @Json(name = "preview_url") val previewUrl: String
+    @Json(name = "preview_url") val previewUrl: String?
 )
 
 /**

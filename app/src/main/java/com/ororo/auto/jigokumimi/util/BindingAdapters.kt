@@ -1,5 +1,6 @@
 package com.ororo.auto.jigokumimi.util
 
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -19,6 +20,15 @@ fun setImageUrl(imageView: ImageView, url: String) {
 @BindingAdapter("dynamicSrcCompat")
 fun dynamicSrcCompat(view: ImageButton, resourceId: Int) {
     view.setImageResource(resourceId)
+}
+
+@BindingAdapter("toggleQueueButton")
+fun toggleQueueButton(view: ImageButton, previewUrl: String?) {
+    view.visibility =  if (previewUrl.isNullOrEmpty()) {
+        View.INVISIBLE
+    } else {
+        View.VISIBLE
+    }
 }
 
 @BindingAdapter("trackListForRankTrack", "trackIndexForRankTrack", requireAll = false)

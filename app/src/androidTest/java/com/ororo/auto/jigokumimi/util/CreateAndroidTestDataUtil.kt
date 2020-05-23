@@ -347,7 +347,7 @@ class CreateAndroidTestDataUtil {
         )
     }
 
-    fun createDummyTrack(previewUrl: String = faker.internet().url(), isSaved: Boolean = faker.bool().bool()): Track {
+    fun createDummyTrack(previewUrl: String? = faker.internet().url(), isSaved: Boolean = faker.bool().bool()): Track {
         return Track(
             album = faker.lorem().word(),
             artists = faker.name().fullName(),

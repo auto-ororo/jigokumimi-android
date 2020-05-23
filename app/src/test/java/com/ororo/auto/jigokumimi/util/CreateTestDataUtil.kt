@@ -346,7 +346,7 @@ class CreateTestDataUtil {
         )
     }
 
-    fun createDummyTrack(): Track {
+    fun createDummyTrack(previewUrl: String? = faker.internet().url()): Track {
         return Track(
             album = faker.lorem().word(),
             artists = faker.name().fullName(),
@@ -354,7 +354,7 @@ class CreateTestDataUtil {
             imageUrl = faker.internet().url(),
             name = faker.name().fullName(),
             popularity = faker.number().randomDigit(),
-            previewUrl = faker.internet().url(),
+            previewUrl = previewUrl,
             rank = faker.number().randomDigit(),
             isSaved = faker.bool().bool()
         )
