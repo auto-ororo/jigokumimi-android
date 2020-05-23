@@ -11,6 +11,7 @@ import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.launch
+import java.lang.Math.abs
 
 
 /**
@@ -197,20 +198,25 @@ class ResultViewModel(
         currentIndex?.let {
             val sumIndex = it + moveIndex
 
-            _playingTrackIndex.value = when {
-                sumIndex < 0 -> {
-                    //指定位置が0以下の場合はリスト中最後の曲を設定
-                    tracklist.value?.lastIndex
-                }
-                sumIndex > tracklist.value?.lastIndex!! -> {
-                    //指定位置が要素数を超える場合はリスト中最初の曲を設定
-                    0
-                }
-                else -> {
-                    // それ以外は指定位置の曲を設定
-                    sumIndex
-                }
+            // 次の再生曲候補を設定
+            val nextPlayingTrackIndex = if (sumIndex >= 0) {
+                sumIndex % (tracklist.value?.lastIndex!! + 1)
+            } else {
+                (tracklist.value?.lastIndex!! + 1 + sumIndex) % (tracklist.value?.lastIndex!! + 1)
             }
+
+            if (tracklist.value?.get(nextPlayingTrackIndex)?.previewUrl.isNullOrEmpty()) {
+                // 次の再生曲候補のPreviewURLがNullか空文字の場合、1つ進めるor戻す
+                if (moveIndex > 0) {
+                    movePlayingTrack(moveIndex + 1)
+                } else {
+                    movePlayingTrack(moveIndex - 1)
+                }
+            } else {
+                // PreviewURLが存在する場合、次の再生曲に設定
+                _playingTrackIndex.value = nextPlayingTrackIndex
+            }
+
         }
     }
 

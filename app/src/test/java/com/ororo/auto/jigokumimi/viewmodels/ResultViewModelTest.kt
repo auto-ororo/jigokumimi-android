@@ -52,8 +52,12 @@ class ResultViewModelTest {
     fun createViewModel() {
         val tracks = mutableListOf<Track>()
 
-        for (i in 1..3) {
-            tracks.add(testDataUtil.createDummyTrack())
+        for (i in 1..4) {
+            if (i == 2 ) {
+                tracks.add(testDataUtil.createDummyTrack(previewUrl = null))
+            } else {
+                tracks.add(testDataUtil.createDummyTrack())
+            }
         }
 
         val artists = mutableListOf<Artist>()
@@ -341,7 +345,26 @@ class ResultViewModelTest {
     }
 
     @Test
-    fun movePlayingTrack_移動後の位置が0以上TrackList要素数以下_指定分移動した位置のTrackList要素が再生曲に設定されること() {
+    fun movePlayingTrack_移動後の位置が0以上TrackList要素数以下_previewUrlがnull_曲を1つ戻す_指定分移動した位置のTrackList要素が再生曲に設定されること() {
+
+        // 初期再生曲をTrackListの最初の要素に指定
+        viewModel.setPlayingTrack(2)
+
+
+        // privateメソッドを取得
+        val method = viewModel::class.memberFunctions.find { it.name == "movePlayingTrack" }
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel, -1)
+        }
+
+        assertThat(viewModel.playingTrackIndex.value, IsEqual(0))
+
+    }
+
+    @Test
+    fun movePlayingTrack_移動後の位置が0以上TrackList要素数以下_previewUrlがnull_曲を1つ進める_指定分移動した位置のTrackList要素が再生曲に設定されること() {
 
         // 初期再生曲をTrackListの最初の要素に指定
         viewModel.setPlayingTrack(0)
@@ -355,7 +378,26 @@ class ResultViewModelTest {
             it.call(viewModel, 1)
         }
 
-        assertThat(viewModel.playingTrackIndex.value, IsEqual(1))
+        assertThat(viewModel.playingTrackIndex.value, IsEqual(2))
+
+    }
+
+    @Test
+    fun movePlayingTrack_移動後の位置が0以上TrackList要素数以下_previewUrlがnull以外_指定分移動した位置のTrackList要素が再生曲に設定されること() {
+
+        // 初期再生曲をTrackListの最初の要素に指定
+        viewModel.setPlayingTrack(1)
+
+
+        // privateメソッドを取得
+        val method = viewModel::class.memberFunctions.find { it.name == "movePlayingTrack" }
+        method?.let {
+            it.isAccessible = true
+            // メソッド呼び出し
+            it.call(viewModel, 1)
+        }
+
+        assertThat(viewModel.playingTrackIndex.value, IsEqual(2))
 
     }
 

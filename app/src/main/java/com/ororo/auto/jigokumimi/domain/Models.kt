@@ -16,7 +16,7 @@ data class Track(
     val name: String,
     val artists: String,
     val imageUrl: String,
-    val previewUrl: String,
+    val previewUrl: String?,
     val rank: Int,
     val popularity: Int,
     var isSaved: Boolean
