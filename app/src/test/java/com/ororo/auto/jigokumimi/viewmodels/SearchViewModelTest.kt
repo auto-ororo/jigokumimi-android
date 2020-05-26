@@ -4,9 +4,7 @@ import android.location.Location
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import com.github.javafaker.Faker
-import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.GetMyFavoriteArtistsResponse
@@ -95,12 +93,12 @@ class SearchViewModelTest {
 
         viewModel =
             spyk(
-              SearchViewModel(
-                ApplicationProvider.getApplicationContext(),
-                authRepository,
-                musicRepository,
-                locationRepository
-            )
+                SearchViewModel(
+                    ApplicationProvider.getApplicationContext(),
+                    authRepository,
+                    musicRepository,
+                    locationRepository
+                )
             )
     }
 

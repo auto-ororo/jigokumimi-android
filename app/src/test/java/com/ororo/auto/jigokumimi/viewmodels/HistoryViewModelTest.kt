@@ -25,7 +25,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
+import com.ororo.auto.jigokumimi.util.MockkHelper.Companion.any
 import java.lang.Exception
 import java.util.*
 
