@@ -6,12 +6,11 @@ import android.media.MediaPlayer
 import androidx.lifecycle.*
 import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Math.abs
 
 
 /**
@@ -42,15 +41,32 @@ class ResultViewModel(
     val artistlist = musicRepository.artists
 
     /**
-     * 再生中の曲情報インデックス(private)
-     */
-    private var _playingTrackIndex = MutableLiveData<Int>()
-
-    /**
      * 再生中の曲情報インデックス
      */
+    private var _playingTrackIndex = MutableLiveData<Int>()
     val playingTrackIndex: LiveData<Int>
         get() = _playingTrackIndex
+
+    /**
+     * 再生曲の現在位置
+     */
+    private var _playingTrackCurrentPosition = MutableLiveData<Int>()
+    val playingTrackCurrentPosition: LiveData<Int>
+        get() = _playingTrackCurrentPosition
+
+    /**
+     * 再生曲の経過時間
+     */
+    private var _playingTrackElapsedTime = MutableLiveData<String>()
+    val playingTrackElapsedTime: LiveData<String>
+        get() = _playingTrackElapsedTime
+
+    /**
+     * 再生曲の残り時間
+     */
+    private var _playingTrackRemainingTime = MutableLiveData<String>()
+    val playingTrackRemainingTime: LiveData<String>
+        get() = _playingTrackRemainingTime
 
     /**
      * 再生状態
@@ -258,7 +274,7 @@ class ResultViewModel(
                         .build()
                 )
 
-                setDataSource(tracklist.value!!.get(playingTrackIndex.value!!).previewUrl)
+                setDataSource(tracklist.value!![playingTrackIndex.value!!].previewUrl)
                 prepare()
                 start()
             }
@@ -341,6 +357,26 @@ class ResultViewModel(
      */
     fun showMiniPlayer() {
         _isMiniPlayerShown.value = true
+    }
+
+    /**
+     * 初期処理
+     */
+    init {
+        // 再生曲の再生位置を保持するLiveDataを更新するコルーチンを発行
+        // ※メインスレッドを中断させないようにバックグラウンドで発行する
+        viewModelScope.launch(Dispatchers.Default) {
+            while (true) {
+                mp?.let {
+                    // 再生位置を更新
+                    _playingTrackCurrentPosition.postValue(it.currentPosition)
+                    // 経過時間・残り時間を更新
+                    _playingTrackElapsedTime.postValue(createTimeLabel(it.currentPosition))
+                    _playingTrackRemainingTime.postValue("- ${createTimeLabel(it.duration - it.currentPosition)}")
+
+                }
+            }
+        }
     }
 
     /**
