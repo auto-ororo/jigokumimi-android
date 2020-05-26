@@ -8,6 +8,7 @@ import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.util.Constants
+import com.ororo.auto.jigokumimi.util.MockkHelper.Companion.any
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -17,7 +18,6 @@ import org.hamcrest.core.IsEqual
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.any
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
