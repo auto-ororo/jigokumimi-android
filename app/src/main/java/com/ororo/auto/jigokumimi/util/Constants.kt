@@ -12,6 +12,8 @@ class Constants {
         const val SP_JIGOKUMIMI_PASSWORD_KEY = "jigokumimiPassword"
         const val SP_JIGOKUMIMI_TOKEN_KEY = "jigokumimiToken"
         const val SP_JIGOKUMIMI_TOKEN_EXPIRE_KEY = "jigokumimiTokenExpire"
+        const val SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY = "jigokumimiPostedTracksDatetime"
+        const val SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY = "jigokumimiPostedArtistsDatetime"
 
         const val SP_SPOTIFY_EMAIL_KEY = "spotifyEmail"
         const val SP_SPOTIFY_PASSWORD_KEY = "spotifyPassword"
@@ -22,6 +24,7 @@ class Constants {
         const val DEBUG_JIGOKUMIMI_BASE_URL = "http://192.168.0.4:10080/api/"
         const val RELEASE_JIGOKUMIMI_BASE_URL = "https://jigokumimi.net/api/"
 
+        const val POST_MUSIC_PERIOD = 600000L
 
 
     }

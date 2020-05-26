@@ -105,4 +105,12 @@ class FakeMusicRepository(
             message = faker.lorem().characters()
         )
     }
+
+    override fun shouldPostFavoriteTracks(): Boolean {
+        return true
+    }
+
+    override fun shouldPostFavoriteArtists(): Boolean {
+        return true
+    }
 }

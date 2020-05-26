@@ -88,4 +88,14 @@ interface IMusicRepository {
      */
     suspend fun deleteTracksAroundSearchHistories(userId: String) : CommonResponse
 
+    /**
+     * 前回の送信日時を元にお気に入り曲を送信すべきかどうかを判断する
+     */
+    fun shouldPostFavoriteTracks() :Boolean
+
+    /**
+     * 前回の送信日時を元にお気に入りアーティストを送信すべきかどうかを判断する
+     */
+    fun shouldPostFavoriteArtists() :Boolean
+
 }
