@@ -1,8 +1,6 @@
 package com.ororo.auto.jigokumimi.ui
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Message
 import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.widget.SeekBar
@@ -89,7 +87,11 @@ class MiniPlayerFragment : Fragment() {
 
         viewModel.changeDataIndex.observe(viewLifecycleOwner) {
             if (it == viewModel.playingTrackIndex.value) {
-                setFavIconFromTrackList(binding.miniPlayerSaveTrackButton, viewModel.tracklist.value, it)
+                setFavIconFromTrackList(
+                    binding.miniPlayerSaveTrackButton,
+                    viewModel.tracklist.value,
+                    it
+                )
             }
         }
 
@@ -137,21 +139,6 @@ class MiniPlayerFragment : Fragment() {
             }
         )
 
-        // シークバーの位置と再生時間を同期させるThread
-        Thread(Runnable {
-            while (true) {
-                try {
-                    viewModel.mp?.let {
-                        val msg = Message()
-                        msg.what = it.currentPosition
-                        handler.sendMessage(msg)
-                        Thread.sleep(10)
-                    }
-                } catch (e: InterruptedException) {
-                }
-            }
-        }).start()
-
         binding.miniPlayerLayout.setOnTouchListener { _, event ->
             gesture.onTouchEvent(event)
         }
@@ -187,20 +174,4 @@ class MiniPlayerFragment : Fragment() {
             }
         })
 
-    /**
-     * 再生状態を監視するイベントハンドラ
-     * シークバー､再生時間の表示を同期
-     */
-    private val handler =
-        Handler(Handler.Callback { msg ->
-            val currentPosition = msg.what
-            // 再生位置を更新
-            binding.seekBar.progress = currentPosition
-            // 経過時間ラベル更新
-            binding.elapsedTimeText.text = viewModel.createTimeLabel(currentPosition)
-            binding.remainingTimeText.text =
-                "- ${viewModel.createTimeLabel(viewModel.mp?.duration!! - currentPosition)}"
-
-            true
-        })
 }
