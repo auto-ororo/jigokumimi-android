@@ -16,7 +16,6 @@ import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.repository.MusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
-import com.ororo.auto.jigokumimi.util.MockitoHelper.Companion.any
 import getOrAwaitValue
 import io.mockk.every
 import io.mockk.mockk
@@ -29,6 +28,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.any
 import java.util.*
 import kotlin.collections.HashMap
 

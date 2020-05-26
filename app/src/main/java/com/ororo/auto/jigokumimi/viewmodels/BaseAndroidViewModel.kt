@@ -2,6 +2,8 @@ package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -103,7 +105,8 @@ open class BaseAndroidViewModel(
     /**
      * ViewModel上で発生する通信系Exceptionのハンドリングを行う
      */
-    protected fun handleConnectException(e: Exception) {
+    @VisibleForTesting(otherwise = PROTECTED)
+    fun handleConnectException(e: Exception) {
         val msg = when (e) {
             is HttpException -> {
                 if (e.code() == 401) {
