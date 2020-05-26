@@ -14,8 +14,8 @@ import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.repository.MusicRepository
+import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
-import com.ororo.auto.jigokumimi.util.MockitoHelper.Companion.any
 import getOrAwaitValue
 import io.mockk.every
 import io.mockk.mockk
@@ -23,10 +23,12 @@ import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
+import org.hamcrest.core.IsNot
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.any
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -338,7 +340,7 @@ class MusicRepositoryTest {
     }
 
     @Test
-    fun postMyFavoriteTracks_APIリクエストが呼ばれること() = runBlocking {
+    fun postMyFavoriteTracks_APIリクエストが呼ばれSharedPreferencesに送信時刻が保存されること() = runBlocking {
 
         // モック化
         jigokumimiApiService = mockk(relaxed = true)
@@ -348,6 +350,14 @@ class MusicRepositoryTest {
 
         // メソッド呼び出し
         musicRepository.postMyFavoriteTracks(any())
+
+        // SharedPreferencesに送信時刻が保存されていることを確認
+        assertThat(
+            prefData.getString(
+                Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY,
+                ""
+            ), IsNot(IsEqual(""))
+        )
 
         // APIリクエストが呼ばれることを確認
         verify { runBlocking { jigokumimiApiService.postTracks(any(), any()) } }
@@ -370,7 +380,7 @@ class MusicRepositoryTest {
     }
 
     @Test
-    fun postMyFavoriteArtists_APIリクエストが呼ばれること() = runBlocking {
+    fun postMyFavoriteArtists_APIリクエストが呼ばれSharedPreferencesに送信時刻が保存されること() = runBlocking {
 
         // モック化
         jigokumimiApiService = mockk(relaxed = true)
@@ -380,6 +390,14 @@ class MusicRepositoryTest {
 
         // メソッド呼び出し
         musicRepository.postMyFavoriteArtists(any())
+
+        // SharedPreferencesに送信時刻が保存されていることを確認
+        assertThat(
+            prefData.getString(
+                Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY,
+                ""
+            ), IsNot(IsEqual(""))
+        )
 
         // APIリクエストが呼ばれることを確認
         verify { runBlocking { jigokumimiApiService.postArtists(any(), any()) } }
@@ -393,7 +411,14 @@ class MusicRepositoryTest {
         jigokumimiApiService = mockk(relaxed = true)
         spotifyApiService = mockk(relaxed = true)
         musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
-        every { runBlocking { jigokumimiApiService.getTracksAroundSearchHistories(any(), any()) } } returns any()
+        every {
+            runBlocking {
+                jigokumimiApiService.getTracksAroundSearchHistories(
+                    any(),
+                    any()
+                )
+            }
+        } returns any()
 
         // メソッド呼び出し
         musicRepository.getTracksAroundSearchHistories(any())
@@ -409,13 +434,27 @@ class MusicRepositoryTest {
         jigokumimiApiService = mockk(relaxed = true)
         spotifyApiService = mockk(relaxed = true)
         musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
-        every { runBlocking { jigokumimiApiService.getArtistsAroundSearchHistories(any(), any()) } } returns any()
+        every {
+            runBlocking {
+                jigokumimiApiService.getArtistsAroundSearchHistories(
+                    any(),
+                    any()
+                )
+            }
+        } returns any()
 
         // メソッド呼び出し
         musicRepository.getArtistsAroundSearchHistories(any())
 
         // APIリクエストが呼ばれることを確認
-        verify { runBlocking { jigokumimiApiService.getArtistsAroundSearchHistories(any(), any()) } }
+        verify {
+            runBlocking {
+                jigokumimiApiService.getArtistsAroundSearchHistories(
+                    any(),
+                    any()
+                )
+            }
+        }
     }
 
 
@@ -426,13 +465,27 @@ class MusicRepositoryTest {
         jigokumimiApiService = mockk(relaxed = true)
         spotifyApiService = mockk(relaxed = true)
         musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
-        every { runBlocking { jigokumimiApiService.deleteTracksAroundSearchHistories(any(), any()) } } returns any()
+        every {
+            runBlocking {
+                jigokumimiApiService.deleteTracksAroundSearchHistories(
+                    any(),
+                    any()
+                )
+            }
+        } returns any()
 
         // メソッド呼び出し
         musicRepository.deleteTracksAroundSearchHistories(any())
 
         // APIリクエストが呼ばれることを確認
-        verify { runBlocking { jigokumimiApiService.deleteTracksAroundSearchHistories(any(), any()) } }
+        verify {
+            runBlocking {
+                jigokumimiApiService.deleteTracksAroundSearchHistories(
+                    any(),
+                    any()
+                )
+            }
+        }
     }
 
     @Test
@@ -442,13 +495,82 @@ class MusicRepositoryTest {
         jigokumimiApiService = mockk(relaxed = true)
         spotifyApiService = mockk(relaxed = true)
         musicRepository = MusicRepository(prefData, spotifyApiService, jigokumimiApiService)
-        every { runBlocking { jigokumimiApiService.deleteArtistsAroundSearchHistories(any(), any()) } } returns any()
+        every {
+            runBlocking {
+                jigokumimiApiService.deleteArtistsAroundSearchHistories(
+                    any(),
+                    any()
+                )
+            }
+        } returns any()
 
         // メソッド呼び出し
         musicRepository.deleteArtistsAroundSearchHistories(any())
 
         // APIリクエストが呼ばれることを確認
-        verify { runBlocking { jigokumimiApiService.deleteArtistsAroundSearchHistories(any(), any()) } }
+        verify {
+            runBlocking {
+                jigokumimiApiService.deleteArtistsAroundSearchHistories(
+                    any(),
+                    any()
+                )
+            }
+        }
     }
 
+    @Test
+    fun shouldPostFavoriteTracks_送信間隔内_falseが返却されること() {
+
+        prefData.edit().let {
+            it.putString(
+                Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY,
+                System.currentTimeMillis().toString()
+            )
+            it.apply()
+        }
+
+        assertThat(musicRepository.shouldPostFavoriteTracks(), IsEqual(false))
+    }
+
+    @Test
+    fun shouldPostFavoriteTracks_送信間隔外_trueが返却されること() {
+
+        prefData.edit().let {
+            it.putString(
+                Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY,
+                (System.currentTimeMillis() - Constants.POST_MUSIC_PERIOD - 1 ).toString()
+            )
+            it.apply()
+        }
+
+        assertThat(musicRepository.shouldPostFavoriteTracks(), IsEqual(true))
+    }
+
+    @Test
+    fun shouldPostFavoriteArtists_送信間隔内_falseが返却されること() {
+
+        prefData.edit().let {
+            it.putString(
+                Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY,
+                System.currentTimeMillis().toString()
+            )
+            it.apply()
+        }
+
+        assertThat(musicRepository.shouldPostFavoriteArtists(), IsEqual(false))
+    }
+
+    @Test
+    fun shouldPostFavoriteArtists_送信間隔外_trueが返却されること() {
+
+        prefData.edit().let {
+            it.putString(
+                Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY,
+                (System.currentTimeMillis() - Constants.POST_MUSIC_PERIOD - 1 ).toString()
+            )
+            it.apply()
+        }
+
+        assertThat(musicRepository.shouldPostFavoriteArtists(), IsEqual(true))
+    }
 }

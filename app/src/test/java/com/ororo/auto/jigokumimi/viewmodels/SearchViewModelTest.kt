@@ -1,5 +1,6 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
+import android.location.Location
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -8,14 +9,24 @@ import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
-import com.ororo.auto.jigokumimi.repository.faker.FakeAuthRepository
-import com.ororo.auto.jigokumimi.repository.faker.FakeLocationRepository
+import com.ororo.auto.jigokumimi.network.GetMyFavoriteArtistsResponse
+import com.ororo.auto.jigokumimi.network.GetMyFavoriteTracksResponse
+import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
+import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
+import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.repository.ILocationRepository
+import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeMusicRepository
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
 import getOrAwaitValue
+import io.mockk.every
+import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.core.IsEqual
 import org.junit.Assert.assertThat
 import org.junit.Before
@@ -32,10 +43,15 @@ class SearchViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     lateinit var viewModel: SearchViewModel
-    lateinit var authRepository: FakeAuthRepository
-    lateinit var musicRepository: FakeMusicRepository
-    lateinit var locationRepository: FakeLocationRepository
-
+    lateinit var authRepository: IAuthRepository
+    lateinit var musicRepository: IMusicRepository
+    lateinit var locationRepository: ILocationRepository
+    lateinit var location: Location
+    lateinit var getMyFavoriteTracksResponse: GetMyFavoriteTracksResponse
+    lateinit var getMyFavoriteArtistsResponse: GetMyFavoriteArtistsResponse
+    lateinit var jigokumimiUserId: String
+    lateinit var tracks: MutableList<Track>
+    lateinit var artists: MutableList<Artist>
 
     val faker = Faker(Locale("jp_JP"))
 
@@ -44,36 +60,57 @@ class SearchViewModelTest {
     @Before
     fun createViewModel() {
 
-        val tracks = mutableListOf<Track>()
-        val artists = mutableListOf<Artist>()
+        getMyFavoriteArtistsResponse = testDataUtil.createDummyGetMyFavoriteArtistsResponse()
+        getMyFavoriteTracksResponse = testDataUtil.createDummyGetMyFavoriteTracksResponse()
+
+        jigokumimiUserId = faker.random().hex()
+
+
+
+        location = Location("test")
+        location.latitude = faker.number().randomDouble(10, 2, 5)
+        location.longitude = faker.number().randomDouble(10, 2, 5)
+
+        tracks = mutableListOf()
+        artists = mutableListOf()
 
         for (i in 1..3) {
             tracks.add(testDataUtil.createDummyTrack())
             artists.add(testDataUtil.createDummyArtist())
         }
 
-        val latitude = faker.number().randomDouble(10, 2, 6)
-        val longitude = faker.number().randomDouble(10, 2, 6)
-
-        authRepository = spyk(FakeAuthRepository())
+        authRepository = mockk(relaxed = true)
         musicRepository = spyk(FakeMusicRepository(_tracks = tracks, _artists = artists))
-        locationRepository = spyk(FakeLocationRepository(latitude, longitude))
+        locationRepository = mockk(relaxed = true)
 
-        viewModel = spyk(
-            SearchViewModel(
+        every { runBlocking { locationRepository.getCurrentLocation() } } returns callbackFlow {
+            offer(location)
+            awaitClose {
+            }
+        }
+
+        every { runBlocking { authRepository.getSavedJigokumimiUserId() } } returns jigokumimiUserId
+        every { runBlocking { musicRepository.getMyFavoriteArtists() } } returns getMyFavoriteArtistsResponse
+        every { runBlocking { musicRepository.getMyFavoriteTracks() } } returns getMyFavoriteTracksResponse
+
+        viewModel =
+            spyk(
+              SearchViewModel(
                 ApplicationProvider.getApplicationContext(),
                 authRepository,
                 musicRepository,
                 locationRepository
             )
-        )
+            )
     }
 
     @Test
-    fun searchMusic_Artist_アーティスト情報が送受信され検索完了フラグがtrueになること() = runBlocking {
+    fun searchMusic_Artist_アーティスト情報が送受信され検索完了フラグがtrueになること() = runBlockingTest {
 
         // アーティストに設定
         viewModel.setSearchTypeToArtist()
+        // 距離を設定
+        viewModel.setDistanceFromSelectedSpinnerString("100m")
         // メソッド呼び出し
         viewModel.searchMusic()
 
@@ -81,29 +118,106 @@ class SearchViewModelTest {
         verify { runBlocking { locationRepository.getCurrentLocation() } }
         verify { runBlocking { authRepository.getSavedJigokumimiUserId() } }
         verify { runBlocking { musicRepository.getMyFavoriteArtists() } }
-        verify { runBlocking { musicRepository.postMyFavoriteArtists(any()) } }
-        verify { runBlocking { musicRepository.refreshArtists(any(), any(), any()) } }
-
+        verify { runBlocking { musicRepository.shouldPostFavoriteArtists() } }
+        verify {
+            runBlocking {
+                musicRepository.postMyFavoriteArtists(
+                    getMyFavoriteArtistsResponse.asPostMyFavoriteArtistsRequest(
+                        jigokumimiUserId,
+                        location
+                    )
+                )
+            }
+        }
+        verify { runBlocking { musicRepository.refreshArtists(jigokumimiUserId, location, any()) } }
 
         // 検索完了フラグがTrueになることを確認
         assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(true))
     }
 
     @Test
+    fun searchMusic_Artist_前回送信日時から一定時間経過していない_アーティスト情報が送信されないこと() = runBlockingTest {
+
+        musicRepository =
+            spyk(FakeMusicRepository(_tracks = tracks, _artists = artists, shouldPostMusic = false))
+
+        // アーティストに設定
+        viewModel.setSearchTypeToArtist()
+        // 距離を設定
+        viewModel.setDistanceFromSelectedSpinnerString("100m")
+        // メソッド呼び出し
+        viewModel.searchMusic()
+
+        // Repositoryメソッドが呼ばれないことを確認
+        verify(exactly = 0) { runBlocking { musicRepository.getMyFavoriteArtists() } }
+        verify(exactly = 0) {
+            runBlocking {
+                musicRepository.postMyFavoriteArtists(
+                    getMyFavoriteArtistsResponse.asPostMyFavoriteArtistsRequest(
+                        jigokumimiUserId,
+                        location
+                    )
+                )
+            }
+        }
+    }
+
+    @Test
     fun searchMusic_Track_曲情報が送受信され検索完了フラグがtrueになること() = runBlocking {
 
+        // Trackに設定
         viewModel.setSearchTypeToTrack()
+        // 距離を設定
+        viewModel.setDistanceFromSelectedSpinnerString("100m")
+        // メソッド呼び出し
         viewModel.searchMusic()
 
         // 処理内のRepositoryメソッドが呼ばれることを確認
         verify { runBlocking { locationRepository.getCurrentLocation() } }
         verify { runBlocking { authRepository.getSavedJigokumimiUserId() } }
         verify { runBlocking { musicRepository.getMyFavoriteTracks() } }
-        verify { runBlocking { musicRepository.postMyFavoriteTracks(any()) } }
-        verify { runBlocking { musicRepository.refreshTracks(any(), any(), any()) } }
+        verify { runBlocking { musicRepository.shouldPostFavoriteTracks() } }
+        verify {
+            runBlocking {
+                musicRepository.postMyFavoriteTracks(
+                    getMyFavoriteTracksResponse.asPostMyFavoriteTracksRequest(
+                        jigokumimiUserId,
+                        location
+                    )
+                )
+            }
+        }
+        verify { runBlocking { musicRepository.refreshTracks(jigokumimiUserId, location, 100) } }
 
         // 検索完了フラグがTrueになることを確認
         assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(true))
+    }
+
+    @Test
+    fun searchMusic_Track_前回送信日時から一定時間経過していない_曲情報が送信されないこと() = runBlocking {
+
+        musicRepository =
+            spyk(FakeMusicRepository(_tracks = tracks, _artists = artists, shouldPostMusic = false))
+
+        // トラックに設定
+        viewModel.setSearchTypeToTrack()
+        // 距離を設定
+        viewModel.setDistanceFromSelectedSpinnerString("100m")
+        // メソッド呼び出し
+        viewModel.searchMusic()
+
+        // Repositoryメソッドが呼ばれないことを確認
+        verify(exactly = 0) { runBlocking { musicRepository.getMyFavoriteTracks() } }
+        verify(exactly = 0) {
+            runBlocking {
+                musicRepository.postMyFavoriteTracks(
+                    getMyFavoriteTracksResponse.asPostMyFavoriteTracksRequest(
+                        jigokumimiUserId,
+                        location
+                    )
+                )
+            }
+        }
     }
 
     @Test
@@ -112,26 +226,11 @@ class SearchViewModelTest {
         // 発生させるExceptionを生成
         val exception = Exception()
 
-        val latitude = faker.number().randomDouble(10, 2, 6)
-        val longitude = faker.number().randomDouble(10, 2, 6)
-
-        viewModel = SearchViewModel(
-            ApplicationProvider.getApplicationContext(),
-            FakeAuthRepository(),
-            FakeMusicRepository(exception = exception),
-            FakeLocationRepository(latitude, longitude)
-        )
+        every { runBlocking { authRepository.getSavedJigokumimiUserId() } } throws exception
 
         viewModel.searchMusic()
 
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.general_error_message, exception::class.java
-            )
-
-        assertThat(viewModel.errorMessage.value, IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.value, IsEqual(true))
-        assertThat(viewModel.isSearchFinished.value, IsEqual(false))
+        verify { viewModel.handleConnectException(exception) }
     }
 
     @Test

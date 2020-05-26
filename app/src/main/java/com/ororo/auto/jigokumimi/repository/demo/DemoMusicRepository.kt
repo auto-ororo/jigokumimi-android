@@ -116,4 +116,12 @@ class DemoMusicRepository(
             message = faker.lorem().characters()
         )
     }
+
+    override fun shouldPostFavoriteTracks(): Boolean {
+        return faker.bool().bool()
+    }
+
+    override fun shouldPostFavoriteArtists(): Boolean {
+        return faker.bool().bool()
+    }
 }

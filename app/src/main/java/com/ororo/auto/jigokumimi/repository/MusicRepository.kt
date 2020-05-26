@@ -11,6 +11,7 @@ import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDateTime
 
 /**
  * 周辺の曲を検索し、ローカルDBに保存するRepository
@@ -76,7 +77,7 @@ class MusicRepository(
             tracks.postValue(tracksModel)
 
             return@withContext
-    }
+        }
 
     /**
      * 検索履歴からアーティスト情報を更新する
@@ -90,13 +91,13 @@ class MusicRepository(
             artists.postValue(artistsModel)
 
             return@withContext
-    }
+        }
 
     /**
      * Jigokumimi APIから取得した周辺曲情報を元に詳細な曲情報を取得する
      *
      */
-    private suspend fun getTrackDetail(spotifyTrackId:String, rank:Int, popularity:Int):Track =
+    private suspend fun getTrackDetail(spotifyTrackId: String, rank: Int, popularity: Int): Track =
         withContext(Dispatchers.IO) {
             val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
@@ -135,7 +136,11 @@ class MusicRepository(
      * Jigokumimi APIから取得した周辺アーティスト情報を元に詳細なアーティスト情報を取得する
      *
      */
-    private suspend fun getArtistDetail(spotifyArtistId:String, rank:Int, popularity:Int):Artist =
+    private suspend fun getArtistDetail(
+        spotifyArtistId: String,
+        rank: Int,
+        popularity: Int
+    ): Artist =
         withContext(Dispatchers.IO) {
             val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
@@ -191,10 +196,18 @@ class MusicRepository(
 
             val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
 
-            return@withContext jigokumimiApiService.postTracks(
+            val response = jigokumimiApiService.postTracks(
                 jigokumimiToken,
                 tracks
             )
+
+            // 送信日時を保存
+            prefData.edit().let {
+                it.putString(Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY, System.currentTimeMillis().toString())
+                it.apply()
+            }
+
+            return@withContext response
         }
 
     /**
@@ -277,10 +290,18 @@ class MusicRepository(
 
             val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
 
-            return@withContext jigokumimiApiService.postArtists(
+            val response = jigokumimiApiService.postArtists(
                 jigokumimiToken,
                 artists
             )
+
+            // 送信日時を保存
+            prefData.edit().let {
+                it.putString(Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY, System.currentTimeMillis().toString())
+                it.apply()
+            }
+
+            return@withContext response
         }
 
     /**
@@ -403,4 +424,30 @@ class MusicRepository(
             )
         }
 
+    /**
+     * 前回の送信日時を元にお気に入り曲を送信すべきかどうかを判断する
+     */
+    override fun shouldPostFavoriteTracks(): Boolean {
+
+        return shouldPostMusic(Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY)
+    }
+
+    /**
+     * 前回の送信日時を元にお気に入りアーティストを送信すべきかどうかを判断する
+     */
+    override fun shouldPostFavoriteArtists(): Boolean {
+
+        return shouldPostMusic(Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY)
+    }
+
+    /**
+     * 前回の送信日時を元にお気に入り音楽を送信すべきかどうかを判断する
+     */
+    private fun shouldPostMusic(sharedPreferencesKey: String) :Boolean {
+
+        // 「現在時刻 - 前回の送信日時」が「送信間隔」の外かどうかを返却
+        val previousPostedDateTime = prefData.getString(sharedPreferencesKey, "0")!!.toLong()
+        val currentDateTime = System.currentTimeMillis()
+        return (currentDateTime - previousPostedDateTime) > Constants.POST_MUSIC_PERIOD
+    }
 }

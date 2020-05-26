@@ -64,12 +64,15 @@ class SearchViewModel(
                         if (searchType.value == Constants.SearchType.TRACK) {
                             // 検索種別が曲の場合
 
-                            // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
-                            val postTracks = musicRepository.getMyFavoriteTracks()
-                                .asPostMyFavoriteTracksRequest(jigokumimiUserId, location)
+                            // 前回のお気に入り曲送信日時から一定時間経過している場合、ユーザーのお気に入り曲一覧を取得してリクエストを作成
+                            if (musicRepository.shouldPostFavoriteTracks()) {
 
-                            // Jigokumimiにお気に入り曲リストを登録
-                            musicRepository.postMyFavoriteTracks(postTracks)
+                                val postTracks = musicRepository.getMyFavoriteTracks()
+                                    .asPostMyFavoriteTracksRequest(jigokumimiUserId, location)
+
+                                // Jigokumimiにお気に入り曲リストを登録
+                                musicRepository.postMyFavoriteTracks(postTracks)
+                            }
 
                             // 周りのJigokumimiユーザーのお気に入り曲を取得
                             musicRepository.refreshTracks(
@@ -89,13 +92,14 @@ class SearchViewModel(
                         } else {
                             // 検索種別がアーティストの場合
 
-                            // ユーザーのお気に入りアーティスト一覧を取得し､リクエストを作成
-                            val postArtists = musicRepository.getMyFavoriteArtists()
-                                .asPostMyFavoriteArtistsRequest(jigokumimiUserId, location)
+                            // 前回のお気に入りアーティスト送信日時から一定時間経過している場合、ユーザーのお気に入りアーティスト一覧を取得してリクエストを作成
+                            if (musicRepository.shouldPostFavoriteArtists()) {
+                                val postArtists = musicRepository.getMyFavoriteArtists()
+                                    .asPostMyFavoriteArtistsRequest(jigokumimiUserId, location)
 
-                            // Jigokumimiにお気に入り曲リストを登録
-                            musicRepository.postMyFavoriteArtists(postArtists)
-
+                                // Jigokumimiにお気に入り曲リストを登録
+                                musicRepository.postMyFavoriteArtists(postArtists)
+                            }
                             // 周りのJigokumimiユーザーのお気に入り曲を取得
                             musicRepository.refreshArtists(
                                 jigokumimiUserId,

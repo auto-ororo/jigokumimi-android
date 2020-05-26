@@ -3,6 +3,7 @@ package com.ororo.auto.jigokumimi.repository.faker
 import android.location.Location
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.github.javafaker.Bool
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.Track
@@ -13,7 +14,8 @@ import java.lang.Exception
 class FakeMusicRepository(
     private val _tracks: List<Track> = mutableListOf(),
     private val _artists: List<Artist> = mutableListOf(),
-    exception: Exception? = null
+    exception: Exception? = null,
+    private val shouldPostMusic : Boolean = true
 ) : IMusicRepository, BaseFakeRepository(exception) {
 
     override val tracks: LiveData<List<Track>>
@@ -104,5 +106,13 @@ class FakeMusicRepository(
             data = null,
             message = faker.lorem().characters()
         )
+    }
+
+    override fun shouldPostFavoriteTracks(): Boolean {
+        return shouldPostMusic
+    }
+
+    override fun shouldPostFavoriteArtists(): Boolean {
+        return shouldPostMusic
     }
 }
