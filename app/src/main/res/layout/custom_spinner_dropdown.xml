@@ -9,4 +9,4 @@
     android:singleLine="true"
     android:textAlignment="center"
     android:textColor="@color/colorPrimary"
-    android:textSize="18sp" />
+    android:textSize="@dimen/text_size_s" />
