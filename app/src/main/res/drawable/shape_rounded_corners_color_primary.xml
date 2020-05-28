@@ -6,10 +6,10 @@
             <item>
                 <shape android:shape="rectangle">
                     <corners
-                        android:bottomLeftRadius="20dp"
-                        android:bottomRightRadius="20dp"
-                        android:topLeftRadius="20dp"
-                        android:topRightRadius="20dp" />
+                        android:bottomLeftRadius="@dimen/radius_m"
+                        android:bottomRightRadius="@dimen/radius_m"
+                        android:topLeftRadius="@dimen/radius_m"
+                        android:topRightRadius="@dimen/radius_m" />
                     <solid android:color="@color/colorPrimary" />
                 </shape>
             </item>

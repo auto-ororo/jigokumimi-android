@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 余白(margin,padding) -->
+    <dimen name="spacing_s">8dp</dimen>
+    <dimen name="spacing_m">16dp</dimen>
+    <dimen name="spacing_l">24dp</dimen>
+
+    <!-- 丸み -->
+    <dimen name="radius_m">20dp</dimen>
+
+    <!-- Viewの大きさ(width,height) -->
+    <dimen name="size_xs">24dp</dimen>
+    <dimen name="size_s">50dp</dimen>
+    <dimen name="size_m">100dp</dimen>
+    <dimen name="size_l">150dp</dimen>
+    <dimen name="size_xl">200dp</dimen>
+
+    <!-- 文字の大きさ -->
+    <dimen name="text_size_xs">14sp</dimen>
+    <dimen name="text_size_s">18sp</dimen>
+    <dimen name="text_size_m">24sp</dimen>
+    <dimen name="text_size_l">30sp</dimen>
+    <dimen name="text_size_xl">36sp</dimen>
+    <dimen name="text_size_app_name">60sp</dimen>
+
+    <!-- 枠線 -->
+    <dimen name="divider_offset">10dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+
+</resources>
