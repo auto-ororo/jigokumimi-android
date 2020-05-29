@@ -2,6 +2,7 @@ package com.ororo.auto.jigokumimi.repository
 
 import android.content.SharedPreferences
 import android.location.Location
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.History
@@ -11,7 +12,6 @@ import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.time.LocalDateTime
 
 /**
  * 周辺の曲を検索し、ローカルDBに保存するRepository
@@ -46,7 +46,7 @@ class MusicRepository(
             val jigokumimiToken = prefData.getString(Constants.SP_JIGOKUMIMI_TOKEN_KEY, "")!!
             Timber.d("トークン: $jigokumimiToken")
 
-            // ユーザーのお気に入り曲一覧を取得し､リクエストを作成
+            // 周辺のお気に入り曲一覧を取得し､リクエストを作成
             val tracksAround = jigokumimiApiService.getTracksAround(
                 authorization = jigokumimiToken,
                 userId = userId,
@@ -55,6 +55,7 @@ class MusicRepository(
                 distance = distance
             )
 
+            // 周辺のお気に入り曲の詳細情報を取得する
             val tracksModel = tracksAround.data?.map { trackAround ->
                 getTrackDetail(trackAround.spotifyTrackId, trackAround.rank, trackAround.popularity)
             }
@@ -70,6 +71,7 @@ class MusicRepository(
     override suspend fun refreshTracksFromHistory(history: History): Unit? =
         withContext(Dispatchers.IO) {
 
+            // 曲の詳細情報を取得する
             val tracksModel = history.historyItems?.map { historyItem ->
                 getTrackDetail(historyItem.spotifyItemId, historyItem.rank, historyItem.popularity)
             }
@@ -84,6 +86,8 @@ class MusicRepository(
      */
     override suspend fun refreshArtistsFromHistory(history: History): Unit? =
         withContext(Dispatchers.IO) {
+
+            // アーティストの詳細情報を取得する
             val artistsModel = history.historyItems?.map { historyItem ->
                 getArtistDetail(historyItem.spotifyItemId, historyItem.rank, historyItem.popularity)
             }
@@ -95,48 +99,70 @@ class MusicRepository(
 
     /**
      * Jigokumimi APIから取得した周辺曲情報を元に詳細な曲情報を取得する
+     * 詳細情報が見つからなかった場合(Spotify APIで例外が発生した場合)削除Trackモデルを返却する
      *
      */
-    private suspend fun getTrackDetail(spotifyTrackId: String, rank: Int, popularity: Int): Track =
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    suspend fun getTrackDetail(spotifyTrackId: String, rank: Int, popularity: Int): Track =
         withContext(Dispatchers.IO) {
             val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
-            // 詳細な曲情報を取得
-            val trackDetail = spotifyApiService.getTrackDetail(
-                spotifyToken,
-                spotifyTrackId
-            )
+            try {
+                // 詳細な曲情報を取得
+                val trackDetail = spotifyApiService.getTrackDetail(
+                    spotifyToken,
+                    spotifyTrackId
+                )
 
-            // 曲がお気に入り登録されているかどうかを取得
-            val isTrackSaved = spotifyApiService.getIfTracksSaved(
-                spotifyToken,
-                spotifyTrackId
-            )[0]
+                // 曲がお気に入り登録されているかどうかを取得
+                val isTrackSaved = spotifyApiService.getIfTracksSaved(
+                    spotifyToken,
+                    spotifyTrackId
+                )[0]
 
-            // 取得した情報をエンティティに追加
-            return@withContext Track(
+                // 取得した情報をエンティティに追加
+                return@withContext Track(
 
-                id = trackDetail.id,
-                album = trackDetail.album.name,
-                name = trackDetail.name,
-                artists = trackDetail.artists.joinToString(separator = ", ") {
-                    it.name
-                },
-                imageUrl = trackDetail.album.images[0].url,
-                previewUrl = trackDetail.previewUrl,
-                rank = rank,
-                popularity = popularity,
-                isSaved = isTrackSaved
-            )
+                    id = trackDetail.id,
+                    album = trackDetail.album.name,
+                    name = trackDetail.name,
+                    artists = trackDetail.artists.joinToString(separator = ", ") {
+                        it.name
+                    },
+                    imageUrl = trackDetail.album.images[0].url,
+                    previewUrl = trackDetail.previewUrl,
+                    rank = rank,
+                    popularity = popularity,
+                    isSaved = isTrackSaved,
+                    isDeleted = false
+                )
+
+            } catch (e: Exception) {
+
+                return@withContext Track(
+                    id = "",
+                    isSaved = false,
+                    album = "",
+                    artists = "",
+                    name = Constants.DELETED_TRACK,
+                    imageUrl = "",
+                    popularity = popularity,
+                    rank = rank,
+                    previewUrl = null,
+                    isDeleted = true
+                )
+            }
+
 
         }
 
 
     /**
      * Jigokumimi APIから取得した周辺アーティスト情報を元に詳細なアーティスト情報を取得する
-     *
+     * 詳細情報が見つからなかった場合(Spotify APIで例外が発生した場合)削除Artistモデルを返却する
      */
-    private suspend fun getArtistDetail(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    suspend fun getArtistDetail(
         spotifyArtistId: String,
         rank: Int,
         popularity: Int
@@ -144,31 +170,47 @@ class MusicRepository(
         withContext(Dispatchers.IO) {
             val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
-            // 詳細なアーティスト情報を取得
-            val artistDetail = spotifyApiService.getArtistDetail(
-                spotifyToken,
-                spotifyArtistId
-            )
+            try {
+                // 詳細なアーティスト情報を取得
+                val artistDetail = spotifyApiService.getArtistDetail(
+                    spotifyToken,
+                    spotifyArtistId
+                )
 
-            val type = "artist"
+                val type = "artist"
 
-            // 曲がお気に入り登録されているかどうかを取得
-            val isArtistFollowed = spotifyApiService.getIfArtistsOrUsersSaved(
-                spotifyToken,
-                type,
-                spotifyArtistId
-            )[0]
+                // アーティストがお気に入り登録されているかどうかを取得
+                val isArtistFollowed = spotifyApiService.getIfArtistsOrUsersSaved(
+                    spotifyToken,
+                    type,
+                    spotifyArtistId
+                )[0]
 
-            // 取得したアーティスト情報を元にエンティティを作成
-            return@withContext Artist(
-                id = artistDetail.id,
-                name = artistDetail.name,
-                imageUrl = artistDetail.images[0].url,
-                genres = artistDetail.genres?.joinToString(separator = ", "),
-                rank = rank,
-                popularity = popularity,
-                isFollowed = isArtistFollowed
-            )
+                // 取得したアーティスト情報を元にエンティティを作成
+                return@withContext Artist(
+                    id = artistDetail.id,
+                    name = artistDetail.name,
+                    imageUrl = artistDetail.images[0].url,
+                    genres = artistDetail.genres?.joinToString(separator = ", "),
+                    rank = rank,
+                    popularity = popularity,
+                    isFollowed = isArtistFollowed,
+                    isDeleted = false
+                )
+
+            } catch (e: Exception) {
+                return@withContext Artist(
+                    id = spotifyArtistId,
+                    name = Constants.DELETED_ARTIST,
+                    imageUrl = "",
+                    genres = "",
+                    rank = rank,
+                    popularity = popularity,
+                    isFollowed = false,
+                    isDeleted = true
+                )
+            }
+
         }
 
     /**
@@ -203,7 +245,10 @@ class MusicRepository(
 
             // 送信日時を保存
             prefData.edit().let {
-                it.putString(Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY, System.currentTimeMillis().toString())
+                it.putString(
+                    Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY,
+                    System.currentTimeMillis().toString()
+                )
                 it.apply()
             }
 
@@ -231,32 +276,10 @@ class MusicRepository(
             )
 
             val artistsModel = artistsAround.data?.map { artistAround ->
-                val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
-
-                // 詳細アーティスト情報を取得
-                val artistDetail = spotifyApiService.getArtistDetail(
-                    spotifyToken,
-                    artistAround.spotifyArtistId
-                )
-
-                val type = "artist"
-
-                // アーティストをフォローしているかどうかを取得
-                val isArtistFollowed = spotifyApiService.getIfArtistsOrUsersSaved(
-                    spotifyToken,
-                    type,
-                    artistAround.spotifyArtistId
-                )[0]
-
-                // 取得したアーティスト情報を元にエンティティを作成
-                return@map Artist(
-                    id = artistDetail.id,
-                    name = artistDetail.name,
-                    imageUrl = artistDetail.images[0].url,
-                    genres = artistDetail.genres?.joinToString(separator = ", "),
-                    rank = artistAround.rank,
-                    popularity = artistAround.popularity,
-                    isFollowed = isArtistFollowed
+                getArtistDetail(
+                    artistAround.spotifyArtistId,
+                    artistAround.rank,
+                    artistAround.popularity
                 )
             }
 
@@ -297,7 +320,10 @@ class MusicRepository(
 
             // 送信日時を保存
             prefData.edit().let {
-                it.putString(Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY, System.currentTimeMillis().toString())
+                it.putString(
+                    Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY,
+                    System.currentTimeMillis().toString()
+                )
                 it.apply()
             }
 
@@ -443,7 +469,7 @@ class MusicRepository(
     /**
      * 前回の送信日時を元にお気に入り音楽を送信すべきかどうかを判断する
      */
-    private fun shouldPostMusic(sharedPreferencesKey: String) :Boolean {
+    private fun shouldPostMusic(sharedPreferencesKey: String): Boolean {
 
         // 「現在時刻 - 前回の送信日時」が「送信間隔」の外かどうかを返却
         val previousPostedDateTime = prefData.getString(sharedPreferencesKey, "0")!!.toLong()

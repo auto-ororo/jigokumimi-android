@@ -363,7 +363,8 @@ class CreateDemoDataUtil(val context: Context) {
             popularity = faker.number().randomDigit(),
             previewUrl = faker.internet().url(),
             rank = faker.number().randomDigit(),
-            isSaved = faker.bool().bool()
+            isSaved = faker.bool().bool(),
+            isDeleted = false
         )
     }
 
@@ -375,7 +376,8 @@ class CreateDemoDataUtil(val context: Context) {
             popularity = faker.number().randomDigit(),
             rank = faker.number().randomDigit(),
             genres = faker.lorem().word(),
-            isFollowed = faker.bool().bool()
+            isFollowed = faker.bool().bool(),
+            isDeleted = false
         )
     }
 
@@ -411,7 +413,8 @@ class CreateDemoDataUtil(val context: Context) {
                         previewUrl = rowData[5],
                         popularity = faker.number().randomDigit(),
                         id = faker.random().hex(),
-                        isSaved = false
+                        isSaved = false,
+                        isDeleted = false
                     )
                 )
             }
@@ -449,7 +452,8 @@ class CreateDemoDataUtil(val context: Context) {
                         imageUrl = rowData[3],
                         popularity = faker.number().randomDigit(),
                         id = faker.random().hex(),
-                        isFollowed = false
+                        isFollowed = false,
+                        isDeleted = false
 
                     )
                 )

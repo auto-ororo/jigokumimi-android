@@ -12,23 +12,24 @@ import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.HistoryItem
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
-import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.repository.MusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
+import com.ororo.auto.jigokumimi.util.MockkHelper.Companion.any
 import getOrAwaitValue
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNot
+import org.hamcrest.core.IsNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.ororo.auto.jigokumimi.util.MockkHelper.Companion.any
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -37,7 +38,7 @@ class MusicRepositoryTest {
     lateinit var prefData: SharedPreferences
     lateinit var jigokumimiApiService: FakeJigokumimiApiService
     lateinit var spotifyApiService: FakeSpotifyApiService
-    lateinit var musicRepository: IMusicRepository
+    lateinit var musicRepository: MusicRepository
     lateinit var faker: Faker
     lateinit var ct: CreateTestDataUtil
 
@@ -49,8 +50,8 @@ class MusicRepositoryTest {
     fun createRepository() {
         prefData =
             PreferenceManager.getDefaultSharedPreferences(ApplicationProvider.getApplicationContext())
-        jigokumimiApiService = FakeJigokumimiApiService()
-        spotifyApiService = FakeSpotifyApiService()
+        jigokumimiApiService = spyk(FakeJigokumimiApiService())
+        spotifyApiService = spyk(FakeSpotifyApiService())
         // Get a reference to the class under test
         musicRepository = MusicRepository(
             prefData,
@@ -103,7 +104,8 @@ class MusicRepositoryTest {
                     name = tracksDetail.last().name,
                     previewUrl = tracksDetail.last().previewUrl,
                     rank = tracksAroundNetWork.last().rank,
-                    isSaved = trackSavedList[spotifyTrackId]!!
+                    isSaved = trackSavedList[spotifyTrackId]!!,
+                    isDeleted = false
                 )
             )
         }
@@ -167,7 +169,8 @@ class MusicRepositoryTest {
                     name = tracksDetail.last().name,
                     previewUrl = tracksDetail.last().previewUrl,
                     rank = historyItem.last().rank,
-                    isSaved = trackSavedList[spotifyTrackId]!!
+                    isSaved = trackSavedList[spotifyTrackId]!!,
+                    isDeleted = false
                 )
             )
         }
@@ -232,7 +235,8 @@ class MusicRepositoryTest {
                     name = artistsDetail.last().name,
                     rank = artistsAroundNetWork.last().rank,
                     genres = artistsDetail.last().genres?.joinToString(separator = ", "),
-                    isFollowed = artistsFollowList[spotifyArtistId]!!
+                    isFollowed = artistsFollowList[spotifyArtistId]!!,
+                    isDeleted = false
                 )
             )
         }
@@ -294,7 +298,8 @@ class MusicRepositoryTest {
                     name = artistsDetail.last().name,
                     rank = historyItems.last().rank,
                     genres = artistsDetail.last().genres?.joinToString(separator = ", "),
-                    isFollowed = artistsFollowList[spotifyArtistId]!!
+                    isFollowed = artistsFollowList[spotifyArtistId]!!,
+                    isDeleted = false
                 )
             )
         }
@@ -538,7 +543,7 @@ class MusicRepositoryTest {
         prefData.edit().let {
             it.putString(
                 Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY,
-                (System.currentTimeMillis() - Constants.POST_MUSIC_PERIOD - 1 ).toString()
+                (System.currentTimeMillis() - Constants.POST_MUSIC_PERIOD - 1).toString()
             )
             it.apply()
         }
@@ -566,11 +571,45 @@ class MusicRepositoryTest {
         prefData.edit().let {
             it.putString(
                 Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY,
-                (System.currentTimeMillis() - Constants.POST_MUSIC_PERIOD - 1 ).toString()
+                (System.currentTimeMillis() - Constants.POST_MUSIC_PERIOD - 1).toString()
             )
             it.apply()
         }
 
         assertThat(musicRepository.shouldPostFavoriteArtists(), IsEqual(true))
+    }
+
+    @Test
+    fun getTrackDetail_例外発生_削除Trackモデルが返却されること() {
+
+        every { runBlocking { spotifyApiService.getTrackDetail(any(), any()) } } throws Exception()
+
+        val ret = runBlocking {
+            musicRepository.getTrackDetail(
+                faker.random().hex(),
+                faker.number().randomDigit(),
+                faker.number().randomDigit()
+            )
+        }
+
+        assertThat(ret.isDeleted, IsEqual(true))
+        assertThat(ret.name, IsEqual(Constants.DELETED_TRACK))
+    }
+
+    @Test
+    fun getArtistDetail_例外発生_削除Artistモデルが返却されること() {
+
+        every { runBlocking { spotifyApiService.getArtistDetail(any(), any()) } } throws Exception()
+
+        val ret = runBlocking {
+            musicRepository.getArtistDetail(
+                faker.random().hex(),
+                faker.number().randomDigit(),
+                faker.number().randomDigit()
+            )
+        }
+
+        assertThat(ret.isDeleted, IsEqual(true))
+        assertThat(ret.name, IsEqual(Constants.DELETED_ARTIST))
     }
 }

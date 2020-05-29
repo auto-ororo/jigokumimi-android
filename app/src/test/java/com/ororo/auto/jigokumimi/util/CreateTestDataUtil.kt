@@ -356,7 +356,8 @@ class CreateTestDataUtil {
             popularity = faker.number().randomDigit(),
             previewUrl = previewUrl,
             rank = faker.number().randomDigit(),
-            isSaved = faker.bool().bool()
+            isSaved = faker.bool().bool(),
+            isDeleted = false
         )
     }
 
@@ -368,7 +369,8 @@ class CreateTestDataUtil {
             popularity = faker.number().randomDigit(),
             rank = faker.number().randomDigit(),
             genres = faker.lorem().word(),
-            isFollowed = faker.bool().bool()
+            isFollowed = faker.bool().bool(),
+            isDeleted = false
         )
     }
 

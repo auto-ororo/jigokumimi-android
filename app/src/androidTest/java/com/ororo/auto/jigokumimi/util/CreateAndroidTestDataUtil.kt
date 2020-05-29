@@ -357,7 +357,8 @@ class CreateAndroidTestDataUtil {
             popularity = faker.number().randomDigit(),
             previewUrl = previewUrl,
             rank = faker.number().randomDigit(),
-            isSaved = isSaved
+            isSaved = isSaved,
+            isDeleted = false
         )
     }
 
@@ -369,7 +370,8 @@ class CreateAndroidTestDataUtil {
             popularity = faker.number().randomDigit(),
             rank = faker.number().randomDigit(),
             genres = faker.lorem().word(),
-            isFollowed = faker.bool().bool()
+            isFollowed = faker.bool().bool(),
+            isDeleted = false
         )
     }
 

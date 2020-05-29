@@ -14,7 +14,7 @@ import com.ororo.auto.jigokumimi.R
  */
 @BindingAdapter("imageUrl")
 fun setImageUrl(imageView: ImageView, url: String) {
-    Glide.with(imageView.context).load(url).into(imageView)
+    Glide.with(imageView.context).load(url).placeholder(R.drawable.ic_no_image).into(imageView)
 }
 
 @BindingAdapter("dynamicSrcCompat")
@@ -25,6 +25,15 @@ fun dynamicSrcCompat(view: ImageButton, resourceId: Int) {
 @BindingAdapter("toggleQueueButton")
 fun toggleQueueButton(view: ImageButton, previewUrl: String?) {
     view.visibility =  if (previewUrl.isNullOrEmpty()) {
+        View.INVISIBLE
+    } else {
+        View.VISIBLE
+    }
+}
+
+@BindingAdapter("toggleFavoriteButton")
+fun toggleFavoriteButton(view: ImageButton, isDeleted: Boolean) {
+    view.visibility =  if (isDeleted) {
         View.INVISIBLE
     } else {
         View.VISIBLE

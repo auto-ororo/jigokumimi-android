@@ -166,6 +166,7 @@
             app:layout_constraintBottom_toTopOf="@+id/queueButton"
             app:layout_constraintEnd_toStartOf="@+id/rightWell"
             app:layout_constraintTop_toBottomOf="@+id/clickableOverlay"
+            app:toggleFavoriteButton="@{track.isDeleted}"
             tools:srcCompat="@drawable/ic_favorite_border" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

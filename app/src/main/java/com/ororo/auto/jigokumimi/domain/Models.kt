@@ -1,7 +1,5 @@
 package com.ororo.auto.jigokumimi.domain
 
-import java.util.*
-
 /**
  *
  * アプリケーション上で表示、計算されるModel群をデータクラスで定義
@@ -19,7 +17,8 @@ data class Track(
     val previewUrl: String?,
     val rank: Int,
     val popularity: Int,
-    var isSaved: Boolean
+    var isSaved: Boolean,
+    val isDeleted: Boolean
 )
 
 /**
@@ -32,7 +31,8 @@ data class Artist(
     val genres: String?,
     val rank: Int,
     val popularity: Int,
-    var isFollowed: Boolean
+    var isFollowed: Boolean,
+    val isDeleted: Boolean
 )
 
 
