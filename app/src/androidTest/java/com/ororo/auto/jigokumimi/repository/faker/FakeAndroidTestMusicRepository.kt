@@ -95,4 +95,12 @@ class FakeAndroidTestMusicRepository(
     override suspend fun deleteTracksAroundSearchHistories(userId: String): CommonResponse {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
+
+    override fun shouldPostFavoriteTracks(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun shouldPostFavoriteArtists(): Boolean {
+        TODO("Not yet implemented")
+    }
 }
