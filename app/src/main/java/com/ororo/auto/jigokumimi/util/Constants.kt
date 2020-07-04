@@ -1,5 +1,7 @@
 package com.ororo.auto.jigokumimi.util
 
+import java.util.*
+
 class Constants {
     companion object {
         const val CLIENT_ID = "66c88d5613964babb7d6ef7d63ffe5c2"
@@ -20,8 +22,7 @@ class Constants {
         const val SP_SPOTIFY_TOKEN_KEY = "spotifyToken"
 
         const val REQUEST_PERMISSION = 1000
-
-        const val DEBUG_JIGOKUMIMI_BASE_URL = "http://192.168.0.5:10080/api/"
+        const val DEBUG_JIGOKUMIMI_BASE_URL = "http://192.168.0.12:10080/api/"
         const val RELEASE_JIGOKUMIMI_BASE_URL = "https://jigokumimi.net/api/"
 
         const val POST_MUSIC_PERIOD = 600000L
