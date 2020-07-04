@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.ui
 
-import ServiceLocator
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas

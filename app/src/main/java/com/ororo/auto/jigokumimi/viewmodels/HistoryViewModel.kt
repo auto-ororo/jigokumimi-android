@@ -1,8 +1,9 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.*
-import com.ororo.auto.jigokumimi.JigokumimiApplication
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.HistoryItem
@@ -112,7 +113,7 @@ class HistoryViewModel(
                                 }
                             )
                         }
-                    artistHistoryList.postValue(artistHistories?.toMutableList() )
+                    artistHistoryList.postValue(artistHistories?.toMutableList())
                 }
 
             } catch (e: Exception) {
@@ -194,23 +195,5 @@ class HistoryViewModel(
      */
     fun doneSearchMusic() {
         _isSearchFinished.postValue(false)
-    }
-
-    /**
-     * Factoryクラス
-     */
-    class Factory(val app: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(HistoryViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return HistoryViewModel(
-                    app,
-                    (app.applicationContext as JigokumimiApplication).musicRepository,
-                    (app.applicationContext as JigokumimiApplication).authRepository,
-                    (app.applicationContext as JigokumimiApplication).locationRepository
-                ) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
-        }
     }
 }

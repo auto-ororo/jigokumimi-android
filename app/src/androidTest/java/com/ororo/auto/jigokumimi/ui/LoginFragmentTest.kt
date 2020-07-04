@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.ui
 
-import ServiceLocator
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
@@ -12,7 +11,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import androidx.test.platform.app.InstrumentationRegistry
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import io.mockk.every

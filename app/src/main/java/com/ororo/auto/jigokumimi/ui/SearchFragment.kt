@@ -15,6 +15,7 @@ import com.ororo.auto.jigokumimi.databinding.FragmentSearchBinding
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Util
 import com.ororo.auto.jigokumimi.viewmodels.SearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
 /**
@@ -22,22 +23,12 @@ import timber.log.Timber
  */
 class SearchFragment : BaseFragment() {
 
-    lateinit var viewModel: SearchViewModel
+    private val viewModel: SearchViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        activity?.run {
-            val viewModelFactory = SearchViewModel.Factory(this.application)
-
-            viewModel = ViewModelProvider(
-                viewModelStore,
-                viewModelFactory
-            ).get(SearchViewModel::class.java)
-        }
-
         val binding: FragmentSearchBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_search,

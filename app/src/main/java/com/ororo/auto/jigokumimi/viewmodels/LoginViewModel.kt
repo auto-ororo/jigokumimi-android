@@ -1,22 +1,18 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
-import android.app.Service
 import android.util.Patterns
-import androidx.lifecycle.*
-import androidx.preference.PreferenceManager
-import com.ororo.auto.jigokumimi.JigokumimiApplication
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.network.JigokumimiApi
-import com.ororo.auto.jigokumimi.network.SpotifyApi
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
-import com.ororo.auto.jigokumimi.repository.LocationRepository
-import com.ororo.auto.jigokumimi.repository.MusicRepository
-import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
-import com.ororo.auto.jigokumimi.repository.demo.DemoLocationRepository
-import com.ororo.auto.jigokumimi.repository.demo.DemoMusicRepository
+import com.ororo.auto.jigokumimi.util.demoRepositoryModule
+import com.ororo.auto.jigokumimi.util.repositoryModule
 import kotlinx.coroutines.launch
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
 import java.util.regex.Pattern
 
 /**
@@ -95,9 +91,8 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
                 if (email.value == getApplication<Application>().getString(R.string.test_email_text) &&
                     password.value == getApplication<Application>().getString(R.string.test_password_text)
                 ) {
-                    ServiceLocator.authRepository = DemoAuthRepository(app)
-                    ServiceLocator.locationRepository = DemoLocationRepository(app)
-                    ServiceLocator.musicRepository = DemoMusicRepository(app)
+                    unloadKoinModules(repositoryModule)
+                    loadKoinModules(demoRepositoryModule)
 
                     _isDemo.postValue(true)
                 } else {
@@ -134,38 +129,12 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
         _loginButtonEnabledState.removeSource(password)
     }
 
-
     /**
      * Ripositoryをリセット
      */
-    fun initRepository(){
-        ServiceLocator.authRepository = AuthRepository(
-            PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
-            JigokumimiApi.retrofitService,
-            SpotifyApi.retrofitService
-        )
-        ServiceLocator.locationRepository = LocationRepository(
-            app
-        )
-        ServiceLocator.musicRepository = MusicRepository(
-            PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
-            SpotifyApi.retrofitService,
-            JigokumimiApi.retrofitService
-        )
-    }
-
-    /**
-     * Factoryクラス
-     */
-    class Factory(val app: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return LoginViewModel(
-                    app, (app.applicationContext as JigokumimiApplication).authRepository
-                ) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
-        }
+    fun initRepository() {
+        unloadKoinModules(demoRepositoryModule)
+        unloadKoinModules(repositoryModule)
+        loadKoinModules(repositoryModule)
     }
 }

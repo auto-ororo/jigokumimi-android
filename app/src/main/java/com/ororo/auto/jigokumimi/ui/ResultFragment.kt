@@ -9,7 +9,6 @@ import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -23,13 +22,15 @@ import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  *  検索結果表示画面
  */
 class ResultFragment : BaseFragment() {
 
-    lateinit var viewModel: ResultViewModel
+    private val viewModel: ResultViewModel by sharedViewModel()
 
     private val args: ResultFragmentArgs by navArgs()
 
@@ -66,16 +67,6 @@ class ResultFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        activity?.run {
-            val viewModelFactory = ResultViewModel.Factory(this.application)
-
-            viewModel = ViewModelProvider(
-                viewModelStore,
-                viewModelFactory
-            ).get(ResultViewModel::class.java)
-        }
-
         val binding: FragmentResultListBinding = DataBindingUtil.inflate(
             inflater,
             R.layout.fragment_result_list,

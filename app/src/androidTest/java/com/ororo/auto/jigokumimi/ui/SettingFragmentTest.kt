@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.ui
 
-import ServiceLocator
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.navigation.Navigation

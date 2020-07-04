@@ -2,8 +2,10 @@ package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
 import android.util.Patterns
-import androidx.lifecycle.*
-import com.ororo.auto.jigokumimi.JigokumimiApplication
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.network.SignUpRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.launch
@@ -159,21 +161,5 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
         _signUpButtonEnabledState.removeSource(email)
         _signUpButtonEnabledState.removeSource(password)
         _signUpButtonEnabledState.removeSource(passwordConfirmation)
-    }
-
-    /**
-     * Factoryクラス
-     */
-    class Factory(val app: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(SignUpViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return SignUpViewModel(
-                    app,
-                    (app.applicationContext as JigokumimiApplication).authRepository
-                ) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
-        }
     }
 }

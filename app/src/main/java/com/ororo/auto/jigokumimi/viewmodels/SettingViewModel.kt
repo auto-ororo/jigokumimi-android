@@ -1,8 +1,10 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.*
-import com.ororo.auto.jigokumimi.JigokumimiApplication
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.network.ChangePasswordRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.launch
@@ -12,7 +14,7 @@ import java.util.regex.Pattern
  * 設定画面のViewModel
  */
 class SettingViewModel(application: Application, authRepository: IAuthRepository) :
-    BaseAndroidViewModel(application , authRepository) {
+    BaseAndroidViewModel(application, authRepository) {
 
     /**
      *  パスワード変更状態
@@ -159,21 +161,5 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
         _changePasswordButtonEnabledState.removeSource(currentPassword)
         _changePasswordButtonEnabledState.removeSource(newPassword)
         _changePasswordButtonEnabledState.removeSource(newPasswordConfirmation)
-    }
-
-    /**
-     * Factoryクラス
-     */
-    class Factory(val app: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(SettingViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return SettingViewModel(
-                    app,
-                    (app.applicationContext as JigokumimiApplication).authRepository
-                ) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
-        }
     }
 }

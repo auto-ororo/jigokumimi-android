@@ -12,13 +12,14 @@ import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSettingBinding
 import com.ororo.auto.jigokumimi.viewmodels.SettingViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * 設定画面
  */
 class SettingFragment : BaseFragment() {
 
-    lateinit var viewModel: SettingViewModel
+    private val viewModel: SettingViewModel by viewModel()
 
     lateinit var binding: FragmentSettingBinding
 
@@ -26,16 +27,6 @@ class SettingFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        // ViewModel取得or生成
-        activity?.run {
-            val viewModelFactory = SettingViewModel.Factory(this.application)
-            viewModel = ViewModelProvider(
-                viewModelStore,
-                viewModelFactory
-            ).get(SettingViewModel::class.java)
-        }
-
         // データバインディング設定
         binding = DataBindingUtil.inflate(
             inflater,

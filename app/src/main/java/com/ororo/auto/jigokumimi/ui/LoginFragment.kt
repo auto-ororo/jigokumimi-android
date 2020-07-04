@@ -10,20 +10,20 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentLoginBinding
 import com.ororo.auto.jigokumimi.util.Constants.Companion.REQUEST_PERMISSION
 import com.ororo.auto.jigokumimi.viewmodels.LoginViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * ログイン画面
  */
 class LoginFragment : BaseFragment() {
 
-    lateinit var viewModel: LoginViewModel
+    private val viewModel: LoginViewModel by viewModel()
 
     lateinit var binding: FragmentLoginBinding
 
@@ -31,18 +31,6 @@ class LoginFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        // ViewModel取得or生成
-        activity?.run {
-            viewModelStore.clear()
-
-            val viewModelFactory = LoginViewModel.Factory(this.application)
-
-            viewModel = ViewModelProvider(
-                viewModelStore,
-                viewModelFactory
-            ).get(LoginViewModel::class.java)
-        }
 
         // データバインディング設定
         binding = DataBindingUtil.inflate(
@@ -123,13 +111,21 @@ class LoginFragment : BaseFragment() {
         if (requestCode == REQUEST_PERMISSION) {
             for (grantResult in grantResults) {
                 if (grantResult != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(activity, getString(R.string.permission_denied_message), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        activity,
+                        getString(R.string.permission_denied_message),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     activity?.finish()
                     return
                 }
             }
         } else {
-            Toast.makeText(activity, getString(R.string.permission_denied_message), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                activity,
+                getString(R.string.permission_denied_message),
+                Toast.LENGTH_SHORT
+            ).show()
             activity?.finish()
         }
     }

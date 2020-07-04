@@ -1,10 +1,7 @@
 package com.ororo.auto.jigokumimi.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.ororo.auto.jigokumimi.JigokumimiApplication
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import kotlinx.coroutines.launch
 
@@ -28,19 +25,12 @@ class MainViewModel(
     }
 
     /**
-     * Factoryクラス
+     * SpotifyAccessTokenを更新
      */
-    class Factory(val app: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return MainViewModel(
-                    app,
-                    (app.applicationContext as JigokumimiApplication).authRepository
-                ) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
+    fun refreshSpotifyAuthToken(token: String) {
+        viewModelScope.launch {
+            // Spotifyトークンを更新
+            authRepository.refreshSpotifyAuthToken(token)
         }
     }
-
 }
