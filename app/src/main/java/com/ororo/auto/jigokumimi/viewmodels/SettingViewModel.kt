@@ -152,14 +152,4 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
     fun doneUnregister() {
         _isUnregistered.postValue(false)
     }
-
-    /**
-     * Vidwmodel破棄時にリソース開放
-     */
-    override fun onCleared() {
-        super.onCleared()
-        _changePasswordButtonEnabledState.removeSource(currentPassword)
-        _changePasswordButtonEnabledState.removeSource(newPassword)
-        _changePasswordButtonEnabledState.removeSource(newPasswordConfirmation)
-    }
 }
