@@ -4,42 +4,30 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentLoginBinding
 import com.ororo.auto.jigokumimi.util.Constants.Companion.REQUEST_PERMISSION
+import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.viewmodels.LoginViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * ログイン画面
  */
-class LoginFragment : BaseFragment() {
+class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
     private val viewModel: LoginViewModel by viewModel()
 
-    lateinit var binding: FragmentLoginBinding
+    private val binding by dataBinding<FragmentLoginBinding>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        // データバインディング設定
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_login,
-            container,
-            false
-        )
-        binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
         // リスナー設定
@@ -81,8 +69,6 @@ class LoginFragment : BaseFragment() {
         if (Build.VERSION.SDK_INT >= 23) {
             requestPermission()
         }
-
-        return binding.root
     }
 
     /**

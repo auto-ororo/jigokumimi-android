@@ -23,6 +23,7 @@ import com.ororo.auto.jigokumimi.databinding.FragmentHistoryListBinding
 import com.ororo.auto.jigokumimi.databinding.HistoryItemBinding
 import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.util.Constants
+import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.viewmodels.HistoryViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import timber.log.Timber
@@ -31,25 +32,14 @@ import timber.log.Timber
 /**
  * 検索履歴画面
  */
-class HistoryFragment : Fragment() {
+class HistoryFragment : Fragment(R.layout.fragment_history) {
 
     private val viewModel: HistoryViewModel by sharedViewModel()
 
-    lateinit var binding: FragmentHistoryBinding
+    private val binding by dataBinding<FragmentHistoryBinding>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_history,
-            container,
-            false
-        )
-
-        binding.lifecycleOwner = viewLifecycleOwner
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         // ViewPager､TabLayoutを設定
         binding.pager.adapter = TabAdapter(
@@ -78,9 +68,6 @@ class HistoryFragment : Fragment() {
                 title = titleStr
             }
         }
-
-
-        return binding.root
     }
 
     override fun onResume() {
@@ -158,9 +145,11 @@ class TabAdapter(fm: FragmentManager, private val context: Context) :
 /**
  * 検索履歴の一覧を表示するFragment
  */
-class HistoryListFragment : BaseFragment() {
+class HistoryListFragment : BaseFragment(R.layout.fragment_history_list) {
 
     private val viewModel: HistoryViewModel by sharedViewModel()
+
+    private val binding by dataBinding<FragmentHistoryListBinding>()
 
     private lateinit var viewModelAdapterHistory: HistoryTrackListAdapter
 
@@ -185,19 +174,8 @@ class HistoryListFragment : BaseFragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        val binding: FragmentHistoryListBinding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_history_list,
-            container,
-            false
-        )
-
-        binding.lifecycleOwner = viewLifecycleOwner
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.viewModel = viewModel
 
@@ -236,8 +214,6 @@ class HistoryListFragment : BaseFragment() {
         viewModel.getSearchHistories(searchType)
 
         baseInit(viewModel)
-
-        return binding.root
     }
 
     /**

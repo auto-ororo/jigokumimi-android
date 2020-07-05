@@ -21,16 +21,18 @@ import com.ororo.auto.jigokumimi.databinding.ResultTrackItemBinding
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.util.Constants
+import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  *  検索結果表示画面
  */
-class ResultFragment : BaseFragment() {
+class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
 
     private val viewModel: ResultViewModel by sharedViewModel()
+
+    private val binding by dataBinding<FragmentResultListBinding>()
 
     private val args: ResultFragmentArgs by navArgs()
 
@@ -63,25 +65,14 @@ class ResultFragment : BaseFragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val binding: FragmentResultListBinding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_result_list,
-            container,
-            false
-        )
-
-        binding.lifecycleOwner = viewLifecycleOwner
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.viewModel = viewModel
 
         viewModel.setDistance(args.distance)
         viewModel.setSearchDateTime(args.searchDateTime)
         viewModel.setSearchType(args.searchType)
-
 
         // 検索種別に応じてアダプター(リストに表示する項目)を切り替え
         if (args.searchType == Constants.SearchType.TRACK) {
@@ -136,7 +127,6 @@ class ResultFragment : BaseFragment() {
 
         baseInit(viewModel)
 
-
         // タイトル設定
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
@@ -147,9 +137,6 @@ class ResultFragment : BaseFragment() {
                 title = titleStr
             }
         }
-
-
-        return binding.root
     }
 
     override fun onPause() {

@@ -10,6 +10,7 @@ import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -20,16 +21,19 @@ import com.google.android.material.navigation.NavigationView
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.ActivityMainBinding
 import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
+import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.viewmodels.MainViewModel
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(R.layout.activity_main),
+    NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var drawerLayout: DrawerLayout
     private val viewModel: MainViewModel by viewModel()
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private val binding by dataBinding<ActivityMainBinding>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,28 +42,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         volumeControlStream = AudioManager.STREAM_MUSIC
 
         // エラー時にメッセージダイアログを表示
-        viewModel.isErrorDialogShown.observe(
-            this,
-            Observer<Boolean> { isErrorDialogShown ->
-                if (isErrorDialogShown) {
-                    val dialog = MessageDialogFragment(
-                        getString(R.string.title_dialog_error),
-                        viewModel.errorMessage.value!!
-                    )
-                    dialog.setOnOkButtonClickListener(
-                        View.OnClickListener {
-                            viewModel.isErrorDialogShown.value = false
-                            dialog.dismiss()
-                        }
-                    )
-                    dialog.show(supportFragmentManager, "onActivity")
-                }
+        viewModel.isErrorDialogShown.observe(this) { isErrorDialogShown ->
+            if (isErrorDialogShown) {
+                val dialog = MessageDialogFragment(
+                    getString(R.string.title_dialog_error),
+                    viewModel.errorMessage.value!!
+                )
+                dialog.setOnOkButtonClickListener(
+                    View.OnClickListener {
+                        viewModel.isErrorDialogShown.value = false
+                        dialog.dismiss()
+                    }
+                )
+                dialog.show(supportFragmentManager, "onActivity")
             }
-        )
+        }
 
-        // データバインディング設定
-        val binding =
-            DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         drawerLayout = binding.drawerLayout
 
         // ドロワーアイコンの表示設定

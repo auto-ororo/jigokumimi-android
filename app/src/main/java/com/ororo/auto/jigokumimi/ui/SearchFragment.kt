@@ -1,19 +1,17 @@
 package com.ororo.auto.jigokumimi.ui
 
 import android.os.Bundle
-import android.view.*
+import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSearchBinding
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Util
+import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.viewmodels.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -21,22 +19,14 @@ import timber.log.Timber
 /**
  * 検索画面
  */
-class SearchFragment : BaseFragment() {
+class SearchFragment : BaseFragment(R.layout.fragment_search) {
 
     private val viewModel: SearchViewModel by viewModel()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val binding: FragmentSearchBinding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_search,
-            container,
-            false
-        )
+    private val binding by dataBinding<FragmentSearchBinding>()
 
-        binding.lifecycleOwner = viewLifecycleOwner
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.viewModel = viewModel
 
@@ -102,12 +92,13 @@ class SearchFragment : BaseFragment() {
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
                 show()
-                val titleStr = "${context?.getString(R.string.title_search)} ${if(viewModel.isDemo()) context?.getString(R.string.title_demo) else ""}"
+                val titleStr =
+                    "${context?.getString(R.string.title_search)} ${if (viewModel.isDemo()) context?.getString(
+                        R.string.title_demo
+                    ) else ""}"
                 title = titleStr
             }
         }
-
-        return binding.root
     }
 
     /**
@@ -124,7 +115,13 @@ class SearchFragment : BaseFragment() {
         Timber.d(this.findNavController().currentDestination.toString())
         viewModel.doneSearchTracks()
         this.findNavController()
-            .navigate(SearchFragmentDirections.actionSearchFragmentToResultFragment(viewModel.searchType.value!!, viewModel.distance.value!!, Util.getNowDate()))
+            .navigate(
+                SearchFragmentDirections.actionSearchFragmentToResultFragment(
+                    viewModel.searchType.value!!,
+                    viewModel.distance.value!!,
+                    Util.getNowDate()
+                )
+            )
     }
 
     /**

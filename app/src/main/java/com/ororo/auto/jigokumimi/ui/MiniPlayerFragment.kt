@@ -1,16 +1,19 @@
 package com.ororo.auto.jigokumimi.ui
 
 import android.os.Bundle
-import android.view.*
+import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
 import android.widget.SeekBar
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
+import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.util.setFavIconFromTrackList
 import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
 import kotlinx.android.synthetic.main.fragment_mini_player.*
@@ -20,25 +23,14 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 /**
  * 音楽再生プレーヤー
  */
-class MiniPlayerFragment : Fragment() {
+class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player) {
 
     private val viewModel: ResultViewModel by sharedViewModel()
 
-    lateinit var binding: FragmentMiniPlayerBinding
+    private val binding by dataBinding<FragmentMiniPlayerBinding>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_mini_player,
-            container,
-            false
-        )
-
-        binding.lifecycleOwner = viewLifecycleOwner
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.viewModel = viewModel
 
@@ -126,8 +118,6 @@ class MiniPlayerFragment : Fragment() {
         binding.miniPlayerLayout.setOnTouchListener { _, event ->
             gesture.onTouchEvent(event)
         }
-
-        return binding.root
     }
 
     /**
