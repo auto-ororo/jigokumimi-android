@@ -152,14 +152,4 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
     fun doneLogin() {
         _isLogin.postValue(false)
     }
-
-    /**
-     * Vidwmodel破棄時にリソース開放
-     */
-    override fun onCleared() {
-        super.onCleared()
-        _signUpButtonEnabledState.removeSource(email)
-        _signUpButtonEnabledState.removeSource(password)
-        _signUpButtonEnabledState.removeSource(passwordConfirmation)
-    }
 }

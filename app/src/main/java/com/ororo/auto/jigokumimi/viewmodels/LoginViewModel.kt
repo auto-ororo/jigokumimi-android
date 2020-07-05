@@ -121,15 +121,6 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
     }
 
     /**
-     * Vidwmodel破棄時にリソース開放
-     */
-    override fun onCleared() {
-        super.onCleared()
-        _loginButtonEnabledState.removeSource(email)
-        _loginButtonEnabledState.removeSource(password)
-    }
-
-    /**
      * Ripositoryをリセット
      */
     fun initRepository() {

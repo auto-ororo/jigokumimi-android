@@ -1,41 +1,27 @@
 package com.ororo.auto.jigokumimi.ui
 
-import android.opengl.Visibility
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
-import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSignUpBinding
+import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.viewmodels.SignUpViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * 新規登録画面
  */
-class SignUpFragment : BaseFragment() {
+class SignUpFragment : BaseFragment(R.layout.fragment_sign_up) {
 
     private val viewModel: SignUpViewModel by viewModel()
 
-    lateinit var binding: FragmentSignUpBinding
+    private val binding by dataBinding<FragmentSignUpBinding>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // データバインディング設定
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_sign_up,
-            container,
-            false
-        )
-        binding.lifecycleOwner = viewLifecycleOwner
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         binding.viewModel = viewModel
 
         // リスナー設定
@@ -67,8 +53,6 @@ class SignUpFragment : BaseFragment() {
                 title = context?.getString(R.string.title_sign_up)
             }
         }
-
-        return binding.root
     }
 
     /**

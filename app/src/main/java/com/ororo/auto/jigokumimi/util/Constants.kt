@@ -22,7 +22,7 @@ class Constants {
         const val SP_SPOTIFY_TOKEN_KEY = "spotifyToken"
 
         const val REQUEST_PERMISSION = 1000
-        const val DEBUG_JIGOKUMIMI_BASE_URL = "http://192.168.0.12:10080/api/"
+        const val DEBUG_JIGOKUMIMI_BASE_URL = "http://192.168.1.216:10080/api/"
         const val RELEASE_JIGOKUMIMI_BASE_URL = "https://jigokumimi.net/api/"
 
         const val POST_MUSIC_PERIOD = 600000L

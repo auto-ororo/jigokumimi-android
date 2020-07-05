@@ -12,7 +12,7 @@ import com.ororo.auto.jigokumimi.viewmodels.BaseAndroidViewModel
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 
-open class BaseFragment() : Fragment() {
+open class BaseFragment(resId: Int) : Fragment(resId) {
 
     /**
      * 画面共通初期化処理
@@ -45,7 +45,7 @@ open class BaseFragment() : Fragment() {
         viewModel.snackbarMessage.observe(
             viewLifecycleOwner,
             Observer {
-                if (it != ""){
+                if (it != "") {
                     Snackbar.make(this.requireView(), it, Snackbar.LENGTH_SHORT).show()
                     viewModel.showedSnackbar()
                 }

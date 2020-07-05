@@ -1,40 +1,28 @@
 package com.ororo.auto.jigokumimi.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSettingBinding
+import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.viewmodels.SettingViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * 設定画面
  */
-class SettingFragment : BaseFragment() {
+class SettingFragment : BaseFragment(R.layout.fragment_setting) {
 
     private val viewModel: SettingViewModel by viewModel()
 
-    lateinit var binding: FragmentSettingBinding
+    private val binding by dataBinding<FragmentSettingBinding>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // データバインディング設定
-        binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_setting,
-            container,
-            false
-        )
-        binding.lifecycleOwner = viewLifecycleOwner
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         binding.viewModel = viewModel
 
         // リスナー設定
@@ -66,11 +54,13 @@ class SettingFragment : BaseFragment() {
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
                 show()
-                val titleStr = "${context?.getString(R.string.title_setting)} ${if(viewModel.isDemo()) context?.getString(R.string.title_demo) else ""}"
+                val titleStr =
+                    "${context?.getString(R.string.title_setting)} ${if (viewModel.isDemo()) context?.getString(
+                        R.string.title_demo
+                    ) else ""}"
                 title = titleStr
             }
         }
-        return binding.root
     }
 
     /**
@@ -78,7 +68,7 @@ class SettingFragment : BaseFragment() {
      * パスワード変更を行う
      */
     private fun onChangePasswordClicked() {
-       viewModel.changePassword()
+        viewModel.changePassword()
     }
 
     /**
@@ -113,7 +103,8 @@ class SettingFragment : BaseFragment() {
     private fun onUnregisterSucceed() {
         viewModel.doneUnregister()
         viewModel.showSnackbar(getString(R.string.success_unregister_message))
-        this.findNavController().navigate(SettingFragmentDirections.actionSettingFragmentToLoginFragment())
+        this.findNavController()
+            .navigate(SettingFragmentDirections.actionSettingFragmentToLoginFragment())
     }
 
     /**
@@ -123,7 +114,8 @@ class SettingFragment : BaseFragment() {
     private fun onChangePasswordSucceed() {
         viewModel.doneChangePassword()
         viewModel.showSnackbar(getString(R.string.success_change_password_message))
-        this.findNavController().navigate(SettingFragmentDirections.actionSettingFragmentToSearchFragment())
+        this.findNavController()
+            .navigate(SettingFragmentDirections.actionSettingFragmentToSearchFragment())
     }
 
 }
