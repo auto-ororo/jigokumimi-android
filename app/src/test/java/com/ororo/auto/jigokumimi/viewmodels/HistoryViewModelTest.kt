@@ -14,19 +14,23 @@ import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
+import com.ororo.auto.jigokumimi.util.MockkHelper.Companion.any
 import getOrAwaitValue
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNot
 import org.hamcrest.core.IsNull
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import com.ororo.auto.jigokumimi.util.MockkHelper.Companion.any
-import java.lang.Exception
+import org.koin.core.context.stopKoin
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -88,6 +92,11 @@ class HistoryViewModelTest {
         every { runBlocking { musicRepository.getTracksAroundSearchHistories(any()) } } returns returnTrackSearchHistoryResponse
         every { runBlocking { musicRepository.getArtistsAroundSearchHistories(any()) } } returns returnArtistSearchHistoryResponse
         every { runBlocking { authRepository.getSavedJigokumimiUserId() } } returns any()
+    }
+
+    @After
+    fun shutDownWebServer() {
+        stopKoin()
     }
 
     @Test

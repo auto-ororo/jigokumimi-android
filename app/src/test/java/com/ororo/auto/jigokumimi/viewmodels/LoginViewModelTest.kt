@@ -12,11 +12,13 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsEqual
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import java.util.*
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
@@ -40,6 +42,11 @@ class LoginViewModelTest {
             ApplicationProvider.getApplicationContext(),
             authRepository
         )
+    }
+
+    @After
+    fun shutDownWebServer() {
+        stopKoin()
     }
 
     @Test

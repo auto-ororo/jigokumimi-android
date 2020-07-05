@@ -11,10 +11,12 @@ import io.mockk.mockk
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.hamcrest.core.IsEqual
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
@@ -33,8 +35,14 @@ class BaseAndroidViewModelTest {
     @Before
     fun createViewModel() {
         authRepository = mockk(relaxed = true)
-        viewModel = BaseAndroidViewModel(ApplicationProvider.getApplicationContext(), authRepository)
+        viewModel =
+            BaseAndroidViewModel(ApplicationProvider.getApplicationContext(), authRepository)
 
+    }
+
+    @After
+    fun shutDownWebServer() {
+        stopKoin()
     }
 
     @Test
@@ -236,7 +244,7 @@ class BaseAndroidViewModelTest {
         method?.let {
             it.isAccessible = true
             // メソッド呼び出し
-            it.call(viewModel,exception)
+            it.call(viewModel, exception)
         }
 
         // 通信エラーメッセージが設定されていることを確認
@@ -265,7 +273,7 @@ class BaseAndroidViewModelTest {
         method?.let {
             it.isAccessible = true
             // メソッド呼び出し
-            it.call(viewModel,exception)
+            it.call(viewModel, exception)
         }
 
         // 通信エラーメッセージが設定されていることを確認
@@ -281,7 +289,7 @@ class BaseAndroidViewModelTest {
         assertThat(afterDialogShownLiveDataValue, IsEqual(true))
     }
 
-     @Test
+    @Test
     fun handleAuthException_HttpException_レスポンスBody内のmessageがエラーメッセージとして表示されること() {
 
         val errorMessage = faker.lorem().sentence()
@@ -326,7 +334,7 @@ class BaseAndroidViewModelTest {
         method?.let {
             it.isAccessible = true
             // メソッド呼び出し
-            it.call(viewModel,exception)
+            it.call(viewModel, exception)
         }
 
         // 通信エラーメッセージが設定されていることを確認
@@ -355,7 +363,7 @@ class BaseAndroidViewModelTest {
         method?.let {
             it.isAccessible = true
             // メソッド呼び出し
-            it.call(viewModel,exception)
+            it.call(viewModel, exception)
         }
 
         // 通信エラーメッセージが設定されていることを確認

@@ -18,6 +18,7 @@ import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateAndroidTestDataUtil
+import com.ororo.auto.jigokumimi.viewmodels.SearchViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -26,9 +27,15 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.ResponseBody
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.android.ext.koin.androidApplication
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
+import org.koin.core.module.Module
+import org.koin.dsl.module
 import retrofit2.HttpException
 import retrofit2.Response
 import java.util.*
@@ -38,10 +45,26 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class SearchFragmentTest {
 
-    private lateinit var authRepository: IAuthRepository
-    private lateinit var musicRepository: IMusicRepository
-    private lateinit var locationRepository: ILocationRepository
     private lateinit var navController: NavController
+
+    private val authRepository: IAuthRepository = mockk(relaxed = true)
+    private val musicRepository: IMusicRepository = mockk(relaxed = true)
+    private val locationRepository: ILocationRepository = mockk(relaxed = true)
+
+    private val modules: List<Module> = listOf(
+        module {
+            factory { musicRepository }
+        },
+        module {
+            factory { authRepository }
+        },
+        module {
+            factory { locationRepository }
+        },
+        module {
+            factory { SearchViewModel(androidApplication(), get(), get(), get()) }
+        }
+    )
 
     val faker = Faker(Locale("jp_JP"))
 
@@ -49,13 +72,7 @@ class SearchFragmentTest {
 
     @Before
     fun init() {
-        // mock化したrepositoryをServiceLocatorへ登録し、テスト実行時に参照するように設定)
-        authRepository = mockk(relaxed = true)
-        musicRepository = mockk(relaxed = true)
-        locationRepository = mockk(relaxed = true)
-        ServiceLocator.authRepository = authRepository
-        ServiceLocator.musicRepository = musicRepository
-        ServiceLocator.locationRepository = locationRepository
+        loadKoinModules(modules)
 
         // 検索画面を起動し、NavControllerを設定
         val scenario = launchFragmentInContainer<SearchFragment>(null, R.style.AppTheme)
@@ -80,6 +97,11 @@ class SearchFragmentTest {
             awaitClose {
             }
         }
+    }
+
+    @After
+    fun cleanup() {
+        unloadKoinModules(modules)
     }
 
     @Test
@@ -137,7 +159,11 @@ class SearchFragmentTest {
         // 結果画面に遷移することを確認
         verify {
             navController.navigate(
-                SearchFragmentDirections.actionSearchFragmentToResultFragment(Constants.SearchType.TRACK, 500, any())
+                SearchFragmentDirections.actionSearchFragmentToResultFragment(
+                    Constants.SearchType.TRACK,
+                    500,
+                    any()
+                )
             )
         }
     }

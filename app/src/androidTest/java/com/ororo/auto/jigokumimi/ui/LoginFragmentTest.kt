@@ -13,31 +13,46 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.viewmodels.LoginViewModel
 import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType
 import okhttp3.ResponseBody
 import org.hamcrest.Matchers.not
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.android.ext.koin.androidApplication
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
+import org.koin.core.module.Module
+import org.koin.dsl.module
 import retrofit2.HttpException
 import retrofit2.Response
-import io.mockk.mockk
-import io.mockk.verify
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class LoginFragmentTest {
 
-    private lateinit var repository: IAuthRepository
+    private val repository: IAuthRepository = mockk(relaxed = true)
     private lateinit var navController: NavController
+
+    private val modules: List<Module> = listOf(
+        module {
+            factory { repository }
+        },
+        module {
+            factory { LoginViewModel(androidApplication(), get()) }
+        }
+    )
 
     @Before
     fun init() {
-        // mock化したrepositoryをServiceLocatorへ登録し、テスト実行時に参照するように設定)
-        repository = mockk(relaxed = true)
-        ServiceLocator.authRepository = repository
+
+        loadKoinModules(modules)
 
         // ログイン画面を起動し、NavControllerを設定
         val scenario = launchFragmentInContainer<LoginFragment>(null, R.style.AppTheme)
@@ -45,6 +60,11 @@ class LoginFragmentTest {
         scenario.onFragment {
             Navigation.setViewNavController(it.view!!, navController)
         }
+    }
+
+    @After
+    fun cleanUp() {
+        unloadKoinModules(modules)
     }
 
     @Test
