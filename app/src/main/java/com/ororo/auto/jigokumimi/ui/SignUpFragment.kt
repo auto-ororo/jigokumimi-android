@@ -13,13 +13,14 @@ import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSignUpBinding
 import com.ororo.auto.jigokumimi.viewmodels.SignUpViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
  * 新規登録画面
  */
 class SignUpFragment : BaseFragment() {
 
-    lateinit var viewModel: SignUpViewModel
+    private val viewModel: SignUpViewModel by viewModel()
 
     lateinit var binding: FragmentSignUpBinding
 
@@ -27,17 +28,6 @@ class SignUpFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        // ViewModel取得or生成
-        activity?.run {
-            val viewModelFactory = SignUpViewModel.Factory(this.application)
-
-            viewModel = ViewModelProvider(
-                viewModelStore,
-                viewModelFactory
-            ).get(SignUpViewModel::class.java)
-        }
-
         // データバインディング設定
         binding = DataBindingUtil.inflate(
             inflater,

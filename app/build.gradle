@@ -16,7 +16,7 @@ android {
         targetSdkVersion 29
         versionCode 5
         versionName "1.4"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.ororo.auto.jigokumimi.TestAppJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
     }
@@ -102,6 +102,15 @@ dependencies {
     // Shared Preferences
     implementation "androidx.preference:preference:$sharedPreferencesVersion"
 
+    implementation "org.koin:koin-core:$koinVersion"
+    implementation "org.koin:koin-core-ext:$koinVersion"
+    testImplementation "org.koin:koin-test:$koinVersion"
+    androidTestImplementation "org.koin:koin-test:$koinVersion"
+    implementation "org.koin:koin-android:$koinVersion"
+    implementation "org.koin:koin-androidx-scope:$koinVersion"
+    implementation "org.koin:koin-androidx-viewmodel:$koinVersion"
+    implementation "org.koin:koin-androidx-fragment:$koinVersion"
+    implementation "org.koin:koin-androidx-ext:$koinVersion"
 
     // hamcrest
     testImplementation "org.hamcrest:hamcrest-all:$hamcrestVersion"

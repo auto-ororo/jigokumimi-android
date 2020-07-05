@@ -26,11 +26,13 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.core.IsEqual
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -100,6 +102,11 @@ class SearchViewModelTest {
                     locationRepository
                 )
             )
+    }
+
+    @After
+    fun shutDownWebServer() {
+        stopKoin()
     }
 
     @Test

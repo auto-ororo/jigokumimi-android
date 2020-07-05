@@ -3,8 +3,9 @@ package com.ororo.auto.jigokumimi.viewmodels
 import android.app.Application
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import androidx.lifecycle.*
-import com.ororo.auto.jigokumimi.JigokumimiApplication
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
@@ -376,23 +377,6 @@ class ResultViewModel(
 
                 }
             }
-        }
-    }
-
-    /**
-     * Factoryクラス
-     */
-    class Factory(val app: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(ResultViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return ResultViewModel(
-                    app,
-                    (app.applicationContext as JigokumimiApplication).authRepository,
-                    (app.applicationContext as JigokumimiApplication).musicRepository
-                ) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
         }
     }
 

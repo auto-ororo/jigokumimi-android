@@ -19,11 +19,13 @@ import io.mockk.spyk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.core.IsEqual
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import java.util.*
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.isAccessible
@@ -53,7 +55,7 @@ class ResultViewModelTest {
         val tracks = mutableListOf<Track>()
 
         for (i in 1..4) {
-            if (i == 2 ) {
+            if (i == 2) {
                 tracks.add(testDataUtil.createDummyTrack(previewUrl = null))
             } else {
                 tracks.add(testDataUtil.createDummyTrack())
@@ -79,6 +81,11 @@ class ResultViewModelTest {
 
         mockMp = mockk(relaxed = true)
         viewModel.mp = mockMp
+    }
+
+    @After
+    fun shutDownWebServer() {
+        stopKoin()
     }
 
     @Test

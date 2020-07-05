@@ -26,10 +26,12 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNot
 import org.hamcrest.core.IsNull
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -60,6 +62,11 @@ class MusicRepositoryTest {
         )
         faker = Faker(Locale("ja_JP"))
         ct = CreateTestDataUtil()
+    }
+
+    @After
+    fun shutDownWebServer() {
+        stopKoin()
     }
 
     @Test

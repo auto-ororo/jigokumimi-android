@@ -6,8 +6,6 @@ import android.view.GestureDetector.SimpleOnGestureListener
 import android.widget.SeekBar
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
@@ -16,6 +14,7 @@ import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
 import com.ororo.auto.jigokumimi.util.setFavIconFromTrackList
 import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
 import kotlinx.android.synthetic.main.fragment_mini_player.*
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 
 /**
@@ -23,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_mini_player.*
  */
 class MiniPlayerFragment : Fragment() {
 
-    lateinit var viewModel: ResultViewModel
+    private val viewModel: ResultViewModel by sharedViewModel()
 
     lateinit var binding: FragmentMiniPlayerBinding
 
@@ -31,16 +30,6 @@ class MiniPlayerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-
-        activity?.run {
-            val viewModelFactory = ResultViewModel.Factory(this.application)
-
-            viewModel = ViewModelProvider(
-                viewModelStore,
-                viewModelFactory
-            ).get(ResultViewModel::class.java)
-        }
 
         binding = DataBindingUtil.inflate(
             inflater,
@@ -54,36 +43,31 @@ class MiniPlayerFragment : Fragment() {
         binding.viewModel = viewModel
 
         // 再生/停止時の動作
-        viewModel.isPlaying.observe(
-            viewLifecycleOwner,
-            Observer { isPlaying ->
-                if (isPlaying) {
-                    viewModel.showMiniPlayer()
-                    seekBar.max = viewModel.mp?.duration!!
-                    viewModel.mp?.setOnCompletionListener(viewModel)
-                    binding.playStopButton.setImageResource(R.drawable.ic_pause)
-                } else {
-                    binding.playStopButton.setImageResource(R.drawable.ic_play_arrow)
-                }
-            })
+        viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
+            if (isPlaying) {
+                viewModel.showMiniPlayer()
+                seekBar.max = viewModel.mp?.duration!!
+                viewModel.mp?.setOnCompletionListener(viewModel)
+                binding.playStopButton.setImageResource(R.drawable.ic_pause)
+            } else {
+                binding.playStopButton.setImageResource(R.drawable.ic_play_arrow)
+            }
+        }
 
         // 音楽プレーヤーの表示/非表示
-        viewModel.isMiniPlayerShown.observe(
-            viewLifecycleOwner,
-            Observer { isMiniPlayerShown ->
-                // 下からプレイヤーが出現するようにアニメーションを設定
-                TransitionManager.beginDelayedTransition(
-                    binding.miniPlayerLayout,
-                    Slide(Gravity.BOTTOM)
-                )
+        viewModel.isMiniPlayerShown.observe(viewLifecycleOwner) { isMiniPlayerShown ->
+            // 下からプレイヤーが出現するようにアニメーションを設定
+            TransitionManager.beginDelayedTransition(
+                binding.miniPlayerLayout,
+                Slide(Gravity.BOTTOM)
+            )
 
-                if (isMiniPlayerShown) {
-                    binding.miniPlayerLayout.visibility = View.VISIBLE
-                } else {
-                    binding.miniPlayerLayout.visibility = View.GONE
-                }
+            if (isMiniPlayerShown) {
+                binding.miniPlayerLayout.visibility = View.VISIBLE
+            } else {
+                binding.miniPlayerLayout.visibility = View.GONE
             }
-        )
+        }
 
         viewModel.changeDataIndex.observe(viewLifecycleOwner) {
             if (it == viewModel.playingTrackIndex.value) {

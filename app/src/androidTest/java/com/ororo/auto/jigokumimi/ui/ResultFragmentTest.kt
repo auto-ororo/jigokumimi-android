@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.ui
 
-import ServiceLocator
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -10,7 +9,6 @@ import android.view.View
 import android.widget.ImageView
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.NavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
@@ -27,10 +25,10 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
-import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateAndroidTestDataUtil
+import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.android.synthetic.main.result_artist_item.view.*
@@ -41,9 +39,15 @@ import kotlinx.coroutines.runBlocking
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.TypeSafeMatcher
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.android.ext.koin.androidApplication
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.unloadKoinModules
+import org.koin.core.module.Module
+import org.koin.dsl.module
 import java.io.Serializable
 import java.util.*
 
@@ -52,20 +56,28 @@ import java.util.*
 @RunWith(AndroidJUnit4::class)
 class ResultFragmentTest {
 
-    private lateinit var authRepository: IAuthRepository
-    private lateinit var musicRepository: IMusicRepository
-    private lateinit var locationRepository: ILocationRepository
-    private lateinit var navController: NavController
+    private val authRepository: IAuthRepository = mockk(relaxed = true)
+    private val musicRepository: IMusicRepository = mockk(relaxed = true)
 
     val faker = Faker(Locale("jp_JP"))
 
     private val testDataUtil = CreateAndroidTestDataUtil()
 
+    private val modules: List<Module> = listOf(
+        module {
+            factory { musicRepository }
+        },
+        module {
+            factory { authRepository }
+        },
+        module {
+            factory { ResultViewModel(androidApplication(), get(), get()) }
+        }
+    )
+
     @Before
     fun init() {
-        // mock化したrepositoryをServiceLocatorへ登録し、テスト実行時に参照するように設定)
-        musicRepository = mockk(relaxed = true)
-        ServiceLocator.musicRepository = musicRepository
+        loadKoinModules(modules)
 
         // Tracksデータを作成・設定
         val dummyTracks = mutableListOf<Track>()
@@ -86,6 +98,11 @@ class ResultFragmentTest {
             dummyArtists.add(testDataUtil.createDummyArtist())
         }
         every { runBlocking { musicRepository.artists } } returns MutableLiveData(dummyArtists)
+    }
+
+    @After
+    fun cleanUp() {
+        unloadKoinModules(modules)
     }
 
     @Test

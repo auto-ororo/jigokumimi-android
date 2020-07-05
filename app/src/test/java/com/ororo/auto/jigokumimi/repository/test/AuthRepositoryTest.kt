@@ -15,9 +15,11 @@ import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsEqual
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import java.util.*
 
 @RunWith(AndroidJUnit4::class)
@@ -44,6 +46,11 @@ class AuthRepositoryTest {
             spotifyApiService
         )
         faker = Faker(Locale("ja_JP"))
+    }
+
+    @After
+    fun shutDownWebServer() {
+        stopKoin()
     }
 
 

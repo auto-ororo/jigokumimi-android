@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -25,6 +24,7 @@ import com.ororo.auto.jigokumimi.databinding.HistoryItemBinding
 import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.viewmodels.HistoryViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import timber.log.Timber
 
 
@@ -33,8 +33,7 @@ import timber.log.Timber
  */
 class HistoryFragment : Fragment() {
 
-
-    lateinit var viewModel: HistoryViewModel
+    private val viewModel: HistoryViewModel by sharedViewModel()
 
     lateinit var binding: FragmentHistoryBinding
 
@@ -42,15 +41,6 @@ class HistoryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        // ViewModelを取得
-        activity?.run {
-            val viewModelFactory = HistoryViewModel.Factory(this.application)
-            viewModel = ViewModelProvider(
-                viewModelStore,
-                viewModelFactory
-            ).get(HistoryViewModel::class.java)
-        }
 
         binding = DataBindingUtil.inflate(
             inflater,
@@ -81,7 +71,10 @@ class HistoryFragment : Fragment() {
         // タイトル設定
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
-                val titleStr = "${context?.getString(R.string.title_history)} ${if(viewModel.isDemo()) context?.getString(R.string.title_demo) else ""}"
+                val titleStr =
+                    "${context?.getString(R.string.title_history)} ${if (viewModel.isDemo()) context?.getString(
+                        R.string.title_demo
+                    ) else ""}"
                 title = titleStr
             }
         }
@@ -105,7 +98,13 @@ class HistoryFragment : Fragment() {
 
         // 結果画面に遷移する
         this.findNavController()
-            .navigate(HistoryFragmentDirections.actionHistoryFragmentToResultFragment(viewModel.searchType.value!!,viewModel.distance.value!!,viewModel.searchDateTime.value!!))
+            .navigate(
+                HistoryFragmentDirections.actionHistoryFragmentToResultFragment(
+                    viewModel.searchType.value!!,
+                    viewModel.distance.value!!,
+                    viewModel.searchDateTime.value!!
+                )
+            )
     }
 }
 
@@ -161,7 +160,7 @@ class TabAdapter(fm: FragmentManager, private val context: Context) :
  */
 class HistoryListFragment : BaseFragment() {
 
-    lateinit var viewModel: HistoryViewModel
+    private val viewModel: HistoryViewModel by sharedViewModel()
 
     private lateinit var viewModelAdapterHistory: HistoryTrackListAdapter
 
@@ -190,15 +189,6 @@ class HistoryListFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        // ViewModelを取得
-        activity?.run {
-            val viewModelFactory = HistoryViewModel.Factory(this.application)
-            viewModel = ViewModelProvider(
-                viewModelStore,
-                viewModelFactory
-            ).get(HistoryViewModel::class.java)
-        }
 
         val binding: FragmentHistoryListBinding = DataBindingUtil.inflate(
             inflater,
