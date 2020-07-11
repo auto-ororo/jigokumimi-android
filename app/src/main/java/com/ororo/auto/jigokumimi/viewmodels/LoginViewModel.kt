@@ -56,6 +56,8 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
         // Email,Passwordが変更された時にバリデーションを実行し、ログインボタンの活性・非活性制御を行う
         _loginButtonEnabledState.addSource(email) { validateLogin() }
         _loginButtonEnabledState.addSource(password) { validateLogin() }
+        // 処理中状態を監視
+        _loginButtonEnabledState.addSource(isLoading) { _loginButtonEnabledState.value = !it }
     }
 
     /**
@@ -84,6 +86,7 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
      * ログイン実行
      */
     fun login() {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
 
@@ -103,6 +106,7 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
             } catch (e: Exception) {
                 handleAuthException(e)
             }
+            _isLoading.value = false
         }
     }
 

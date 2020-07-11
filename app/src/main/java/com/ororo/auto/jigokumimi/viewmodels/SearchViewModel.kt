@@ -49,6 +49,7 @@ class SearchViewModel(
      * 周辺曲情報を更新する
      */
     fun searchMusic() {
+        _isLoading.value = true
 
         // 位置情報を取得する
         viewModelScope.launch {
@@ -81,6 +82,7 @@ class SearchViewModel(
                                 location,
                                 _distance.value!!
                             )
+                            _isLoading.postValue(false)
 
                             // 取得件数が0件の場合はエラー表示
                             if (musicRepository.tracks.value?.size == 0) {
@@ -107,6 +109,7 @@ class SearchViewModel(
                                 location,
                                 _distance.value!!
                             )
+                            _isLoading.postValue(false)
 
                             // 取得件数が0件の場合はエラー表示
                             if (musicRepository.artists.value?.size == 0) {

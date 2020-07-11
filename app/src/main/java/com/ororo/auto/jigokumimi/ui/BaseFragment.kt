@@ -1,6 +1,7 @@
 package com.ororo.auto.jigokumimi.ui
 
 import android.view.View
+import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
@@ -55,6 +56,15 @@ open class BaseFragment(resId: Int) : Fragment(resId) {
         viewModel.isTokenExpired.observe(viewLifecycleOwner) {
             if (it) onTokenExpired(viewModel)
         }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            if (it) {
+                activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            } else {
+                activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            }
+        }
+        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 
     /**

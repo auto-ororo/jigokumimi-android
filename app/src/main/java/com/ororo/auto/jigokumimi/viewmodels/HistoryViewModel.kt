@@ -70,6 +70,7 @@ class HistoryViewModel(
      * 検索履歴を取得する
      */
     fun getSearchHistories(searchType: Constants.SearchType) {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
                 val userId = authRepository.getSavedJigokumimiUserId()
@@ -93,6 +94,7 @@ class HistoryViewModel(
                                 }
                             )
                         }
+                    _isLoading.value = false
                     trackHistoryList.postValue(trackHistories?.toMutableList())
                 } else {
                     val artistHistories =
@@ -113,11 +115,13 @@ class HistoryViewModel(
                                 }
                             )
                         }
+                    _isLoading.value = false
                     artistHistoryList.postValue(artistHistories?.toMutableList())
                 }
 
             } catch (e: Exception) {
                 handleConnectException(e)
+                _isLoading.value = false
             }
         }
     }
@@ -126,6 +130,7 @@ class HistoryViewModel(
      * 検索履歴を削除する
      */
     fun deleteHistory(searchType: Constants.SearchType, historyIndex: Int) {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
 
@@ -154,9 +159,11 @@ class HistoryViewModel(
                         getSearchHistories(searchType)
                     }
                 }
+                _isLoading.value = false
 
             } catch (e: Exception) {
                 handleConnectException(e)
+                _isLoading.value = false
             }
 
         }
@@ -166,6 +173,7 @@ class HistoryViewModel(
      * 検索履歴の詳細を取得する
      */
     fun searchHistoryDetails(searchType: Constants.SearchType, historyIndex: Int) {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
                 _searchType.postValue(searchType)
@@ -174,6 +182,7 @@ class HistoryViewModel(
                         musicRepository.refreshTracksFromHistory(history)
                         _distance.value = history.distance
                         _searchDateTime.value = history.createdAt
+                        _isLoading.value = false
                         _isSearchFinished.postValue(true)
                     }
                 } else {
@@ -181,10 +190,12 @@ class HistoryViewModel(
                         musicRepository.refreshArtistsFromHistory(history)
                         _distance.value = history.distance
                         _searchDateTime.value = history.createdAt
+                        _isLoading.value = false
                         _isSearchFinished.postValue(true)
                     }
                 }
             } catch (e: Exception) {
+                _isLoading.value = false
                 handleConnectException(e)
             }
         }

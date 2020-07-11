@@ -109,6 +109,7 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
      * 新規登録実行
      */
     fun signUp() {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
                 authRepository.signUpJigokumimi(
@@ -118,9 +119,11 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
                         passwordConfirmation = passwordConfirmation.value!!
                     )
                 )
+                _isLoading.value = false
                 _isSignUp.value = true
             } catch (e: Exception) {
                 handleAuthException(e)
+                _isLoading.value = false
             }
         }
     }
@@ -129,12 +132,15 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
      * ログイン実行
      */
     fun login() {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
                 authRepository.loginJigokumimi(email.value!!, password.value!!)
+                _isLoading.value = false
                 _isLogin.value = true
             } catch (e: Exception) {
                 handleAuthException(e)
+                _isLoading.value = false
             }
         }
     }

@@ -16,32 +16,33 @@
         android:layout_height="match_parent"
         tools:context=".ui.SearchFragment">
 
-        <Button
-            android:id="@+id/searchTracksButton"
-            style="@style/CommonButton"
-            android:layout_marginStart="@dimen/spacing_m"
-            android:layout_marginEnd="@dimen/spacing_m"
-            android:layout_marginBottom="@dimen/spacing_m"
-            android:text="@string/search_tracks_button_text"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/indicator_height"
+            android:indeterminate="true"
+            android:invisibility="@{viewModel.isLoading}"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <Spinner
-            android:id="@+id/distanceSpinner"
+        <TextView
+            android:id="@+id/selectTypeSuggest"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_m"
             android:layout_marginTop="@dimen/spacing_m"
             android:layout_marginEnd="@dimen/spacing_m"
-            android:background="@color/colorPrimary"
-            android:entries="@array/distance_array"
-            android:spinnerMode="dialog"
-            android:textAlignment="center"
+            android:text="@string/select_types_suggest"
             android:textSize="@dimen/text_size_m"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/selectDistanceSuggest" />
+            app:layout_constraintTop_toBottomOf="@id/progressBar"
+            app:layout_constraintVertical_bias="0" />
 
         <TextView
             android:id="@+id/trackButton"
@@ -80,23 +81,6 @@
             app:layout_constraintTop_toTopOf="@+id/trackButton" />
 
         <TextView
-            android:id="@+id/selectTypeSuggest"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/spacing_m"
-            android:layout_marginTop="@dimen/spacing_m"
-            android:layout_marginEnd="@dimen/spacing_m"
-            android:text="@string/select_types_suggest"
-            android:textSize="@dimen/text_size_m"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0" />
-
-        <TextView
             android:id="@+id/selectDistanceSuggest"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -112,6 +96,22 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.4" />
 
+        <Spinner
+            android:id="@+id/distanceSpinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_m"
+            android:layout_marginTop="@dimen/spacing_m"
+            android:layout_marginEnd="@dimen/spacing_m"
+            android:background="@color/colorPrimary"
+            android:entries="@array/distance_array"
+            android:spinnerMode="dialog"
+            android:textAlignment="center"
+            android:textSize="@dimen/text_size_m"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/selectDistanceSuggest" />
+
         <TextView
             android:id="@+id/searchSuggest"
             android:layout_width="wrap_content"
@@ -124,6 +124,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/distanceSpinner" />
 
+        <Button
+            android:id="@+id/searchTracksButton"
+            style="@style/CommonButton"
+            android:layout_marginStart="@dimen/spacing_m"
+            android:layout_marginEnd="@dimen/spacing_m"
+            android:layout_marginBottom="@dimen/spacing_m"
+            android:text="@string/search_tracks_button_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
