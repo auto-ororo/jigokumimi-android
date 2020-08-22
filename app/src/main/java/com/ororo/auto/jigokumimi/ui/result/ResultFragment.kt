@@ -1,26 +1,17 @@
 package com.ororo.auto.jigokumimi.ui.result
 
-
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentResultListBinding
-import com.ororo.auto.jigokumimi.databinding.ResultArtistItemBinding
-import com.ororo.auto.jigokumimi.databinding.ResultTrackItemBinding
-import com.ororo.auto.jigokumimi.domain.Artist
-import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.ui.common.BaseFragment
+import com.ororo.auto.jigokumimi.ui.common.ItemClick
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.dataBinding
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
@@ -79,13 +70,13 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
 
             // キューアイコンがタップされたときのコールバックを設定
             val playCallback =
-                PlayTrackClick { index: Int ->
+                ItemClick { index: Int ->
                     onQueueButtonClicked(index)
                 }
 
             // Track追加ボタンがタップされたときのコールバックを設定
             val saveOrRemoveCallback =
-                SaveOrRemoveTrackClick { trackIndex: Int ->
+                ItemClick { trackIndex: Int ->
                     onSaveOrRemoveButtonClicked(trackIndex)
                 }
 
@@ -106,7 +97,7 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
 
             // Artistフォローボタンがタップされたときのコールバックを設定
             val followOrUnFollowCallback =
-                FollowOrUnFollowArtistClick { artistIndex: Int ->
+                ItemClick { artistIndex: Int ->
                     onFollowOrUnFollowButtonClicked(artistIndex)
                 }
 
@@ -168,147 +159,3 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
     }
 }
 
-/**
- * Trackを設定､表示するアダプタ
- */
-class ResultTrackListAdapter(
-    val playTrackCallback: PlayTrackClick,
-    val saveOrRemoveTrackCallback: SaveOrRemoveTrackClick
-) :
-    RecyclerView.Adapter<ResultTrackListViewHolder>() {
-
-    /**
-     * リストに表示する曲情報
-     */
-    var tracks: List<Track> = emptyList()
-        set(value) {
-            field = value
-
-            // リストが更新されたことを通知
-            notifyDataSetChanged()
-        }
-
-    /**
-     * リストアイテムが作られたときに呼ばれる
-     */
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultTrackListViewHolder {
-        val withDataBinding: ResultTrackItemBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(parent.context),
-            ResultTrackListViewHolder.LAYOUT,
-            parent,
-            false
-        )
-        return ResultTrackListViewHolder(
-            withDataBinding
-        )
-    }
-
-    override fun getItemCount() = tracks.size
-
-    /**
-     * リストアイテムが表示されたときに呼ばれる
-     */
-    override fun onBindViewHolder(holderTrack: ResultTrackListViewHolder, position: Int) {
-        holderTrack.viewDataBinding.also {
-            it.track = tracks[position]
-            it.playCallback = playTrackCallback
-            it.saveOrRemoveCallback = saveOrRemoveTrackCallback
-            it.position = position
-        }
-    }
-}
-
-/**
- * 別ファイルで定義したTrackレイアウトをつなげるViewHolder
- */
-class ResultTrackListViewHolder(val viewDataBinding: ResultTrackItemBinding) :
-    RecyclerView.ViewHolder(viewDataBinding.root) {
-    companion object {
-        @LayoutRes
-        val LAYOUT = R.layout.result_track_item
-    }
-}
-
-/**
- * Artistを設定､表示するアダプタ
- */
-class ResultArtistListAdapter(val followOrUnFollowArtistCallback: FollowOrUnFollowArtistClick) :
-    RecyclerView.Adapter<ResultArtistListViewHolder>() {
-
-    /**
-     * リストに表示する曲情報
-     */
-    var artists: List<Artist> = emptyList()
-        set(value) {
-            field = value
-
-            // リストが更新されたことを通知
-            notifyDataSetChanged()
-        }
-
-    /**
-     * リストアイテムが作られたときに呼ばれる
-     */
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultArtistListViewHolder {
-        val withDataBinding: ResultArtistItemBinding = DataBindingUtil.inflate(
-            LayoutInflater.from(parent.context),
-            ResultArtistListViewHolder.LAYOUT,
-            parent,
-            false
-        )
-        return ResultArtistListViewHolder(
-            withDataBinding
-        )
-    }
-
-    override fun getItemCount() = artists.size
-
-    /**
-     * リストアイテムが表示されたときに呼ばれる
-     */
-    override fun onBindViewHolder(holderTrack: ResultArtistListViewHolder, position: Int) {
-        holderTrack.viewDataBinding.also {
-            it.artist = artists[position]
-            it.followOrUnFollowCallback = followOrUnFollowArtistCallback
-            it.position = position
-        }
-    }
-}
-
-/**
- * 別ファイルで定義したArtistレイアウトをつなげるViewHolder
- */
-class ResultArtistListViewHolder(val viewDataBinding: ResultArtistItemBinding) :
-    RecyclerView.ViewHolder(viewDataBinding.root) {
-    companion object {
-        @LayoutRes
-        val LAYOUT = R.layout.result_artist_item
-    }
-}
-
-/**
- * Trackお気に入り追加ボタンをクリックしたときの動作を定義
- *
- */
-class SaveOrRemoveTrackClick(val block: (Int) -> Unit) {
-
-    fun onClick(trackIndex: Int) = block(trackIndex)
-}
-
-/**
- * キューボタンをクリックしたときの動作を定義
- *
- */
-class PlayTrackClick(val block: (Int) -> Unit) {
-
-    fun onClick(trackIndex: Int) = block(trackIndex)
-}
-
-/**
- * Artistフォローボタンをクリックしたときの動作を定義
- *
- */
-class FollowOrUnFollowArtistClick(val block: (Int) -> Unit) {
-
-    fun onClick(artistIndex: Int) = block(artistIndex)
-}

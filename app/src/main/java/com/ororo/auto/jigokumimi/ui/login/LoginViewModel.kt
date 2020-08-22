@@ -6,12 +6,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.preference.PreferenceManager
+import com.github.javafaker.Bool
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.network.JigokumimiApi
+import com.ororo.auto.jigokumimi.network.SpotifyApi
+import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import com.ororo.auto.jigokumimi.util.demoRepositoryModule
 import com.ororo.auto.jigokumimi.util.repositoryModule
 import kotlinx.coroutines.launch
+import org.koin.core.context.KoinContextHandler.get
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import java.util.regex.Pattern
@@ -91,24 +98,27 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
         viewModelScope.launch {
             try {
 
-                // デモ用ユーザーのEmail､パスワードの場合はデモ用リポジトリに切り替え
-                if (email.value == getApplication<Application>().getString(R.string.test_email_text) &&
-                    password.value == getApplication<Application>().getString(R.string.test_password_text)
-                ) {
+                // デモ用ユーザーの場合はデモ用リポジトリに切り替え
+                if (isDemoUser()) {
                     unloadKoinModules(repositoryModule)
                     loadKoinModules(demoRepositoryModule)
-
                     _isDemo.postValue(true)
-                } else {
-                    authRepository.loginJigokumimi(email.value!!, password.value!!)
-                    _isLogin.postValue(true)
+                    authRepository = DemoAuthRepository(app)
                 }
+
+                authRepository.loginJigokumimi(email.value!!, password.value!!)
+                _isLogin.postValue(true)
 
             } catch (e: Exception) {
                 handleAuthException(e)
             }
             _isLoading.value = false
         }
+    }
+
+    private fun isDemoUser(): Boolean {
+        return email.value == getApplication<Application>().getString(R.string.test_email_text) &&
+                password.value == getApplication<Application>().getString(R.string.test_password_text)
     }
 
     /**
