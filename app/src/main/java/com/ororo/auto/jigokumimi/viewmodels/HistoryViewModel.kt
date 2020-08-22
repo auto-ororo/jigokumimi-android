@@ -130,6 +130,7 @@ class HistoryViewModel(
      * 検索履歴を削除する
      */
     fun deleteHistory(searchType: Constants.SearchType, historyIndex: Int) {
+        if (isLoading.value == true) return
         _isLoading.value = true
         viewModelScope.launch {
             try {
@@ -173,6 +174,7 @@ class HistoryViewModel(
      * 検索履歴の詳細を取得する
      */
     fun searchHistoryDetails(searchType: Constants.SearchType, historyIndex: Int) {
+        if (isLoading.value == true) return
         _isLoading.value = true
         viewModelScope.launch {
             try {

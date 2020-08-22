@@ -61,6 +61,11 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
         _signUpButtonEnabledState.addSource(email) { validateSignUp() }
         _signUpButtonEnabledState.addSource(password) { validateSignUp() }
         _signUpButtonEnabledState.addSource(passwordConfirmation) { validateSignUp() }
+
+        // 処理中はタップ不可
+        _signUpButtonEnabledState.addSource(isLoading) {
+            _signUpButtonEnabledState.value = !it
+        }
     }
 
     /**

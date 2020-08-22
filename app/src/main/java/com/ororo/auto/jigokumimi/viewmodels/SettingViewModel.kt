@@ -60,6 +60,11 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
         _changePasswordButtonEnabledState.addSource(currentPassword) { validateSignUp() }
         _changePasswordButtonEnabledState.addSource(newPassword) { validateSignUp() }
         _changePasswordButtonEnabledState.addSource(newPasswordConfirmation) { validateSignUp() }
+
+        // 処理中はタップ不可
+        _changePasswordButtonEnabledState.addSource(isLoading) {
+            _changePasswordButtonEnabledState.value = !it
+        }
     }
 
     /**

@@ -5,6 +5,7 @@
     tools:context=".ui.ResultFragment">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.ororo.auto.jigokumimi.viewmodels.HistoryViewModel" />

@@ -1,9 +1,7 @@
 package com.ororo.auto.jigokumimi.ui
 
 import android.view.View
-import android.view.WindowManager
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
@@ -23,48 +21,33 @@ open class BaseFragment(resId: Int) : Fragment(resId) {
 
         // エラー時にメッセージダイアログを表示
         // ｢OK｣タップ時の処理を併せて設定する
-        viewModel.isErrorDialogShown.observe(
-            viewLifecycleOwner,
-            Observer<Boolean> { isErrorDialogShown ->
-                if (isErrorDialogShown) {
-                    val dialog = MessageDialogFragment(
-                        getString(R.string.title_dialog_error),
-                        viewModel.errorMessage.value!!
-                    )
-                    dialog.setOnOkButtonClickListener(
-                        View.OnClickListener {
-                            viewModel.isErrorDialogShown.value = false
-                            dialog.dismiss()
-                        }
-                    )
-                    dialog.show(parentFragmentManager, "onFragment")
-                }
+        viewModel.isErrorDialogShown.observe(viewLifecycleOwner) { isErrorDialogShown ->
+            if (isErrorDialogShown) {
+                val dialog = MessageDialogFragment(
+                    getString(R.string.title_dialog_error),
+                    viewModel.errorMessage.value!!
+                )
+                dialog.setOnOkButtonClickListener(
+                    View.OnClickListener {
+                        viewModel.isErrorDialogShown.value = false
+                        dialog.dismiss()
+                    }
+                )
+                dialog.show(parentFragmentManager, "onFragment")
             }
-        )
+        }
 
         // Snackbarメッセージが設定された際にSnackbarを表示
-        viewModel.snackbarMessage.observe(
-            viewLifecycleOwner,
-            Observer {
-                if (it != "") {
-                    Snackbar.make(this.requireView(), it, Snackbar.LENGTH_SHORT).show()
-                    viewModel.showedSnackbar()
-                }
+        viewModel.snackbarMessage.observe(viewLifecycleOwner) {
+            if (it != "") {
+                Snackbar.make(this.requireView(), it, Snackbar.LENGTH_SHORT).show()
+                viewModel.showedSnackbar()
             }
-        )
+        }
 
         viewModel.isTokenExpired.observe(viewLifecycleOwner) {
             if (it) onTokenExpired(viewModel)
         }
-
-        viewModel.isLoading.observe(viewLifecycleOwner) {
-            if (it) {
-                activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            } else {
-                activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            }
-        }
-        activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 
     /**
