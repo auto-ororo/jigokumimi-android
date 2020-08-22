@@ -16,6 +16,16 @@
         android:layout_height="match_parent"
         tools:context=".ui.SignUpFragment">
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/indicator_height"
+            android:indeterminate="true"
+            android:invisibility="@{viewModel.isLoading}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/passwordConfirmSuggest"
@@ -30,10 +40,9 @@
             android:id="@+id/emailSuggest"
             style="@style/InputSuggestTextView"
             android:layout_marginStart="@dimen/spacing_m"
-            android:layout_marginTop="@dimen/spacing_m"
             android:text="@string/email_edit_suggest"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/progressBar" />
 
         <TextView
             android:id="@+id/passwordSuggest"
@@ -49,6 +58,7 @@
             style="@style/CommonEditText"
             android:layout_marginStart="@dimen/spacing_m"
             android:layout_marginEnd="@dimen/spacing_m"
+            android:enabled="@{!viewModel.isLoading}"
             android:hint="@string/email_hint"
             android:inputType="textEmailAddress"
             android:text="@={viewModel.email}"
@@ -61,6 +71,7 @@
             style="@style/CommonEditText"
             android:layout_marginStart="@dimen/spacing_m"
             android:layout_marginEnd="@dimen/spacing_m"
+            android:enabled="@{!viewModel.isLoading}"
             android:hint="@string/password_hint"
             android:inputType="textPassword"
             android:text="@={viewModel.password}"
@@ -73,6 +84,7 @@
             style="@style/CommonEditText"
             android:layout_marginStart="@dimen/spacing_m"
             android:layout_marginEnd="@dimen/spacing_m"
+            android:enabled="@{!viewModel.isLoading}"
             android:hint="@string/password_retype_hint"
             android:inputType="textPassword"
             android:text="@={viewModel.passwordConfirmation}"

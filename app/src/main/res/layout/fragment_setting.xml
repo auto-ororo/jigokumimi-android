@@ -16,15 +16,25 @@
         android:layout_height="match_parent"
         tools:context=".ui.SettingFragment">
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/indicator_height"
+            android:indeterminate="true"
+            android:invisibility="@{viewModel.isLoading}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <TextView
             android:id="@+id/currentPasswordSuggest"
             style="@style/InputSuggestTextView"
             android:layout_marginStart="@dimen/spacing_m"
-            android:layout_marginTop="@dimen/spacing_m"
             android:text="@string/current_password_edit_suggest"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
 
         <EditText
@@ -32,6 +42,7 @@
             style="@style/CommonEditText"
             android:layout_marginStart="@dimen/spacing_m"
             android:layout_marginEnd="@dimen/spacing_m"
+            android:enabled="@{!viewModel.isLoading}"
             android:hint="@string/current_password_hint"
             android:inputType="textPassword"
             android:text="@={viewModel.currentPassword}"
@@ -53,6 +64,7 @@
             style="@style/CommonEditText"
             android:layout_marginStart="@dimen/spacing_m"
             android:layout_marginEnd="@dimen/spacing_m"
+            android:enabled="@{!viewModel.isLoading}"
             android:hint="@string/new_password_hint"
             android:inputType="textPassword"
             android:text="@={viewModel.newPassword}"
@@ -75,6 +87,7 @@
             android:layout_marginStart="@dimen/spacing_m"
             android:layout_marginEnd="@dimen/spacing_m"
             android:hint="@string/new_password_retype_hint"
+            android:enabled="@{!viewModel.isLoading}"
             android:inputType="textPassword"
             android:text="@={viewModel.newPasswordConfirmation}"
             app:layout_constraintEnd_toEndOf="parent"
@@ -99,6 +112,7 @@
             android:layout_marginStart="@dimen/spacing_m"
             android:layout_marginEnd="@dimen/spacing_m"
             android:layout_marginBottom="@dimen/spacing_s"
+            android:enabled="@{!viewModel.isLoading}"
             android:text="@string/unregister_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

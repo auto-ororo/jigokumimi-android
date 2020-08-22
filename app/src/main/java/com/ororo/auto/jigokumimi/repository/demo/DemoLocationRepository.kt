@@ -5,6 +5,7 @@ import android.location.Location
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.util.*
@@ -14,6 +15,7 @@ class DemoLocationRepository(private val app: Application) : ILocationRepository
     val faker = Faker(Locale("jp_JP"))
 
     override fun getCurrentLocation(): Flow<Location> = callbackFlow {
+        delay(1000)
 
         val location = Location("test")
         location.latitude = faker.number().randomDouble(10, 2,5)

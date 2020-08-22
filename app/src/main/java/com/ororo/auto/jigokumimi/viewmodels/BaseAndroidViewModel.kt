@@ -31,6 +31,13 @@ open class BaseAndroidViewModel(
 ) : AndroidViewModel(application) {
 
     /**
+     * 処理中状態
+     */
+    protected var _isLoading = MutableLiveData<Boolean>()
+    val isLoading: MutableLiveData<Boolean>
+        get() = _isLoading
+
+    /**
      * エラーメッセージダイアログの表示状態
      */
     var isErrorDialogShown = MutableLiveData<Boolean>(false)

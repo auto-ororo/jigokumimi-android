@@ -60,6 +60,11 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
         _changePasswordButtonEnabledState.addSource(currentPassword) { validateSignUp() }
         _changePasswordButtonEnabledState.addSource(newPassword) { validateSignUp() }
         _changePasswordButtonEnabledState.addSource(newPasswordConfirmation) { validateSignUp() }
+
+        // 処理中はタップ不可
+        _changePasswordButtonEnabledState.addSource(isLoading) {
+            _changePasswordButtonEnabledState.value = !it
+        }
     }
 
     /**
@@ -109,6 +114,7 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
      * パスワード変更実行
      */
     fun changePassword() {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
                 authRepository.changeJigokumimiPassword(
@@ -118,9 +124,11 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
                         newPasswordConfirmation = newPasswordConfirmation.value!!
                     )
                 )
+                _isLoading.value = false
                 _changedPassword.value = true
             } catch (e: Exception) {
                 handleAuthException(e)
+                _isLoading.value = false
             }
         }
     }
@@ -129,12 +137,15 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
      * 登録解除実行
      */
     fun unregister() {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
                 authRepository.unregisterJigokumimiUser()
+                _isLoading.value = false
                 _isUnregistered.value = true
             } catch (e: Exception) {
                 handleAuthException(e)
+                _isLoading.value = false
             }
         }
     }

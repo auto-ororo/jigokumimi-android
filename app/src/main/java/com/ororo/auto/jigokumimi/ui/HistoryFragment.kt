@@ -32,7 +32,7 @@ import timber.log.Timber
 /**
  * 検索履歴画面
  */
-class HistoryFragment : Fragment(R.layout.fragment_history) {
+class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 
     private val viewModel: HistoryViewModel by sharedViewModel()
 
@@ -68,10 +68,21 @@ class HistoryFragment : Fragment(R.layout.fragment_history) {
                 title = titleStr
             }
         }
+        baseInit(viewModel)
+
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.progressBar.visibility = View.VISIBLE
+            } else {
+                binding.progressBar.visibility = View.INVISIBLE
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        viewModel.getSearchHistories(Constants.SearchType.ARTIST)
+        viewModel.getSearchHistories(Constants.SearchType.TRACK)
 
         Timber.d("HistoryFragment onResume Called")
     }
@@ -145,7 +156,7 @@ class TabAdapter(fm: FragmentManager, private val context: Context) :
 /**
  * 検索履歴の一覧を表示するFragment
  */
-class HistoryListFragment : BaseFragment(R.layout.fragment_history_list) {
+class HistoryListFragment : Fragment(R.layout.fragment_history_list) {
 
     private val viewModel: HistoryViewModel by sharedViewModel()
 
@@ -211,9 +222,6 @@ class HistoryListFragment : BaseFragment(R.layout.fragment_history_list) {
 
         searchType = arguments?.getSerializable("SearchType") as Constants.SearchType
 
-        viewModel.getSearchHistories(searchType)
-
-        baseInit(viewModel)
     }
 
     /**

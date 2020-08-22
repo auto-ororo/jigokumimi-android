@@ -11,6 +11,7 @@ import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.util.demo.CreateDemoDataUtil
+import kotlinx.coroutines.delay
 import java.util.*
 
 class DemoMusicRepository(
@@ -31,12 +32,14 @@ class DemoMusicRepository(
         location: Location,
         distance: Int
     ): Unit? {
+        delay(1000)
         tracks.postValue(cd.createDummyTrackList())
 
         return null
     }
 
     override suspend fun refreshTracksFromHistory(history: History): Unit? {
+        delay(1000)
 
         tracks.postValue(cd.createDummyTrackList())
 
@@ -44,6 +47,7 @@ class DemoMusicRepository(
     }
 
     override suspend fun refreshArtistsFromHistory(history: History): Unit? {
+        delay(1000)
 
         artists.postValue(cd.createDummyArtistList())
 
@@ -51,11 +55,13 @@ class DemoMusicRepository(
     }
 
     override suspend fun getMyFavoriteTracks(): GetMyFavoriteTracksResponse {
+        delay(1000)
 
         return cd.createDummyGetMyFavoriteTracksResponse()
     }
 
     override suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): CommonResponse {
+        delay(1000)
         return CommonResponse(
             data = null,
             message = faker.lorem().sentence()
@@ -67,16 +73,19 @@ class DemoMusicRepository(
         location: Location,
         distance: Int
     ): Unit? {
+        delay(1000)
 
         artists.postValue(cd.createDummyArtistList())
         return null
     }
 
     override suspend fun getMyFavoriteArtists(): GetMyFavoriteArtistsResponse {
+        delay(1000)
         return cd.createDummyGetMyFavoriteArtistsResponse()
     }
 
     override suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): CommonResponse {
+        delay(1000)
         return CommonResponse(
             data = null,
             message = faker.lorem().sentence()
@@ -90,6 +99,7 @@ class DemoMusicRepository(
     }
 
     override suspend fun getArtistsAroundSearchHistories(userId: String): GetArtistSearchHistoryResponse {
+        delay(1000)
         return GetArtistSearchHistoryResponse(
             data = cd.createDummyArtistHistoryList(),
             message = faker.lorem().characters()
@@ -97,6 +107,7 @@ class DemoMusicRepository(
     }
 
     override suspend fun getTracksAroundSearchHistories(userId: String): GetTrackSearchHistoryResponse {
+        delay(1000)
         return GetTrackSearchHistoryResponse(
             data = cd.createDummyTrackHistoryList(),
             message = faker.lorem().characters()
@@ -104,6 +115,7 @@ class DemoMusicRepository(
     }
 
     override suspend fun deleteArtistsAroundSearchHistories(userId: String): CommonResponse {
+        delay(1000)
         return CommonResponse(
             data = null,
             message = faker.lorem().characters()
@@ -111,6 +123,7 @@ class DemoMusicRepository(
     }
 
     override suspend fun deleteTracksAroundSearchHistories(userId: String): CommonResponse {
+        delay(1000)
         return CommonResponse(
             data = null,
             message = faker.lorem().characters()

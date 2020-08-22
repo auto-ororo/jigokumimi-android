@@ -40,6 +40,16 @@ fun toggleFavoriteButton(view: ImageButton, isDeleted: Boolean) {
     }
 }
 
+@BindingAdapter("android:visibility")
+fun setVisibility(view: View, value: Boolean) {
+    view.visibility = if (value) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("android:invisibility")
+fun setInvisibility(view: View, value: Boolean) {
+    view.visibility = if (value) View.VISIBLE else View.INVISIBLE
+}
+
 @BindingAdapter("trackListForRankTrack", "trackIndexForRankTrack", requireAll = false)
 fun setRankTrackNameText(view: TextView, trackList: List<Track>?, trackIndex: Int) {
 

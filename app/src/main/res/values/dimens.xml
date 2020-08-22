@@ -24,6 +24,9 @@
     <dimen name="text_size_xl">36sp</dimen>
     <dimen name="text_size_app_name">60sp</dimen>
 
+    <!-- indicatorの大きさ -->
+    <dimen name="indicator_height">16dp</dimen>
+
     <!-- 枠線 -->
     <dimen name="divider_offset">10dp</dimen>
     <dimen name="divider_height">1dp</dimen>
