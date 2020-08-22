@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.setting
 
 import android.os.Bundle
 import android.view.View
@@ -7,8 +7,9 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSettingBinding
+import com.ororo.auto.jigokumimi.ui.common.BaseFragment
+import com.ororo.auto.jigokumimi.ui.common.ConfirmDialogFragment
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.ororo.auto.jigokumimi.viewmodels.SettingViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**

@@ -13,7 +13,7 @@
 
         <variable
             name="followOrUnFollowCallback"
-            type="com.ororo.auto.jigokumimi.ui.FollowOrUnFollowArtistClick" />
+            type="com.ororo.auto.jigokumimi.ui.result.FollowOrUnFollowArtistClick" />
 
         <variable
             name="position"

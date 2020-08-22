@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.history
 
 import android.content.Context
 import android.os.Bundle
@@ -22,9 +22,9 @@ import com.ororo.auto.jigokumimi.databinding.FragmentHistoryBinding
 import com.ororo.auto.jigokumimi.databinding.FragmentHistoryListBinding
 import com.ororo.auto.jigokumimi.databinding.HistoryItemBinding
 import com.ororo.auto.jigokumimi.domain.History
+import com.ororo.auto.jigokumimi.ui.common.BaseFragment
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.ororo.auto.jigokumimi.viewmodels.HistoryViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import timber.log.Timber
 
@@ -42,7 +42,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
         super.onViewCreated(view, savedInstanceState)
 
         // ViewPager､TabLayoutを設定
-        binding.pager.adapter = TabAdapter(
+        binding.pager.adapter = HistoryTabAdapter(
             childFragmentManager,
             requireActivity().applicationContext
         )
@@ -109,7 +109,7 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
 /**
  * Fragmentの切り替えを行うAdapter
  */
-class TabAdapter(fm: FragmentManager, private val context: Context) :
+class HistoryTabAdapter(fm: FragmentManager, private val context: Context) :
     FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     /**
@@ -119,14 +119,16 @@ class TabAdapter(fm: FragmentManager, private val context: Context) :
         return when (position) {
             0 -> {
                 val bundle = Bundle()
-                val fragment = HistoryListFragment()
+                val fragment =
+                    HistoryListFragment()
                 bundle.putSerializable("SearchType", Constants.SearchType.TRACK)
                 fragment.arguments = bundle
                 fragment
             }
             else -> {
                 val bundle = Bundle()
-                val fragment = HistoryListFragment()
+                val fragment =
+                    HistoryListFragment()
                 bundle.putSerializable("SearchType", Constants.SearchType.ARTIST)
                 fragment.arguments = bundle
                 fragment
@@ -191,20 +193,23 @@ class HistoryListFragment : Fragment(R.layout.fragment_history_list) {
         binding.viewModel = viewModel
 
         // 履歴がタップされたときのコールバックを設定
-        val historyClickCallback = HistoryClick { historyIndex: Int ->
-            onHistoryClicked(searchType, historyIndex)
-        }
+        val historyClickCallback =
+            HistoryClick { historyIndex: Int ->
+                onHistoryClicked(searchType, historyIndex)
+            }
 
         // 履歴削除がタップされたときのコールバックを設定
-        val deleteHistoryClickCallback = HistoryClick { historyIndex: Int ->
-            onDeleteHistoryClicked(searchType, historyIndex)
-        }
+        val deleteHistoryClickCallback =
+            HistoryClick { historyIndex: Int ->
+                onDeleteHistoryClicked(searchType, historyIndex)
+            }
 
         // コールバックをコンストラクタに渡してアダプタを登録
-        viewModelAdapterHistory = HistoryTrackListAdapter(
-            historyClickCallback,
-            deleteHistoryClickCallback
-        )
+        viewModelAdapterHistory =
+            HistoryTrackListAdapter(
+                historyClickCallback,
+                deleteHistoryClickCallback
+            )
         binding.recyclerView.adapter = viewModelAdapterHistory
 
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
@@ -270,7 +275,9 @@ class HistoryTrackListAdapter(
             parent,
             false
         )
-        return HistoryListViewHolder(withDataBinding)
+        return HistoryListViewHolder(
+            withDataBinding
+        )
     }
 
     override fun getItemCount() = histories.size

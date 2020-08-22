@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.common
 
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -7,7 +7,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.util.Constants
-import com.ororo.auto.jigokumimi.viewmodels.BaseAndroidViewModel
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 
@@ -23,10 +22,11 @@ open class BaseFragment(resId: Int) : Fragment(resId) {
         // ｢OK｣タップ時の処理を併せて設定する
         viewModel.isErrorDialogShown.observe(viewLifecycleOwner) { isErrorDialogShown ->
             if (isErrorDialogShown) {
-                val dialog = MessageDialogFragment(
-                    getString(R.string.title_dialog_error),
-                    viewModel.errorMessage.value!!
-                )
+                val dialog =
+                    MessageDialogFragment(
+                        getString(R.string.title_dialog_error),
+                        viewModel.errorMessage.value!!
+                    )
                 dialog.setOnOkButtonClickListener(
                     View.OnClickListener {
                         viewModel.isErrorDialogShown.value = false

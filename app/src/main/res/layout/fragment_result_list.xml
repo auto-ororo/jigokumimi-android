@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.ResultFragment">
+    tools:context=".ui.result.ResultFragment">
 
     <data>
 
@@ -10,7 +10,7 @@
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.ResultViewModel" />
+            type="com.ororo.auto.jigokumimi.ui.result.ResultViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,7 +32,7 @@
 
         <fragment
             android:id="@+id/miniPlayerLayoutContainer"
-            android:name="com.ororo.auto.jigokumimi.ui.MiniPlayerFragment"
+            android:name="com.ororo.auto.jigokumimi.ui.result.MiniPlayerFragment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"

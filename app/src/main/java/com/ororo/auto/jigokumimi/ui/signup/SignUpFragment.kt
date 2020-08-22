@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.signup
 
 import android.os.Bundle
 import android.view.View
@@ -6,8 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSignUpBinding
+import com.ororo.auto.jigokumimi.ui.common.BaseFragment
+import com.ororo.auto.jigokumimi.ui.common.MessageDialogFragment
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.ororo.auto.jigokumimi.viewmodels.SignUpViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**

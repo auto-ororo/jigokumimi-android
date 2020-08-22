@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.login
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -11,9 +11,9 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentLoginBinding
+import com.ororo.auto.jigokumimi.ui.common.BaseFragment
 import com.ororo.auto.jigokumimi.util.Constants.Companion.REQUEST_PERMISSION
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.ororo.auto.jigokumimi.viewmodels.LoginViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**

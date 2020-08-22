@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.viewmodels
+package com.ororo.auto.jigokumimi.ui.login
 
 import android.app.Application
 import android.util.Patterns
@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import com.ororo.auto.jigokumimi.util.demoRepositoryModule
 import com.ororo.auto.jigokumimi.util.repositoryModule
 import kotlinx.coroutines.launch

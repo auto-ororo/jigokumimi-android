@@ -7,14 +7,14 @@
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.LoginViewModel" />
+            type="com.ororo.auto.jigokumimi.ui.login.LoginViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/consdtraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.LoginFragment">
+        tools:context=".ui.login.LoginFragment">
 
         <ProgressBar
             android:id="@+id/progressBar"

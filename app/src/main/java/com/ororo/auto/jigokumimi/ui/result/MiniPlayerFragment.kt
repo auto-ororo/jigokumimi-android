@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.result
 
 import android.os.Bundle
 import android.view.GestureDetector
@@ -15,7 +15,6 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
 import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.util.setFavIconFromTrackList
-import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
 import kotlinx.android.synthetic.main.fragment_mini_player.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.LoginFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.login.LoginFragment"
         android:label="LoginFragment" >
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
@@ -20,7 +20,7 @@
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.SignUpFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.signup.SignUpFragment"
         android:label="SignUpFragment" >
         <action
             android:id="@+id/action_signUpFragment_to_searchFragment"
@@ -30,7 +30,7 @@
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.SearchFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.search.SearchFragment"
         android:label="SearchFragment">
         <action
             android:id="@+id/action_searchFragment_to_resultFragment"
@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/resultFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.ResultFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.result.ResultFragment"
         android:label="Result"
         tools:layout="@layout/fragment_result_list" >
         <argument
@@ -53,7 +53,7 @@
     </fragment>
     <fragment
         android:id="@+id/historyFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.HistoryFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.history.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_history" >
         <action
@@ -64,7 +64,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.ororo.auto.jigokumimi.ui.SettingFragment"
+        android:name="com.ororo.auto.jigokumimi.ui.setting.SettingFragment"
         android:label="SettingFragment" >
         <action
             android:id="@+id/action_settingFragment_to_loginFragment"

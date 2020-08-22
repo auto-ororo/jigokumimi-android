@@ -15,6 +15,7 @@ import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeMusicRepository
+import com.ororo.auto.jigokumimi.ui.search.SearchViewModel
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
 import getOrAwaitValue
 import io.mockk.every

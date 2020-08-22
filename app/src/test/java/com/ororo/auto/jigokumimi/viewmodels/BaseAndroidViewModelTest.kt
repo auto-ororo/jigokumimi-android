@@ -6,6 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import getOrAwaitValue
 import io.mockk.mockk
 import okhttp3.MediaType
@@ -36,7 +37,10 @@ class BaseAndroidViewModelTest {
     fun createViewModel() {
         authRepository = mockk(relaxed = true)
         viewModel =
-            BaseAndroidViewModel(ApplicationProvider.getApplicationContext(), authRepository)
+            BaseAndroidViewModel(
+                ApplicationProvider.getApplicationContext(),
+                authRepository
+            )
 
     }
 

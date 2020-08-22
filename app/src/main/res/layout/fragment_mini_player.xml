@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.ResultViewModel" />
+            type="com.ororo.auto.jigokumimi.ui.result.ResultViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +18,7 @@
         android:layout_height="@dimen/size_l"
         android:background="@color/colorPrimary"
         android:visibility="visible"
-        tools:context=".ui.MiniPlayerFragment">
+        tools:context=".ui.result.MiniPlayerFragment">
 
 
         <TextView

@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.search
 
 import android.os.Bundle
 import android.view.View
@@ -9,10 +9,10 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSearchBinding
+import com.ororo.auto.jigokumimi.ui.common.BaseFragment
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.Util
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.ororo.auto.jigokumimi.viewmodels.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 

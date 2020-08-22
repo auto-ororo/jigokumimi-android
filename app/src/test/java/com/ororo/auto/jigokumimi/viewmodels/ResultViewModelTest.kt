@@ -11,6 +11,7 @@ import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.faker.FakeMusicRepository
+import com.ororo.auto.jigokumimi.ui.result.ResultViewModel
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
 import getOrAwaitValue
 import io.mockk.every

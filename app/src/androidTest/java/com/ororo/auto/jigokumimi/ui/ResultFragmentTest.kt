@@ -26,9 +26,13 @@ import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
+import com.ororo.auto.jigokumimi.ui.history.HistoryListViewHolder
+import com.ororo.auto.jigokumimi.ui.result.ResultArtistListViewHolder
+import com.ororo.auto.jigokumimi.ui.result.ResultFragment
+import com.ororo.auto.jigokumimi.ui.result.ResultTrackListViewHolder
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateAndroidTestDataUtil
-import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
+import com.ororo.auto.jigokumimi.ui.result.ResultViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.android.synthetic.main.result_artist_item.view.*
@@ -71,7 +75,13 @@ class ResultFragmentTest {
             factory { authRepository }
         },
         module {
-            factory { ResultViewModel(androidApplication(), get(), get()) }
+            factory {
+                ResultViewModel(
+                    androidApplication(),
+                    get(),
+                    get()
+                )
+            }
         }
     )
 

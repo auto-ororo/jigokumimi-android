@@ -1,8 +1,9 @@
-package com.ororo.auto.jigokumimi.viewmodels
+package com.ororo.auto.jigokumimi.ui
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import kotlinx.coroutines.launch
 
 class MainViewModel(

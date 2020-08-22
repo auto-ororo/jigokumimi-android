@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.result
 
 
 import android.os.Bundle
@@ -20,9 +20,9 @@ import com.ororo.auto.jigokumimi.databinding.ResultArtistItemBinding
 import com.ororo.auto.jigokumimi.databinding.ResultTrackItemBinding
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
+import com.ororo.auto.jigokumimi.ui.common.BaseFragment
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.ororo.auto.jigokumimi.viewmodels.ResultViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 /**
@@ -78,20 +78,23 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
         if (args.searchType == Constants.SearchType.TRACK) {
 
             // キューアイコンがタップされたときのコールバックを設定
-            val playCallback = PlayTrackClick { index: Int ->
-                onQueueButtonClicked(index)
-            }
+            val playCallback =
+                PlayTrackClick { index: Int ->
+                    onQueueButtonClicked(index)
+                }
 
             // Track追加ボタンがタップされたときのコールバックを設定
-            val saveOrRemoveCallback = SaveOrRemoveTrackClick { trackIndex: Int ->
-                onSaveOrRemoveButtonClicked(trackIndex)
-            }
+            val saveOrRemoveCallback =
+                SaveOrRemoveTrackClick { trackIndex: Int ->
+                    onSaveOrRemoveButtonClicked(trackIndex)
+                }
 
             // コールバックをコンストラクタに渡してアダプタを登録
-            viewModelAdapterTrack = ResultTrackListAdapter(
-                playCallback,
-                saveOrRemoveCallback
-            )
+            viewModelAdapterTrack =
+                ResultTrackListAdapter(
+                    playCallback,
+                    saveOrRemoveCallback
+                )
             binding.recyclerView.adapter = viewModelAdapterTrack
 
             // データが変更された際にAdapterに検知
@@ -102,12 +105,16 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
         } else {
 
             // Artistフォローボタンがタップされたときのコールバックを設定
-            val followOrUnFollowCallback = FollowOrUnFollowArtistClick { artistIndex: Int ->
-                onFollowOrUnFollowButtonClicked(artistIndex)
-            }
+            val followOrUnFollowCallback =
+                FollowOrUnFollowArtistClick { artistIndex: Int ->
+                    onFollowOrUnFollowButtonClicked(artistIndex)
+                }
 
             // コールバックをコンストラクタに渡してアダプタを登録
-            viewModelAdapterArtist = ResultArtistListAdapter(followOrUnFollowCallback)
+            viewModelAdapterArtist =
+                ResultArtistListAdapter(
+                    followOrUnFollowCallback
+                )
             binding.recyclerView.adapter = viewModelAdapterArtist
 
 
@@ -191,7 +198,9 @@ class ResultTrackListAdapter(
             parent,
             false
         )
-        return ResultTrackListViewHolder(withDataBinding)
+        return ResultTrackListViewHolder(
+            withDataBinding
+        )
     }
 
     override fun getItemCount() = tracks.size
@@ -247,7 +256,9 @@ class ResultArtistListAdapter(val followOrUnFollowArtistCallback: FollowOrUnFoll
             parent,
             false
         )
-        return ResultArtistListViewHolder(withDataBinding)
+        return ResultArtistListViewHolder(
+            withDataBinding
+        )
     }
 
     override fun getItemCount() = artists.size

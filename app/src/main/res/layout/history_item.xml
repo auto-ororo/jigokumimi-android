@@ -14,11 +14,11 @@
 
         <variable
             name="historyClickCallback"
-            type="com.ororo.auto.jigokumimi.ui.HistoryClick" />
+            type="com.ororo.auto.jigokumimi.ui.history.HistoryClick" />
 
         <variable
             name="deleteHistoryClickCallback"
-            type="com.ororo.auto.jigokumimi.ui.HistoryClick" />
+            type="com.ororo.auto.jigokumimi.ui.history.HistoryClick" />
 
         <variable
             name="position"

@@ -7,9 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
@@ -20,9 +18,9 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.ActivityMainBinding
+import com.ororo.auto.jigokumimi.ui.common.MessageDialogFragment
 import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.ororo.auto.jigokumimi.viewmodels.MainViewModel
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -44,10 +42,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         // エラー時にメッセージダイアログを表示
         viewModel.isErrorDialogShown.observe(this) { isErrorDialogShown ->
             if (isErrorDialogShown) {
-                val dialog = MessageDialogFragment(
-                    getString(R.string.title_dialog_error),
-                    viewModel.errorMessage.value!!
-                )
+                val dialog =
+                    MessageDialogFragment(
+                        getString(R.string.title_dialog_error),
+                        viewModel.errorMessage.value!!
+                    )
                 dialog.setOnOkButtonClickListener(
                     View.OnClickListener {
                         viewModel.isErrorDialogShown.value = false

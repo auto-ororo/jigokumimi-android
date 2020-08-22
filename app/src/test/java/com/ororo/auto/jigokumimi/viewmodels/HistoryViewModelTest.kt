@@ -12,6 +12,7 @@ import com.ororo.auto.jigokumimi.network.GetTrackSearchHistoryResponse
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
+import com.ororo.auto.jigokumimi.ui.history.HistoryViewModel
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateTestDataUtil
 import com.ororo.auto.jigokumimi.util.MockkHelper.Companion.any

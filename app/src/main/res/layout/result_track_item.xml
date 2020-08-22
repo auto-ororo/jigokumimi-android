@@ -14,11 +14,11 @@
 
         <variable
             name="playCallback"
-            type="com.ororo.auto.jigokumimi.ui.PlayTrackClick" />
+            type="com.ororo.auto.jigokumimi.ui.result.PlayTrackClick" />
 
         <variable
             name="saveOrRemoveCallback"
-            type="com.ororo.auto.jigokumimi.ui.SaveOrRemoveTrackClick" />
+            type="com.ororo.auto.jigokumimi.ui.result.SaveOrRemoveTrackClick" />
 
         <variable
             name="position"
