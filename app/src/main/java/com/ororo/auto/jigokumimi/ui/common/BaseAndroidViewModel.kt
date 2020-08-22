@@ -26,7 +26,7 @@ import java.io.IOException
  */
 open class BaseAndroidViewModel(
     application: Application,
-    val authRepository: IAuthRepository
+    var authRepository: IAuthRepository
 ) : AndroidViewModel(application) {
 
     /**

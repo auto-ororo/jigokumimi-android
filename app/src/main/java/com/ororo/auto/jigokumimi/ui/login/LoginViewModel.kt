@@ -142,5 +142,10 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
         unloadKoinModules(demoRepositoryModule)
         unloadKoinModules(repositoryModule)
         loadKoinModules(repositoryModule)
+        authRepository = AuthRepository(
+            PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
+            JigokumimiApi.retrofitService,
+            SpotifyApi.retrofitService
+        )
     }
 }
