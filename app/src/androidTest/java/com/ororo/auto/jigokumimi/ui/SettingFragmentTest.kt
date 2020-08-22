@@ -13,7 +13,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
-import com.ororo.auto.jigokumimi.viewmodels.SettingViewModel
+import com.ororo.auto.jigokumimi.ui.setting.SettingFragment
+import com.ororo.auto.jigokumimi.ui.setting.SettingViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -45,7 +46,12 @@ class SettingFragmentTest {
             factory { repository }
         },
         module {
-            factory { SettingViewModel(androidApplication(), get()) }
+            factory {
+                SettingViewModel(
+                    androidApplication(),
+                    get()
+                )
+            }
         }
     )
 

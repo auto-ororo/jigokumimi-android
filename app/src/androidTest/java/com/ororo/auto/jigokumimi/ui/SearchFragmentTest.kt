@@ -16,9 +16,10 @@ import com.ororo.auto.jigokumimi.network.CommonResponse
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
+import com.ororo.auto.jigokumimi.ui.search.SearchFragment
 import com.ororo.auto.jigokumimi.util.Constants
 import com.ororo.auto.jigokumimi.util.CreateAndroidTestDataUtil
-import com.ororo.auto.jigokumimi.viewmodels.SearchViewModel
+import com.ororo.auto.jigokumimi.ui.search.SearchViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -62,7 +63,14 @@ class SearchFragmentTest {
             factory { locationRepository }
         },
         module {
-            factory { SearchViewModel(androidApplication(), get(), get(), get()) }
+            factory {
+                SearchViewModel(
+                    androidApplication(),
+                    get(),
+                    get(),
+                    get()
+                )
+            }
         }
     )
 

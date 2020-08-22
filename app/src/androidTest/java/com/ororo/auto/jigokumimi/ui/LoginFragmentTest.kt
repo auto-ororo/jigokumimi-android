@@ -13,7 +13,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
-import com.ororo.auto.jigokumimi.viewmodels.LoginViewModel
+import com.ororo.auto.jigokumimi.ui.login.LoginFragment
+import com.ororo.auto.jigokumimi.ui.login.LoginViewModel
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -45,7 +46,12 @@ class LoginFragmentTest {
             factory { repository }
         },
         module {
-            factory { LoginViewModel(androidApplication(), get()) }
+            factory {
+                LoginViewModel(
+                    androidApplication(),
+                    get()
+                )
+            }
         }
     )
 

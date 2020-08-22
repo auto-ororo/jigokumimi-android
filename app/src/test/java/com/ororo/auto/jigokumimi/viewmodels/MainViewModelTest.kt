@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.ui.MainViewModel
 import com.ororo.auto.jigokumimi.util.MockkHelper.Companion.any
 import io.mockk.every
 import io.mockk.mockk

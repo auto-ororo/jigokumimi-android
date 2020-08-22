@@ -12,7 +12,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
-import com.ororo.auto.jigokumimi.viewmodels.SignUpViewModel
+import com.ororo.auto.jigokumimi.ui.signup.SignUpFragment
+import com.ororo.auto.jigokumimi.ui.signup.SignUpViewModel
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -42,7 +43,12 @@ class SighUpFragmentTest {
             factory { repository }
         },
         module {
-            factory { SignUpViewModel(androidApplication(), get()) }
+            factory {
+                SignUpViewModel(
+                    androidApplication(),
+                    get()
+                )
+            }
         }
     )
 

@@ -7,14 +7,14 @@
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.SettingViewModel" />
+            type="com.ororo.auto.jigokumimi.ui.setting.SettingViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.SettingFragment">
+        tools:context=".ui.setting.SettingFragment">
 
         <ProgressBar
             android:id="@+id/progressBar"

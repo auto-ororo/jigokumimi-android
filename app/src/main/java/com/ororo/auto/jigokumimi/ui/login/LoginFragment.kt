@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.login
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -11,9 +11,11 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentLoginBinding
+import com.ororo.auto.jigokumimi.ui.MainViewModel
+import com.ororo.auto.jigokumimi.ui.common.BaseFragment
 import com.ororo.auto.jigokumimi.util.Constants.Companion.REQUEST_PERMISSION
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.ororo.auto.jigokumimi.viewmodels.LoginViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -22,6 +24,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
     private val viewModel: LoginViewModel by viewModel()
+
+    private val mainViewModel : MainViewModel by sharedViewModel()
 
     private val binding by dataBinding<FragmentLoginBinding>()
 
@@ -57,6 +61,8 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
         // リポジトリを初期化
         viewModel.initRepository()
+        // MainViewModelのリポジトリ初期化
+        mainViewModel.setAuthRepository()
 
         // ドロワーアイコンを非表示
         if (activity is AppCompatActivity) {
@@ -137,9 +143,10 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
     /**
      *  デモモード切り替え成功時の処理
-     *  検索画面に遷移する
+     *  MainViewModelのリポジトリをデモ用に設定して検索画面に遷移する
      */
     private fun onDemoSucceed() {
+        mainViewModel.setDemoAuthRepository()
         this.findNavController()
             .navigate(LoginFragmentDirections.actionLoginFragmentToSearchFragment())
         viewModel.doneDemo()

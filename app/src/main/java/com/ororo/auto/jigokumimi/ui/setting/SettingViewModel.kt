@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.viewmodels
+package com.ororo.auto.jigokumimi.ui.setting
 
 import android.app.Application
 import androidx.lifecycle.LiveData
@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.network.ChangePasswordRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 

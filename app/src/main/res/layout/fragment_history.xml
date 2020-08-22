@@ -7,14 +7,14 @@
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.HistoryViewModel" />
+            type="com.ororo.auto.jigokumimi.ui.history.HistoryViewModel" />
 
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.HistoryFragment">
+        tools:context=".ui.history.HistoryFragment">
 
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/pager"

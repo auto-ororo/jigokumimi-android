@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.ui
+package com.ororo.auto.jigokumimi.ui.common
 
 import android.app.AlertDialog
 import android.app.Dialog

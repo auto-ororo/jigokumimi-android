@@ -8,6 +8,7 @@ import com.github.javafaker.Faker
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.SignUpRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
+import com.ororo.auto.jigokumimi.ui.signup.SignUpViewModel
 import getOrAwaitValue
 import io.mockk.every
 import io.mockk.mockk

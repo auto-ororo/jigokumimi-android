@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.viewmodels
+package com.ororo.auto.jigokumimi.ui.history
 
 import android.app.Application
 import androidx.lifecycle.LiveData
@@ -10,6 +10,7 @@ import com.ororo.auto.jigokumimi.domain.HistoryItem
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
+import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.launch
 

@@ -7,14 +7,14 @@
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.viewmodels.SearchViewModel" />
+            type="com.ororo.auto.jigokumimi.ui.search.SearchViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.SearchFragment">
+        tools:context=".ui.search.SearchFragment">
 
         <ProgressBar
             android:id="@+id/progressBar"

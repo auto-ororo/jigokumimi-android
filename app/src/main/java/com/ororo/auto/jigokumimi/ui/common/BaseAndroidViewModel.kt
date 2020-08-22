@@ -1,4 +1,4 @@
-package com.ororo.auto.jigokumimi.viewmodels
+package com.ororo.auto.jigokumimi.ui.common
 
 import android.app.Application
 import android.net.Uri
@@ -8,7 +8,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
 import com.ororo.auto.jigokumimi.util.Constants
@@ -27,7 +26,7 @@ import java.io.IOException
  */
 open class BaseAndroidViewModel(
     application: Application,
-    val authRepository: IAuthRepository
+    var authRepository: IAuthRepository
 ) : AndroidViewModel(application) {
 
     /**
