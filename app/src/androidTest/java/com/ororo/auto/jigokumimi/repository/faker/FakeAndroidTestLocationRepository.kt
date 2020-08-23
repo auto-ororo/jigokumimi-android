@@ -13,15 +13,13 @@ class FakeAndroidTestLocationRepository(
     exception: Exception? = null
 ) : ILocationRepository, BaseFakeAndroidTestRepository(exception) {
 
-    override fun getCurrentLocation(): Flow<Location> = callbackFlow {
+    override suspend fun getCurrentLocation(): Location  {
         launchExceptionByErrorMode()
 
         val location = Location("test")
         location.latitude = latitude
         location.longitude = longitude
-        offer(location)
-        awaitClose {
-        }
+        return location
     }
 
     override fun getPlaceName(latitude: Double, longitude: Double): String {

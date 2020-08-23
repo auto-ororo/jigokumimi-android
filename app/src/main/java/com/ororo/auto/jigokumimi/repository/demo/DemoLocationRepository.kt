@@ -14,15 +14,13 @@ class DemoLocationRepository(private val app: Application) : ILocationRepository
 
     val faker = Faker(Locale("jp_JP"))
 
-    override fun getCurrentLocation(): Flow<Location> = callbackFlow {
+    override suspend fun getCurrentLocation(): Location  {
         delay(1000)
 
         val location = Location("test")
         location.latitude = faker.number().randomDouble(10, 2,5)
         location.longitude = faker.number().randomDouble(10, 2,5)
-        offer(location)
-        awaitClose {
-        }
+        return location
     }
 
     override fun getPlaceName(latitude: Double, longitude: Double): String {
