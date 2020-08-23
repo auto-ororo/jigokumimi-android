@@ -1,21 +1,27 @@
 package com.ororo.auto.jigokumimi.repository
 
+import android.Manifest
 import android.app.Application
+import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.ororo.auto.jigokumimi.R
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.lang.Exception
 import java.util.*
+import kotlin.coroutines.resume
 
 class LocationRepository(
-    application: Application
+    private val application: Application
 ) : ILocationRepository {
 
     val fusedLocationClient: FusedLocationProviderClient = FusedLocationProviderClient(application)
@@ -25,24 +31,29 @@ class LocationRepository(
     /**
      * 現在の位置情報を取得する
      */
-    override fun getCurrentLocation(): Flow<Location> = callbackFlow {
-        val request = LocationRequest().also {
-            it.interval = 500
-            it.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
-        val callback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult?) {
-                super.onLocationResult(locationResult)
-                val location = locationResult?.lastLocation ?: return
-                offer(location)
-                fusedLocationClient.removeLocationUpdates(this)
+    override suspend fun getCurrentLocation(): Location =
+        suspendCancellableCoroutine { continuation ->
+            val request = LocationRequest().also {
+                it.interval = 500
+                it.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+            }
+            if (ActivityCompat.checkSelfPermission(
+                    application,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                fusedLocationClient.requestLocationUpdates(request, object : LocationCallback() {
+                    override fun onLocationResult(locationResult: LocationResult?) {
+                        super.onLocationResult(locationResult)
+                        val location = locationResult?.lastLocation ?: return
+                        continuation.resume(location)
+                        fusedLocationClient.removeLocationUpdates(this)
+                    }
+                }, null)
+            } else {
+                throw Throwable(application.applicationContext.getString(R.string.permission_denied_message))
             }
         }
-        fusedLocationClient.requestLocationUpdates(request, callback, null)
-        awaitClose {
-            fusedLocationClient.removeLocationUpdates(callback)
-        }
-    }
 
     /**
      * 緯度･経度から地点名を取得する
@@ -62,8 +73,8 @@ class LocationRepository(
                 result.append(it.locality)
             }
 
-        } catch (e:Exception) {
-           Timber.d(e.message)
+        } catch (e: Exception) {
+            Timber.d(e.message)
         }
 
         return result.toString()

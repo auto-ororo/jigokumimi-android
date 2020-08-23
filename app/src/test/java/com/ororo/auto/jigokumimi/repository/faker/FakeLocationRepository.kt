@@ -17,19 +17,17 @@ class FakeLocationRepository(
     exception: Exception? = null
 ) : ILocationRepository, BaseFakeRepository(exception) {
 
-    override fun getCurrentLocation(): Flow<Location> = callbackFlow {
+    override suspend fun getCurrentLocation(): Location {
         launchExceptionByErrorMode()
 
         val location = Location("test")
         location.latitude = latitude
         location.longitude = longitude
-        offer(location)
-        awaitClose {
-        }
+        return location
     }
 
     override fun getPlaceName(latitude: Double, longitude: Double): String {
-       val placeList = listOf(
+        val placeList = listOf(
             "東京都墨田区押上1-1-2",
             "東京都港区芝公園4-2-8",
             "大阪府大阪市浪速区恵美須東1-18-6",
