@@ -31,11 +31,11 @@ class SignUpFragment : BaseFragment(R.layout.fragment_sign_up) {
         }
 
         // LiveDataの監視
-        viewModel.isLogin.observe(viewLifecycleOwner) {
-            if (it) onLoginSucceed()
+        viewModel.loginFinished.observe(viewLifecycleOwner) {
+            onLoginSucceed()
         }
-        viewModel.isSignUp.observe(viewLifecycleOwner) {
-            if (it) onSignUpSucceed()
+        viewModel.signUpFinished.observe(viewLifecycleOwner) {
+            onSignUpSucceed()
         }
         viewModel.signUpButtonEnabledState.observe(viewLifecycleOwner) {
             binding.signUpButton.isEnabled = it
@@ -76,7 +76,6 @@ class SignUpFragment : BaseFragment(R.layout.fragment_sign_up) {
         dialog.setOnOkButtonClickListener(
             View.OnClickListener {
                 dialog.dismiss()
-                viewModel.doneSignUp()
                 viewModel.login()
             }
         )
@@ -89,7 +88,6 @@ class SignUpFragment : BaseFragment(R.layout.fragment_sign_up) {
      */
     private fun onLoginSucceed() {
         authenticateSpotify(viewModel)
-        viewModel.doneLogin()
     }
 
 }

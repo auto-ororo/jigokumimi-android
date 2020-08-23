@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.network.SignUpRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
+import com.ororo.auto.jigokumimi.util.SingleLiveEvent
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
@@ -21,16 +22,16 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
     /**
      *  登録状態
      */
-    private var _isSignUp = MutableLiveData(false)
-    val isSignUp: LiveData<Boolean>
-        get() = _isSignUp
+    private var _signUpFinished = SingleLiveEvent<Unit>()
+    val signUpFinished: LiveData<Unit>
+        get() = _signUpFinished
 
     /**
      *  ログイン状態
      */
-    private var _isLogin = MutableLiveData(false)
-    val isLogin: LiveData<Boolean>
-        get() = _isLogin
+    private var _loginFinished = SingleLiveEvent<Unit>()
+    val loginFinished: LiveData<Unit>
+        get() = _loginFinished
 
     /**
      * Emailの入力内容を保持
@@ -126,7 +127,7 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
                     )
                 )
                 _isLoading.value = false
-                _isSignUp.value = true
+                _signUpFinished.call()
             } catch (e: Exception) {
                 handleAuthException(e)
                 _isLoading.value = false
@@ -143,25 +144,11 @@ class SignUpViewModel(application: Application, authRepository: IAuthRepository)
             try {
                 authRepository.loginJigokumimi(email.value!!, password.value!!)
                 _isLoading.value = false
-                _isLogin.value = true
+                _loginFinished.call()
             } catch (e: Exception) {
                 handleAuthException(e)
                 _isLoading.value = false
             }
         }
-    }
-
-    /**
-     * 新規登録後にフラグリセット
-     */
-    fun doneSignUp() {
-        _isSignUp.postValue(false)
-    }
-
-    /**
-     * ログイン後にフラグリセット
-     */
-    fun doneLogin() {
-        _isLogin.postValue(false)
     }
 }

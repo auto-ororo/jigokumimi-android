@@ -38,11 +38,11 @@ class SettingFragment : BaseFragment(R.layout.fragment_setting) {
         viewModel.changePasswordButtonEnabledState.observe(viewLifecycleOwner) {
             binding.changePasswordButton.isEnabled = it
         }
-        viewModel.isUnregistered.observe(viewLifecycleOwner) {
-            if (it) onUnregisterSucceed()
+        viewModel.unregistered.observe(viewLifecycleOwner) {
+            onUnregisterSucceed()
         }
-        viewModel.isChangedPassword.observe(viewLifecycleOwner) {
-            if (it) onChangePasswordSucceed()
+        viewModel.changedPassword.observe(viewLifecycleOwner) {
+            onChangePasswordSucceed()
         }
 
         // 入力項目のクリア
@@ -102,7 +102,6 @@ class SettingFragment : BaseFragment(R.layout.fragment_setting) {
      * 完了メッセージを表示後ログイン画面に遷移する
      */
     private fun onUnregisterSucceed() {
-        viewModel.doneUnregister()
         viewModel.showSnackbar(getString(R.string.success_unregister_message))
         this.findNavController()
             .navigate(SettingFragmentDirections.actionSettingFragmentToLoginFragment())
@@ -113,7 +112,6 @@ class SettingFragment : BaseFragment(R.layout.fragment_setting) {
      * 完了メッセージを表示後検索画面に遷移する
      */
     private fun onChangePasswordSucceed() {
-        viewModel.doneChangePassword()
         viewModel.showSnackbar(getString(R.string.success_change_password_message))
         this.findNavController()
             .navigate(SettingFragmentDirections.actionSettingFragmentToSearchFragment())

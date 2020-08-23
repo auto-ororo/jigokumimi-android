@@ -33,7 +33,7 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
         baseInit(viewModel)
 
         viewModel.isSearchFinished.observe(viewLifecycleOwner) {
-            if (it) onSearchFinished()
+            onSearchFinished()
         }
 
         viewModel.searchType.observe(viewLifecycleOwner) {
@@ -113,7 +113,6 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
      */
     private fun onSearchFinished() {
         Timber.d(this.findNavController().currentDestination.toString())
-        viewModel.doneSearchTracks()
         this.findNavController()
             .navigate(
                 SearchFragmentDirections.actionSearchFragmentToResultFragment(

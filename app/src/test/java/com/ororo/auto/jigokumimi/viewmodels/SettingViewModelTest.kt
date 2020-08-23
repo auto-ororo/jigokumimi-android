@@ -211,7 +211,7 @@ class SettingViewModelTest {
         }
 
         // パウワード変更フラグがtrueになること
-        val ret = viewModel.isChangedPassword.getOrAwaitValue()
+        val ret = viewModel.changedPassword.getOrAwaitValue()
         assertThat(ret, IsEqual(true))
     }
 
@@ -259,7 +259,7 @@ class SettingViewModelTest {
         }
 
         // 登録解除フラグがTrueになることを確認
-        val ret = viewModel.isUnregistered.getOrAwaitValue()
+        val ret = viewModel.unregistered.getOrAwaitValue()
         assertThat(ret, IsEqual(true))
     }
 
