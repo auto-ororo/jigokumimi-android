@@ -10,6 +10,7 @@ import com.ororo.auto.jigokumimi.repository.demo.DemoMusicRepository
 import com.ororo.auto.jigokumimi.ui.MainViewModel
 import com.ororo.auto.jigokumimi.ui.history.HistoryViewModel
 import com.ororo.auto.jigokumimi.ui.login.LoginViewModel
+import com.ororo.auto.jigokumimi.ui.result.MiniPlayerViewModel
 import com.ororo.auto.jigokumimi.ui.result.ResultViewModel
 import com.ororo.auto.jigokumimi.ui.search.SearchViewModel
 import com.ororo.auto.jigokumimi.ui.setting.SettingViewModel
@@ -63,6 +64,13 @@ val viewModelModule = module {
     }
     viewModel {
         ResultViewModel(
+            androidApplication(),
+            get(),
+            get()
+        )
+    }
+    viewModel {
+        MiniPlayerViewModel(
             androidApplication(),
             get(),
             get()

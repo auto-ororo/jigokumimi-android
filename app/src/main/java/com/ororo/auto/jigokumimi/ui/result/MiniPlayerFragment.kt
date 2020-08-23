@@ -24,7 +24,9 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
  */
 class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player) {
 
-    private val viewModel: ResultViewModel by sharedViewModel()
+    private val resultViewModel : ResultViewModel by sharedViewModel()
+
+    private val viewModel: MiniPlayerViewModel by sharedViewModel()
 
     private val binding by dataBinding<FragmentMiniPlayerBinding>()
 
@@ -60,7 +62,7 @@ class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player) {
             }
         }
 
-        viewModel.changeDataIndex.observe(viewLifecycleOwner) {
+        resultViewModel.changeDataIndex.observe(viewLifecycleOwner) {
             if (it == viewModel.playingTrackIndex.value) {
                 setFavIconFromTrackList(
                     binding.miniPlayerSaveTrackButton,
@@ -73,7 +75,7 @@ class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player) {
         // お気にり曲追加ボタン
         binding.miniPlayerSaveTrackButton.setOnClickListener {
             viewModel.playingTrackIndex.value?.let {
-                viewModel.changeTrackFavoriteState(it)
+                resultViewModel.changeTrackFavoriteState(it)
             }
         }
 
