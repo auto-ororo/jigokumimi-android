@@ -12,6 +12,7 @@ import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import com.ororo.auto.jigokumimi.util.Constants
+import com.ororo.auto.jigokumimi.util.SingleLiveEvent
 import kotlinx.coroutines.launch
 
 class HistoryViewModel(
@@ -35,8 +36,8 @@ class HistoryViewModel(
     /**
      *  検索完了フラグ
      */
-    private var _isSearchFinished = MutableLiveData(false)
-    val isSearchFinished: LiveData<Boolean>
+    private var _isSearchFinished = SingleLiveEvent<Unit>()
+    val isSearchFinished: LiveData<Unit>
         get() = _isSearchFinished
 
     /**
@@ -186,7 +187,7 @@ class HistoryViewModel(
                         _distance.value = history.distance
                         _searchDateTime.value = history.createdAt
                         _isLoading.value = false
-                        _isSearchFinished.postValue(true)
+                        _isSearchFinished.call()
                     }
                 } else {
                     artistHistoryList.value?.get(historyIndex)?.let { history ->
@@ -194,7 +195,7 @@ class HistoryViewModel(
                         _distance.value = history.distance
                         _searchDateTime.value = history.createdAt
                         _isLoading.value = false
-                        _isSearchFinished.postValue(true)
+                        _isSearchFinished.call()
                     }
                 }
             } catch (e: Exception) {
@@ -202,12 +203,5 @@ class HistoryViewModel(
                 handleConnectException(e)
             }
         }
-    }
-
-    /**
-     * 検索完了フラグをリセット
-     */
-    fun doneSearchMusic() {
-        _isSearchFinished.postValue(false)
     }
 }

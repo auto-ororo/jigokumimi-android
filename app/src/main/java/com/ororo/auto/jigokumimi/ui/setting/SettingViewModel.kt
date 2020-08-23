@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.network.ChangePasswordRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
+import com.ororo.auto.jigokumimi.util.SingleLiveEvent
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
@@ -20,16 +21,16 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
     /**
      *  パスワード変更状態
      */
-    private var _changedPassword = MutableLiveData(false)
-    val isChangedPassword: LiveData<Boolean>
+    private var _changedPassword = SingleLiveEvent<Unit>()
+    val changedPassword: LiveData<Unit>
         get() = _changedPassword
 
     /**
      *  登録解除状態
      */
-    private var _isUnregistered = MutableLiveData(false)
-    val isUnregistered: LiveData<Boolean>
-        get() = _isUnregistered
+    private var _unregistered = SingleLiveEvent<Unit>()
+    val unregistered: LiveData<Unit>
+        get() = _unregistered
 
     /**
      * 現在のPasswordの入力内容を保持
@@ -126,7 +127,7 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
                     )
                 )
                 _isLoading.value = false
-                _changedPassword.value = true
+                _changedPassword.call()
             } catch (e: Exception) {
                 handleAuthException(e)
                 _isLoading.value = false
@@ -143,25 +144,11 @@ class SettingViewModel(application: Application, authRepository: IAuthRepository
             try {
                 authRepository.unregisterJigokumimiUser()
                 _isLoading.value = false
-                _isUnregistered.value = true
+                _unregistered.call()
             } catch (e: Exception) {
                 handleAuthException(e)
                 _isLoading.value = false
             }
         }
-    }
-
-    /**
-     * パスワード変更後にフラグリセット
-     */
-    fun doneChangePassword() {
-        _changedPassword.postValue(false)
-    }
-
-    /**
-     * 登録解除後にフラグリセット
-     */
-    fun doneUnregister() {
-        _isUnregistered.postValue(false)
     }
 }

@@ -277,7 +277,7 @@ class SignUpViewModelTest {
         }
 
         // ログインフラグがTrueになることを確認
-        val ret = viewModel.isLogin.getOrAwaitValue()
+        val ret = viewModel.loginFinished.getOrAwaitValue()
         assertThat(ret, IsEqual(true))
     }
 
@@ -295,7 +295,7 @@ class SignUpViewModelTest {
         // メソッド呼び出し
         viewModel.login()
 
-        val ret = viewModel.isLogin.getOrAwaitValue()
+        val ret = viewModel.loginFinished.getOrAwaitValue()
         assertThat(ret, IsEqual(false))
 
         val extectedMessage =

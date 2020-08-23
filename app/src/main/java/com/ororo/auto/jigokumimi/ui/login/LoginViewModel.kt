@@ -7,7 +7,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
-import com.github.javafaker.Bool
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.network.JigokumimiApi
 import com.ororo.auto.jigokumimi.network.SpotifyApi
@@ -15,10 +14,10 @@ import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
+import com.ororo.auto.jigokumimi.util.SingleLiveEvent
 import com.ororo.auto.jigokumimi.util.demoRepositoryModule
 import com.ororo.auto.jigokumimi.util.repositoryModule
 import kotlinx.coroutines.launch
-import org.koin.core.context.KoinContextHandler.get
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 import java.util.regex.Pattern
@@ -32,16 +31,9 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
     /**
      *  ログイン状態
      */
-    private var _isLogin = MutableLiveData(false)
-    val isLogin: MutableLiveData<Boolean>
+    private var _isLogin = SingleLiveEvent<Unit>()
+    val isLogin: LiveData<Unit>
         get() = _isLogin
-
-    /**
-     *  デモモード状態
-     */
-    private var _isDemo = MutableLiveData(false)
-    val isDemo: MutableLiveData<Boolean>
-        get() = _isDemo
 
     /**
      * Emailの入力内容を保持
@@ -102,12 +94,11 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
                 if (isDemoUser()) {
                     unloadKoinModules(repositoryModule)
                     loadKoinModules(demoRepositoryModule)
-                    _isDemo.postValue(true)
                     authRepository = DemoAuthRepository(app)
                 }
 
                 authRepository.loginJigokumimi(email.value!!, password.value!!)
-                _isLogin.postValue(true)
+                _isLogin.call()
 
             } catch (e: Exception) {
                 handleAuthException(e)
@@ -116,23 +107,9 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
         }
     }
 
-    private fun isDemoUser(): Boolean {
+    fun isDemoUser(): Boolean {
         return email.value == getApplication<Application>().getString(R.string.test_email_text) &&
                 password.value == getApplication<Application>().getString(R.string.test_password_text)
-    }
-
-    /**
-     * ログイン後にフラグリセット
-     */
-    fun doneLogin() {
-        _isLogin.postValue(false)
-    }
-
-    /**
-     * デモモード切り替え後にフラグリセット
-     */
-    fun doneDemo() {
-        _isDemo.postValue(false)
     }
 
     /**

@@ -25,7 +25,7 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
     private val viewModel: LoginViewModel by viewModel()
 
-    private val mainViewModel : MainViewModel by sharedViewModel()
+    private val mainViewModel: MainViewModel by sharedViewModel()
 
     private val binding by dataBinding<FragmentLoginBinding>()
 
@@ -47,10 +47,7 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
 
         // LiveDataの監視
         viewModel.isLogin.observe(viewLifecycleOwner) {
-            if (it) onLoginSucceed()
-        }
-        viewModel.isDemo.observe(viewLifecycleOwner) {
-            if (it) onDemoSucceed()
+            onLoginSucceed()
         }
         viewModel.loginButtonEnabledState.observe(viewLifecycleOwner) {
             binding.loginButton.isEnabled = it
@@ -127,8 +124,13 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
      *  Spotifyへ認証リクエストを送信しトークンを取得する
      */
     private fun onLoginSucceed() {
-        authenticateSpotify(viewModel)
-        viewModel.doneLogin()
+        if (viewModel.isDemoUser()) {
+            mainViewModel.setDemoAuthRepository()
+            this.findNavController()
+                .navigate(LoginFragmentDirections.actionLoginFragmentToSearchFragment())
+        } else {
+            authenticateSpotify(viewModel)
+        }
     }
 
     /**
@@ -139,17 +141,6 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
         // デモ用ログイン情報
         viewModel.email.value = getString(R.string.test_email_text)
         viewModel.password.value = getString(R.string.test_password_text)
-    }
-
-    /**
-     *  デモモード切り替え成功時の処理
-     *  MainViewModelのリポジトリをデモ用に設定して検索画面に遷移する
-     */
-    private fun onDemoSucceed() {
-        mainViewModel.setDemoAuthRepository()
-        this.findNavController()
-            .navigate(LoginFragmentDirections.actionLoginFragmentToSearchFragment())
-        viewModel.doneDemo()
     }
 
     /**
