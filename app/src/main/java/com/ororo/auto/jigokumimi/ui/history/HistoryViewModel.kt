@@ -97,7 +97,7 @@ class HistoryViewModel(
                             )
                         }
                     _isLoading.value = false
-                    trackHistoryList.postValue(trackHistories?.toMutableList())
+                    trackHistoryList.value = trackHistories?.toMutableList()
                 } else {
                     val artistHistories =
                         musicRepository.getArtistsAroundSearchHistories(userId).data?.map {
@@ -118,7 +118,7 @@ class HistoryViewModel(
                             )
                         }
                     _isLoading.value = false
-                    artistHistoryList.postValue(artistHistories?.toMutableList())
+                    artistHistoryList.value = artistHistories?.toMutableList()
                 }
 
             } catch (e: Exception) {
@@ -146,7 +146,7 @@ class HistoryViewModel(
                         )
 
                         showSnackbar(msg)
-                        _deleteDataIndex.postValue(historyIndex)
+                        _deleteDataIndex.value = historyIndex
                         getSearchHistories(searchType)
                     }
                 } else {
@@ -158,7 +158,7 @@ class HistoryViewModel(
                         )
 
                         showSnackbar(msg)
-                        _deleteDataIndex.postValue(historyIndex)
+                        _deleteDataIndex.value = historyIndex
                         getSearchHistories(searchType)
                     }
                 }
@@ -180,7 +180,7 @@ class HistoryViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                _searchType.postValue(searchType)
+                _searchType.value = searchType
                 if (searchType == Constants.SearchType.TRACK) {
                     trackHistoryList.value?.get(historyIndex)?.let { history ->
                         musicRepository.refreshTracksFromHistory(history)

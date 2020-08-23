@@ -159,7 +159,7 @@ class ResultViewModel(
                         )
                     }
 
-                    _changeDataIndex.postValue(trackIndex)
+                    _changeDataIndex.value = trackIndex
                     showSnackbar(msg)
 
                 } catch (e: Exception) {
@@ -193,8 +193,7 @@ class ResultViewModel(
                         )
                     }
 
-
-                    _changeDataIndex.postValue(artistIndex)
+                    _changeDataIndex.value = artistIndex
                     showSnackbar(msg)
 
                 } catch (e: Exception) {

@@ -67,22 +67,22 @@ open class BaseAndroidViewModel(
      * トークン認証フラグをリセットする
      */
     fun onMovedLogin() {
-        _isTokenExpired.postValue(false)
+        _isTokenExpired.value = false
     }
 
     /**
      * 例外を元にエラーメッセージを表示する
      */
     fun showMessageDialog(message: String) {
-        _errorMessage.postValue(message)
-        isErrorDialogShown.postValue(true)
+        _errorMessage.value = message
+        isErrorDialogShown.value = true
     }
 
     /**
      * Snackbarメッセージを表示する
      */
     fun showSnackbar(message: String) {
-        _snackbarMessage.postValue(message)
+        _snackbarMessage.value = message
     }
 
 
@@ -90,7 +90,7 @@ open class BaseAndroidViewModel(
      * Snackbarメッセージを初期化する
      */
     fun showedSnackbar() {
-        _snackbarMessage.postValue("")
+        _snackbarMessage.value = ""
     }
 
 
@@ -116,7 +116,7 @@ open class BaseAndroidViewModel(
         val msg = when (e) {
             is HttpException -> {
                 if (e.code() == 401) {
-                    _isTokenExpired.postValue(true)
+                    _isTokenExpired.value = true
                     getApplication<Application>().getString(R.string.token_expired_error_message)
                 } else {
                     getMessageFromHttpException(e)
