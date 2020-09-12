@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="com.ororo.auto.jigokumimi.ui.result.ResultViewModel" />
+            type="com.ororo.auto.jigokumimi.ui.result.MiniPlayerViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

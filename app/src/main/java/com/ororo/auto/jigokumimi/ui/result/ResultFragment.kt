@@ -23,6 +23,8 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
 
     private val viewModel: ResultViewModel by sharedViewModel()
 
+    private val miniPlayerViewModel: MiniPlayerViewModel by sharedViewModel()
+
     private val binding by dataBinding<FragmentResultListBinding>()
 
     private val args: ResultFragmentArgs by navArgs()
@@ -140,13 +142,13 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
     override fun onPause() {
         super.onPause()
         // 再生曲を停止し､音楽プレーヤーを隠す
-        viewModel.stopTrack()
-        viewModel.hideMiniPlayer()
+        miniPlayerViewModel.stopTrack()
+        miniPlayerViewModel.hideMiniPlayer()
     }
 
     private fun onQueueButtonClicked(trackIndex: Int) {
-        viewModel.setPlayingTrack(trackIndex)
-        viewModel.playTrack()
+        miniPlayerViewModel.setPlayingTrack(trackIndex)
+        miniPlayerViewModel.playTrack()
     }
 
     private fun onSaveOrRemoveButtonClicked(trackIndex: Int) {
