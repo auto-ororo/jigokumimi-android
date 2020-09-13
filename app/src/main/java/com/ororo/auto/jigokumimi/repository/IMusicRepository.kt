@@ -5,7 +5,10 @@ import androidx.lifecycle.LiveData
 import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.Track
-import com.ororo.auto.jigokumimi.network.*
+import com.ororo.auto.jigokumimi.firebase.PostMusicAroundRequest
+import com.ororo.auto.jigokumimi.network.GetMyFavoriteArtistsResponse
+import com.ororo.auto.jigokumimi.network.GetMyFavoriteTracksResponse
+import com.ororo.auto.jigokumimi.util.Constants
 
 interface IMusicRepository {
     /**
@@ -19,19 +22,9 @@ interface IMusicRepository {
     val artists: LiveData<List<Artist>>
 
     /**
-     * 周辺曲情報を更新する
+     * 検索履歴から周辺音楽情報を更新する
      */
-    suspend fun refreshTracks(spotifyUserId: String, location: Location, distance: Int): Unit?
-
-    /**
-     * 検索履歴から周辺曲情報を更新する
-     */
-    suspend fun refreshTracksFromHistory(history: History): Unit?
-
-    /**
-     * 検索履歴から周辺アーティスト情報を更新する
-     */
-    suspend fun refreshArtistsFromHistory(history: History): Unit?
+    suspend fun refreshMusicFromHistory(type: Constants.Type, history: History): Unit?
 
     /**
      * ユーザーのお気に入り曲を取得する
@@ -39,24 +32,25 @@ interface IMusicRepository {
     suspend fun getMyFavoriteTracks(): GetMyFavoriteTracksResponse
 
     /**
-     * ユーザーのお気に入り曲を位置情報と一緒に登録する
+     * ユーザーのお気に入り音楽を位置情報と一緒に登録する
      */
-    suspend fun postMyFavoriteTracks(tracks: List<PostMyFavoriteTracksRequest>): CommonResponse
+    suspend fun postMyFavoriteMusic(postMusicAroundRequest: PostMusicAroundRequest)
 
     /**
-     * 周辺アーティスト情報を更新する
+     * 周辺音楽情報を更新・検索履歴に追加する
      */
-    suspend fun refreshArtists(spotifyUserId: String, location: Location, distance: Int): Unit?
+    suspend fun refreshMusic(
+        type: Constants.Type,
+        userId: String,
+        location: Location,
+        place: String,
+        distance: Int
+    ): Int
 
     /**
      * ユーザーのお気に入りアーティストを取得する
      */
     suspend fun getMyFavoriteArtists(): GetMyFavoriteArtistsResponse
-
-    /**
-     * ユーザーのお気に入りアーティストを更新する
-     */
-    suspend fun postMyFavoriteArtists(artists: List<PostMyFavoriteArtistsRequest>): CommonResponse
 
     /**
      * Spotify上でお気に入り曲を登録/解除する
@@ -69,33 +63,18 @@ interface IMusicRepository {
     suspend fun changeArtistFollowState(artistIndex: Int, state: Boolean)
 
     /**
-     * アーティスト情報の検索履歴を取得する
+     * 検索履歴を取得する
      */
-    suspend fun getArtistsAroundSearchHistories(userId: String) : GetArtistSearchHistoryResponse
+    suspend fun getSearchHistories(type: Constants.Type, userId: String): List<History>
 
     /**
-     * 曲情報の検索履歴を取得する
+     * 検索履歴を削除する
      */
-    suspend fun getTracksAroundSearchHistories(userId: String) : GetTrackSearchHistoryResponse
+    suspend fun deleteSearchHistory(type: Constants.Type, userId: String, searchHistoryId: String)
 
     /**
-     * アーティスト情報の検索履歴を削除する
+     * 前回の送信日時を元にお気に入りの音楽を送信すべきかどうかを判断する
      */
-    suspend fun deleteArtistsAroundSearchHistories(userId: String) : CommonResponse
-
-    /**
-     * 曲情報の検索履歴を削除する
-     */
-    suspend fun deleteTracksAroundSearchHistories(userId: String) : CommonResponse
-
-    /**
-     * 前回の送信日時を元にお気に入り曲を送信すべきかどうかを判断する
-     */
-    fun shouldPostFavoriteTracks() :Boolean
-
-    /**
-     * 前回の送信日時を元にお気に入りアーティストを送信すべきかどうかを判断する
-     */
-    fun shouldPostFavoriteArtists() :Boolean
+    fun shouldPostFavoriteMusic(type: Constants.Type): Boolean
 
 }

@@ -19,7 +19,7 @@ class HistoryTabAdapter(fm: FragmentManager, private val context: Context) :
      */
     override fun getItem(position: Int): Fragment {
 
-        fun createFragmentFromSearchType(searchType: Constants.SearchType) : Fragment {
+        fun createFragmentFromSearchType(searchType: Constants.Type) : Fragment {
             val bundle = Bundle()
             val fragment =
                 HistoryListFragment()
@@ -30,10 +30,10 @@ class HistoryTabAdapter(fm: FragmentManager, private val context: Context) :
 
         return when (position) {
             0 -> {
-                createFragmentFromSearchType(Constants.SearchType.TRACK)
+                createFragmentFromSearchType(Constants.Type.TRACK)
             }
             else -> {
-                createFragmentFromSearchType(Constants.SearchType.ARTIST)
+                createFragmentFromSearchType(Constants.Type.ARTIST)
             }
         }
     }

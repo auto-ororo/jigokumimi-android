@@ -5,8 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ororo.auto.jigokumimi.R
-import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
-import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
+import com.ororo.auto.jigokumimi.network.asPostMusicAroundRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
@@ -33,16 +32,14 @@ class SearchViewModel(
     /**
      * 検索種別
      */
-    private val _searchType = MutableLiveData(Constants.SearchType.TRACK)
-    val searchType: LiveData<Constants.SearchType>
-        get() = _searchType
+    private val _searchType = MutableLiveData(Constants.Type.TRACK)
+    val searchType: LiveData<Constants.Type> get() = _searchType
 
     /**
      *  検索距離
      */
     private val _distance = MutableLiveData(0)
-    val distance: LiveData<Int>
-        get() = _distance
+    val distance: LiveData<Int> get() = _distance
 
     /**
      * 周辺曲情報を更新する
@@ -50,8 +47,10 @@ class SearchViewModel(
     fun searchMusic() {
         _isLoading.value = true
 
+        val type = searchType.value!!
+
         viewModelScope.launch {
-            // 位置情報を取得する
+            // 位置情報を取得
             val location = locationRepository.getCurrentLocation()
             Timber.d("Search Music called")
             try {
@@ -60,62 +59,35 @@ class SearchViewModel(
                 // JigokumimiのユーザーIDを取得する
                 val jigokumimiUserId = authRepository.getSavedJigokumimiUserId()
 
-                if (searchType.value == Constants.SearchType.TRACK) {
-                    // 検索種別が曲の場合
-
-                    // 前回のお気に入り曲送信日時から一定時間経過している場合、ユーザーのお気に入り曲一覧を取得してリクエストを作成
-                    if (musicRepository.shouldPostFavoriteTracks()) {
-
-                        val postTracks = musicRepository.getMyFavoriteTracks()
-                            .asPostMyFavoriteTracksRequest(jigokumimiUserId, location)
-
-                        // Jigokumimiにお気に入り曲リストを登録
-                        musicRepository.postMyFavoriteTracks(postTracks)
-                    }
-
-                    // 周りのJigokumimiユーザーのお気に入り曲を取得
-                    musicRepository.refreshTracks(
-                        jigokumimiUserId,
-                        location,
-                        _distance.value!!
-                    )
-                    _isLoading.value = false
-
-                    // 取得件数が0件の場合はエラー表示
-                    if (musicRepository.tracks.value?.size == 0) {
-                        showMessageDialog(getApplication<Application>().getString(R.string.no_tracks_error_message))
+                if (musicRepository.shouldPostFavoriteMusic(type)) {
+                    val postMusic = if (type == Constants.Type.TRACK) {
+                        musicRepository.getMyFavoriteTracks()
+                            .asPostMusicAroundRequest(jigokumimiUserId, location)
                     } else {
-                        // 検索完了
-                        _isSearchFinished.call()
+                        musicRepository.getMyFavoriteArtists()
+                            .asPostMusicAroundRequest(jigokumimiUserId, location)
                     }
-
-                } else {
-                    // 検索種別がアーティストの場合
-
-                    // 前回のお気に入りアーティスト送信日時から一定時間経過している場合、ユーザーのお気に入りアーティスト一覧を取得してリクエストを作成
-                    if (musicRepository.shouldPostFavoriteArtists()) {
-                        val postArtists = musicRepository.getMyFavoriteArtists()
-                            .asPostMyFavoriteArtistsRequest(jigokumimiUserId, location)
-
-                        // Jigokumimiにお気に入り曲リストを登録
-                        musicRepository.postMyFavoriteArtists(postArtists)
-                    }
-                    // 周りのJigokumimiユーザーのお気に入り曲を取得
-                    musicRepository.refreshArtists(
-                        jigokumimiUserId,
-                        location,
-                        _distance.value!!
-                    )
-                    _isLoading.value = false
-
-                    // 取得件数が0件の場合はエラー表示
-                    if (musicRepository.artists.value?.size == 0) {
-                        showMessageDialog(getApplication<Application>().getString(R.string.no_artists_error_message))
-                    } else {
-                        // 検索完了
-                        _isSearchFinished.call()
-                    }
+                    musicRepository.postMyFavoriteMusic(postMusic)
                 }
+
+                val place = locationRepository.getPlaceName(location.latitude, location.longitude)
+
+                val count = musicRepository.refreshMusic(
+                    type,
+                    jigokumimiUserId,
+                    location,
+                    place,
+                    _distance.value!!
+                )
+
+                if (count == 0) {
+                    showMessageDialog(getApplication<Application>().getString(R.string.no_music_error_message))
+                } else {
+                    _isSearchFinished.call()
+                }
+
+                _isLoading.value = false
+
                 Timber.d("Search Music Succeeded")
 
             } catch (e: Exception) {
@@ -128,14 +100,14 @@ class SearchViewModel(
      * 検索種別を曲にセット
      */
     fun setSearchTypeToTrack() {
-        _searchType.value = Constants.SearchType.TRACK
+        _searchType.value = Constants.Type.TRACK
     }
 
     /**
      * 検索種別をアーティストにセット
      */
     fun setSearchTypeToArtist() {
-        _searchType.value = Constants.SearchType.ARTIST
+        _searchType.value = Constants.Type.ARTIST
     }
 
     /**

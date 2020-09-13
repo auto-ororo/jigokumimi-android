@@ -1,7 +1,9 @@
 package com.ororo.auto.jigokumimi.util
 
 import androidx.preference.PreferenceManager
+import com.google.firebase.firestore.BuildConfig
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.ororo.auto.jigokumimi.firebase.FirestoreService
 import com.ororo.auto.jigokumimi.network.JigokumimiApi
 import com.ororo.auto.jigokumimi.network.SpotifyApi
@@ -27,7 +29,21 @@ val prefModule = module {
 }
 
 val firebaseModule = module {
-    factory { FirebaseFirestore.getInstance() }
+    factory {
+        if (BuildConfig.DEBUG) {
+            // DEBUGビルド時はエミュレータを使用
+            FirebaseFirestore.getInstance().apply {
+                useEmulator(
+                    "10.0.2.2", 8080
+                )
+                firestoreSettings = FirebaseFirestoreSettings.Builder()
+                    .setPersistenceEnabled(false)
+                    .build()
+            }
+        } else {
+            FirebaseFirestore.getInstance()
+        }
+    }
 }
 
 val serviceModule = module {

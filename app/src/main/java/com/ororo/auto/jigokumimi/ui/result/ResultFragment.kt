@@ -42,7 +42,7 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        if (args.searchType == Constants.SearchType.TRACK) {
+        if (args.searchType == Constants.Type.TRACK) {
             viewModel.tracklist.observe(viewLifecycleOwner, Observer { tracks ->
                 tracks?.apply {
                     viewModelAdapterTrack.tracks = tracks
@@ -68,7 +68,7 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
         viewModel.setSearchType(args.searchType)
 
         // 検索種別に応じてアダプター(リストに表示する項目)を切り替え
-        if (args.searchType == Constants.SearchType.TRACK) {
+        if (args.searchType == Constants.Type.TRACK) {
 
             // キューアイコンがタップされたときのコールバックを設定
             val playCallback =

@@ -37,7 +37,7 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
         }
 
         viewModel.searchType.observe(viewLifecycleOwner) {
-            if (it == Constants.SearchType.TRACK) {
+            if (it == Constants.Type.TRACK) {
                 binding.trackButton.setBackgroundResource(R.drawable.shape_rounded_corners_color_primary)
                 binding.artistButton.setBackgroundResource(R.drawable.shape_rounded_corners_color_grey)
             } else {

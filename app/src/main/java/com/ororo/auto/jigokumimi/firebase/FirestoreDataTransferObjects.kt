@@ -3,6 +3,8 @@ package com.ororo.auto.jigokumimi.firebase
 import android.location.Location
 import android.os.Parcelable
 import com.google.firebase.firestore.GeoPoint
+import com.ororo.auto.jigokumimi.domain.History
+import com.ororo.auto.jigokumimi.domain.HistoryItem
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.parcel.RawValue
@@ -58,15 +60,27 @@ data class SearchHistory(
     val id: String = "",
     val musicAroundItems: List<MusicAroundItem> = listOf(),
     val location: @RawValue GeoPoint = GeoPoint(0.0, 0.0),
+    val place: String = "",
     val distance: Int = 0,
     val createdAt: Date = Date()
-) : Parcelable
+) : Parcelable {
+    fun convertToHistory(): History = History(
+        id = this.id,
+        longitude = this.location.longitude,
+        latitude = this.location.latitude,
+        distance = this.distance,
+        createdAt = this.createdAt.toString(),
+        place = this.place,
+        historyItems = this.musicAroundItems.mapIndexed { index, item ->
+            return@mapIndexed HistoryItem(
+                rank = index.plus(1),
+                popularity = item.popularity,
+                spotifyItemId = item.musicItemId
+            )
+        }
+    )
 
-//@Parcelize
-//data class HistoryItem(
-//    val rank: Int = 0,
-//    val musicItemId: String = ""
-//) : Parcelable
+}
 
 @Parcelize
 data class PostSearchHistoryRequest(
@@ -74,6 +88,7 @@ data class PostSearchHistoryRequest(
     val userId: String = "",
     val musicAroundItems: List<MusicAroundItem> = listOf(),
     val location: Location = Location(""),
+    val place: String = "",
     val distance: Int = 0,
     val createdAt: Date = Date()
 ) : Parcelable {
@@ -82,6 +97,7 @@ data class PostSearchHistoryRequest(
             id = id,
             musicAroundItems = musicAroundItems,
             location = GeoPoint(location.latitude, location.longitude),
+            place = place,
             distance = distance,
             createdAt = createdAt
         )
@@ -97,5 +113,5 @@ data class GetSearchHistoryRequest(
 data class DeleteSearchHistoryRequest(
     val type: Constants.Type = Constants.Type.TRACK,
     val userId: String = "",
-    val searchHistoryId : String = ""
+    val searchHistoryId: String = ""
 ) : Parcelable

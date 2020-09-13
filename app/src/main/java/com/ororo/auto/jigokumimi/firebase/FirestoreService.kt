@@ -22,7 +22,7 @@ class FirestoreService(private val firestore: FirebaseFirestore) {
     }
 
     suspend fun postMusicAround(request: PostMusicAroundRequest): Unit =
-        suspendCancellableCoroutine {continuation ->
+        suspendCancellableCoroutine { continuation ->
             val ref = firestore.collection(request.type.pathName)
 
             val doc = ref.document()
@@ -49,7 +49,7 @@ class FirestoreService(private val firestore: FirebaseFirestore) {
 
             GeoFirestore(firestore.collection(itemsRequest.type.pathName)).getAtLocation(
                 GeoPoint(itemsRequest.location.latitude, itemsRequest.location.longitude),
-                itemsRequest.distance.toDouble()
+                itemsRequest.distance.toDouble() / 1000
             ) { docs, ex ->
                 ex?.let { continuation.resumeWithException(ex) }
 

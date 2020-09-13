@@ -33,8 +33,7 @@
     <!--  message-->
     <string name="general_error_message">エラーが発生しました｡:%1$s</string>
     <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nお使いの端末がインターネットに繋がっていない可能性があります｡</string>
-    <string name="no_tracks_error_message">指定した範囲内で聴かれている曲を見つけることができませんでした｡指定範囲を広げてみて下さい｡</string>
-    <string name="no_artists_error_message">指定した範囲内で聴かれているアーティストを見つけることができませんでした｡指定範囲を広げてみて下さい｡</string>
+    <string name="no_music_error_message">近くので人気の音楽を見つけることができませんでした｡指定範囲を広げてみて下さい｡</string>
     <string name="spotify_auth_error_message">Spotifyとの連携に失敗しました｡\nログイン画面から再度やり直して下さい｡</string>
     <string name="token_expired_error_message">しばらく操作されていなかったため、認証期限が切れました。\n再ログインを行って下さい｡</string>
     <string name="request_success_message">通信に成功しました｡</string>

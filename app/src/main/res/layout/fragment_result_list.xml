@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_s"
             android:layout_marginTop="@dimen/spacing_s"
-            android:text='@{viewModel.searchType == Constants.SearchType.TRACK ? @string/track_text : @string/artist_text}'
+            android:text='@{viewModel.searchType == Constants.Type.TRACK ? @string/track_text : @string/artist_text}'
             android:textColor="@color/colorGreyDark"
             android:textSize="@dimen/text_size_m"
             android:textStyle="bold"

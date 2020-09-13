@@ -43,7 +43,7 @@
         tools:layout="@layout/fragment_result_list" >
         <argument
             android:name="searchType"
-            app:argType="com.ororo.auto.jigokumimi.util.Constants$SearchType" />
+            app:argType="com.ororo.auto.jigokumimi.util.Constants$Type" />
         <argument
             android:name="distance"
             app:argType="integer" />

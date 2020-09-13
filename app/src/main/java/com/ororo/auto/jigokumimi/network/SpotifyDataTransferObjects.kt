@@ -1,6 +1,9 @@
 package com.ororo.auto.jigokumimi.network
 
 import android.location.Location
+import com.ororo.auto.jigokumimi.firebase.MusicAroundItem
+import com.ororo.auto.jigokumimi.firebase.PostMusicAroundRequest
+import com.ororo.auto.jigokumimi.util.Constants
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
@@ -65,19 +68,22 @@ data class GetMyFavoriteTracksResponse(
 /**
  * Spotifyから取得したお気に入り曲リストを元にJigokumimiへ送信するリクエストBodyを作成する
  */
-fun GetMyFavoriteTracksResponse.asPostMyFavoriteTracksRequest(
+fun GetMyFavoriteTracksResponse.asPostMusicAroundRequest(
     spotifyUserId: String,
     location: Location
-): List<PostMyFavoriteTracksRequest> {
-    return items.map {
-        PostMyFavoriteTracksRequest(
-            userId = spotifyUserId,
-            spotifyTrackId = it.id,
-            longitude = location.longitude,
-            latitude = location.latitude,
-            popularity = it.popularity
-        )
-    }
+): PostMusicAroundRequest {
+
+    return PostMusicAroundRequest(
+        type = Constants.Type.TRACK,
+        userId = spotifyUserId,
+        location = location,
+        musicAroundItems = items.map {
+            return@map MusicAroundItem(
+                musicItemId = it.id,
+                popularity = it.popularity
+            )
+        }
+    )
 }
 
 /**
@@ -97,19 +103,22 @@ data class GetMyFavoriteArtistsResponse(
 /**
  * Spotifyから取得したお気に入りアーティストリストを元にJigokumimiへ送信するリクエストBodyを作成する
  */
-fun GetMyFavoriteArtistsResponse.asPostMyFavoriteArtistsRequest(
+fun GetMyFavoriteArtistsResponse.asPostMusicAroundRequest(
     spotifyUserId: String,
     location: Location
-): List<PostMyFavoriteArtistsRequest> {
-    return items.map {
-        PostMyFavoriteArtistsRequest(
-            userId = spotifyUserId,
-            spotifyArtistId = it.id,
-            longitude = location.longitude,
-            latitude = location.latitude,
-            popularity = it.popularity
-        )
-    }
+): PostMusicAroundRequest {
+
+    return PostMusicAroundRequest(
+        type = Constants.Type.ARTIST,
+        userId = spotifyUserId,
+        location = location,
+        musicAroundItems = items.map {
+            return@map MusicAroundItem(
+                musicItemId = it.id,
+                popularity = it.popularity
+            )
+        }
+    )
 }
 
 /**
