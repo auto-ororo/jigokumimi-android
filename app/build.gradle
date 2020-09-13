@@ -11,11 +11,11 @@ apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.ororo.auto.jigokumimi"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 5
         versionName "1.4"
         testInstrumentationRunner "com.ororo.auto.jigokumimi.TestAppJUnitRunner"
@@ -38,10 +38,9 @@ android {
         jvmTarget = '1.8'
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding true
     }
-    buildToolsVersion = '28.0.3'
 
     testOptions.unitTests {
         includeAndroidResources = true
@@ -52,37 +51,45 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core-ktx:1.3.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+
 
     // Lifecycle
+    def lifecycleVersion = '2.2.0'
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
 
     // Coroutine
+    def coroutineVersion = '1.3.7'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutineVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineVersion"
 
     // Navigation
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
 
     // Material Design
+    def materialVersion = '1.2.1'
     implementation "com.google.android.material:material:$materialVersion"
 
     // Timber
+    def timberVersion = '4.7.1'
     implementation "com.jakewharton.timber:timber:$timberVersion"
 
     // Retrofit
+    def retrofitVersion = "2.7.1"
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
 
     // moshi for parsing the JSON format
+    def moshiVersion = "1.9.3"
     implementation "com.squareup.moshi:moshi:$moshiVersion"
     implementation("com.squareup.moshi:moshi-kotlin:$moshiVersion") {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-reflect'
@@ -90,20 +97,26 @@ dependencies {
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
 
     // glide for images
+    def glideVersion = "4.11.0"
     implementation "com.github.bumptech.glide:glide:$glideVersion"
     kapt "com.github.bumptech.glide:compiler:$glideVersion"
 
     // Spotify SDK
+    def spotifyAuthVersion = '1.2.3'
     implementation "com.spotify.android:auth:$spotifyAuthVersion"
 
+    def multidexVersion = '1.0.3'
     implementation "com.android.support:multidex:$multidexVersion"
 
     // Location
+    def locationVersion = '17.0.0'
     implementation "com.google.android.gms:play-services-location:$locationVersion"
 
     // Shared Preferences
+    def sharedPreferencesVersion = '1.1.1'
     implementation "androidx.preference:preference:$sharedPreferencesVersion"
 
+    def koinVersion = '2.2.0-alpha-1'
     implementation "org.koin:koin-core:$koinVersion"
     implementation "org.koin:koin-core-ext:$koinVersion"
     testImplementation "org.koin:koin-test:$koinVersion"
@@ -115,42 +128,53 @@ dependencies {
     implementation "org.koin:koin-androidx-ext:$koinVersion"
 
     // hamcrest
+    def hamcrestVersion = '1.3'
     testImplementation "org.hamcrest:hamcrest-all:$hamcrestVersion"
 
     // AndroidX Test - JVM testing
+    def androidXTestExtKotlinRunnerVersion = '1.1.2'
     testImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion"
-    testImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
+    def robolectricVersion = '4.4'
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
+
+    def archTestingVersion = '2.1.0'
     testImplementation "androidx.arch.core:core-testing:$archTestingVersion"
 
+    def androidXTestCoreVersion = '1.3.0'
+    testImplementation "androidx.test:core-ktx:$androidXTestCoreVersion"
     androidTestImplementation "androidx.test:runner:$androidXTestCoreVersion"
     androidTestImplementation "androidx.test:rules:$androidXTestCoreVersion"
     androidTestImplementation "androidx.test:monitor:$androidXTestCoreVersion"
-    androidTestImplementation"androidx.test:rules:$androidXTestCoreVersion"
+    androidTestImplementation "androidx.test:rules:$androidXTestCoreVersion"
 
+    def androidXTestFragmentVersion = '1.2.5'
     debugImplementation("androidx.fragment:fragment-testing:$androidXTestFragmentVersion") {
         exclude group: 'androidx.test', module: 'core'
     }
 
-    // Coroutines testting
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineVersion"
-
     // Faker
-    implementation  "com.github.javafaker:javafaker:$fakerVersion"
+    def fakerVersion = '1.0.2'
+    implementation "com.github.javafaker:javafaker:$fakerVersion"
     testImplementation "com.github.javafaker:javafaker:$fakerVersion"
     androidTestImplementation "com.github.javafaker:javafaker:$fakerVersion"
 
     // mockk
+    def mockkVersion = '1.10.0'
     androidTestImplementation "io.mockk:mockk-android:$mockkVersion"
     testImplementation "io.mockk:mockk:$mockkVersion"
 
-
     // espresso
+    def espressoVersion = '3.3.0'
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
 
-    // Firestore
+    // Firebase
+    implementation 'com.google.firebase:firebase-core:17.5.0'
     implementation 'com.google.firebase:firebase-firestore-ktx:21.6.0'
+    implementation 'com.google.firebase:firebase-firestore:21.6.0'
+
+    // GeoFirestore
+    implementation 'com.github.imperiumlabs:GeoFirestore-Android:v1.5.0'
 
 }
 

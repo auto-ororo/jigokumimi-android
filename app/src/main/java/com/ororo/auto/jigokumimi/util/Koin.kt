@@ -1,6 +1,8 @@
 package com.ororo.auto.jigokumimi.util
 
 import androidx.preference.PreferenceManager
+import com.google.firebase.firestore.FirebaseFirestore
+import com.ororo.auto.jigokumimi.firebase.FirestoreService
 import com.ororo.auto.jigokumimi.network.JigokumimiApi
 import com.ororo.auto.jigokumimi.network.SpotifyApi
 import com.ororo.auto.jigokumimi.repository.*
@@ -24,9 +26,14 @@ val prefModule = module {
     factory { PreferenceManager.getDefaultSharedPreferences(androidContext()) }
 }
 
-val apiModule = module {
+val firebaseModule = module {
+    factory { FirebaseFirestore.getInstance() }
+}
+
+val serviceModule = module {
     single { SpotifyApi.retrofitService }
     single { JigokumimiApi.retrofitService }
+    factory { FirestoreService(get()) }
 }
 
 val repositoryModule = module {
@@ -100,7 +107,8 @@ val viewModelModule = module {
 
 val koinModules = listOf(
     prefModule,
-    apiModule,
+    firebaseModule,
+    serviceModule,
     repositoryModule,
     viewModelModule
 )
