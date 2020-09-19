@@ -92,7 +92,7 @@ class FirestoreService(private val firestore: FirebaseFirestore) {
         firestore.collection("$HISTORY/${request.userId}/${request.type.pathName}")
             .document(request.searchHistoryId).delete().await()
 
-    suspend fun createUser(request: CreateUserRequest): String {
+    suspend fun createUser(request: UserRequest): String {
         val ref = firestore.collection(USER)
 
         val doc = ref.document()
@@ -106,7 +106,7 @@ class FirestoreService(private val firestore: FirebaseFirestore) {
         return doc.id
     }
 
-    suspend fun existsUser(request: ExistsUserRequest): Boolean =
+    suspend fun existsUser(request: UserRequest): Boolean =
         firestore.collection(USER)
             .whereEqualTo(FieldPath.of("spotify", "id"), request.spotifyUserId)
             .get().await().isEmpty.not()

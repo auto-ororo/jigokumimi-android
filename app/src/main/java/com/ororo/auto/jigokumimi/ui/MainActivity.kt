@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.ui
 
-import android.content.Intent
 import android.media.AudioManager
 import android.os.Bundle
 import android.view.MenuItem
@@ -19,10 +18,7 @@ import com.google.android.material.navigation.NavigationView
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.ActivityMainBinding
 import com.ororo.auto.jigokumimi.ui.common.MessageDialogFragment
-import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.spotify.sdk.android.auth.AuthorizationClient
-import com.spotify.sdk.android.auth.AuthorizationResponse
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(R.layout.activity_main),
@@ -65,8 +61,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
             setOf(
                 R.id.loginFragment,
                 R.id.searchFragment,
-                R.id.historyFragment,
-                R.id.settingFragment
+                R.id.historyFragment
             ), drawerLayout
         )
         val navController = Navigation.findNavController(this, R.id.myNavHostFragment).also {
@@ -101,11 +96,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                     this.findNavController(R.id.myNavHostFragment)
                 )
             R.id.historyFragment ->
-                NavigationUI.onNavDestinationSelected(
-                    item,
-                    this.findNavController(R.id.myNavHostFragment)
-                )
-            R.id.settingFragment ->
                 NavigationUI.onNavDestinationSelected(
                     item,
                     this.findNavController(R.id.myNavHostFragment)

@@ -3,8 +3,6 @@ package com.ororo.auto.jigokumimi.ui.result
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,18 +41,18 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
         super.onActivityCreated(savedInstanceState)
 
         if (args.searchType == Constants.Type.TRACK) {
-            viewModel.tracklist.observe(viewLifecycleOwner, Observer { tracks ->
+            viewModel.tracklist.observe(viewLifecycleOwner) { tracks ->
                 tracks?.apply {
                     viewModelAdapterTrack.tracks = tracks
                 }
-            })
+            }
 
         } else {
-            viewModel.artistlist.observe(viewLifecycleOwner, Observer { artists ->
+            viewModel.artistlist.observe(viewLifecycleOwner) { artists ->
                 artists?.apply {
                     viewModelAdapterArtist.artists = artists
                 }
-            })
+            }
         }
     }
 
@@ -131,9 +129,11 @@ class ResultFragment : BaseFragment(R.layout.fragment_result_list) {
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {
                 val titleStr =
-                    "${context?.getString(R.string.title_result)} ${if (viewModel.isDemo()) context?.getString(
-                        R.string.title_demo
-                    ) else ""}"
+                    "${context?.getString(R.string.title_result)} ${
+                        if (viewModel.isDemo()) context?.getString(
+                            R.string.title_demo
+                        ) else ""
+                    }"
                 title = titleStr
             }
         }

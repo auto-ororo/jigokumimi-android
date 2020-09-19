@@ -56,16 +56,16 @@ class SearchViewModel(
             try {
                 Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
 
-                // JigokumimiのユーザーIDを取得する
-                val jigokumimiUserId = authRepository.getSavedJigokumimiUserId()
+                // ユーザーIDを取得する
+                val userId = authRepository.getUserId()
 
                 if (musicRepository.shouldPostFavoriteMusic(type)) {
                     val postMusic = if (type == Constants.Type.TRACK) {
                         musicRepository.getMyFavoriteTracks()
-                            .asPostMusicAroundRequest(jigokumimiUserId, location)
+                            .asPostMusicAroundRequest(userId, location)
                     } else {
                         musicRepository.getMyFavoriteArtists()
-                            .asPostMusicAroundRequest(jigokumimiUserId, location)
+                            .asPostMusicAroundRequest(userId, location)
                     }
                     musicRepository.postMyFavoriteMusic(postMusic)
                 }
@@ -74,7 +74,7 @@ class SearchViewModel(
 
                 val count = musicRepository.refreshMusic(
                     type,
-                    jigokumimiUserId,
+                    userId,
                     location,
                     place,
                     _distance.value!!

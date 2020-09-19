@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ororo.auto.jigokumimi.firebase.FirestoreService
-import com.ororo.auto.jigokumimi.network.JigokumimiApi
 import com.ororo.auto.jigokumimi.network.SpotifyApi
 import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
@@ -25,7 +24,7 @@ class MainViewModel(
     fun logout() {
         viewModelScope.launch {
             try {
-                authRepository.logoutJigokumimi()
+                // Todo Spotifyトークンの削除
             } catch (e: Exception) {
                 handleAuthException(e)
             }
@@ -38,7 +37,6 @@ class MainViewModel(
     fun setAuthRepository() {
         authRepository = AuthRepository(
             PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
-            JigokumimiApi.retrofitService,
             SpotifyApi.retrofitService,
             FirestoreService(FirebaseFirestore.getInstance())
         )

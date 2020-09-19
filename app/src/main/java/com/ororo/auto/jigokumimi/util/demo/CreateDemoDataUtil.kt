@@ -39,27 +39,6 @@ class CreateDemoDataUtil(val context: Context) {
         )
     }
 
-    fun createDummyTrackAroundNetwork(
-        rank: Int = faker.number().randomDigit(),
-        spotifyTrackId: String = faker.random().hex()
-    ): TrackAroundNetwork {
-        return TrackAroundNetwork(
-            rank = rank,
-            popularity = faker.number().randomDigit(),
-            spotifyTrackId = spotifyTrackId
-        )
-    }
-
-    fun createDummyArtistAroundNetwork(
-        rank: Int = faker.number().randomDigit(),
-        spotifyArtistId: String = faker.random().hex()
-    ): ArtistAroundNetwork {
-        return ArtistAroundNetwork(
-            rank = rank,
-            popularity = faker.number().randomDigit(),
-            spotifyArtistId = spotifyArtistId
-        )
-    }
 
     fun createDummyHistoryItem(
         rank: Int = faker.number().randomDigit(),
@@ -86,54 +65,6 @@ class CreateDemoDataUtil(val context: Context) {
                 createDummyHistoryItem(),
                 createDummyHistoryItem()
             )
-        )
-    }
-
-    fun createDummyTrackHistoryItem(): TrackHistoryItem {
-        return TrackHistoryItem(
-            rank = faker.number().randomDigit(),
-            popularity = faker.number().randomDigit(),
-            spotifyTrackId = faker.random().hex()
-        )
-    }
-
-    fun createDummyArtistHistoryItem(): ArtistHistoryItem {
-        return ArtistHistoryItem(
-            rank = faker.number().randomDigit(),
-            popularity = faker.number().randomDigit(),
-            spotifyArtistId = faker.random().hex()
-        )
-    }
-
-    fun createDummyTrackHistory(): TrackHistory {
-        return TrackHistory(
-            id = faker.random().hex(),
-            latitude = faker.number().randomDouble(10, 2, 5),
-            longitude = faker.number().randomDouble(10, 2, 5),
-            distance = faker.number().randomDigit(),
-            createdAt = faker.date().toString(),
-            tracksAroundHistories = listOf(
-                createDummyTrackHistoryItem(),
-                createDummyTrackHistoryItem(),
-                createDummyTrackHistoryItem()
-            ),
-            userId = faker.random().hex()
-        )
-    }
-
-    fun createDummyArtistHistory(): ArtistHistory {
-        return ArtistHistory(
-            id = faker.random().hex(),
-            latitude = faker.number().randomDouble(10, 2, 5),
-            longitude = faker.number().randomDouble(10, 2, 5),
-            distance = faker.number().randomDigit(),
-            createdAt = faker.date().toString(),
-            artistsAroundHistories = listOf(
-                createDummyArtistHistoryItem(),
-                createDummyArtistHistoryItem(),
-                createDummyArtistHistoryItem()
-            ),
-            userId = faker.random().hex()
         )
     }
 
@@ -245,27 +176,6 @@ class CreateDemoDataUtil(val context: Context) {
             uri = faker.internet().url()
         )
     }
-
-
-    fun createDummyGetMeResponse(): GetMeResponse {
-
-        return GetMeResponse(
-            data = createDummyJigokumimiUserProfile(),
-            message = faker.lorem().word()
-        )
-    }
-
-    fun createDummyJigokumimiUserProfile(): JigokumimiUserProfile {
-        return JigokumimiUserProfile(
-            id = faker.random().hex(),
-            email = faker.internet().safeEmailAddress(),
-            emailVerifiedAt = null,
-            name = faker.name().fullName(),
-            createdAt = faker.date().toString(),
-            updatedAt = faker.date().toString()
-        )
-    }
-
 
     fun createDummyGetMyFavoriteTracksResponse(): GetMyFavoriteTracksResponse {
         return GetMyFavoriteTracksResponse(
@@ -463,81 +373,6 @@ class CreateDemoDataUtil(val context: Context) {
         } catch (e: Exception) {
             Timber.d(e.message)
         }
-
         return artistList
-    }
-
-     fun createDummyTrackHistoryList(): List<TrackHistory> {
-
-        val trackHistoryList = mutableListOf<TrackHistory>()
-
-        // Csv読み込み
-        val assetManager: AssetManager = context.resources.assets
-        val inputStream: InputStream = assetManager.open("demoTrackHistoryList.csv")
-        val inputStreamReader = InputStreamReader(inputStream)
-        val bufferReader = BufferedReader(inputStreamReader)
-        var line: String
-
-        // 読み込んだCSVを元にデモ用履歴リストを作成
-        try {
-            while (bufferReader.readLine().also { line = it } != null) {
-                val rowData = line.split(",").toTypedArray()
-
-                trackHistoryList.add(
-                    TrackHistory(
-                        id = rowData[0],
-                        userId = rowData[1],
-                        latitude = rowData[2].toDouble(),
-                        longitude = rowData[3].toDouble(),
-                        distance = rowData[4].toInt(),
-                        createdAt = rowData[5],
-                        tracksAroundHistories = listOf()
-                    )
-                )
-            }
-            bufferReader.close()
-
-        } catch (e: Exception) {
-            Timber.d(e.message)
-        }
-
-        return trackHistoryList
-    }
-
-    fun createDummyArtistHistoryList(): List<ArtistHistory> {
-
-        val artistHistoryList = mutableListOf<ArtistHistory>()
-
-        // Csv読み込み
-        val assetManager: AssetManager = context.resources.assets
-        val inputStream: InputStream = assetManager.open("demoArtistHistoryList.csv")
-        val inputStreamReader = InputStreamReader(inputStream)
-        val bufferReader = BufferedReader(inputStreamReader)
-        var line: String
-
-        // 読み込んだCSVを元にデモ用履歴リストを作成
-        try {
-            while (bufferReader.readLine().also { line = it } != null) {
-                val rowData = line.split(",").toTypedArray()
-
-                artistHistoryList.add(
-                    ArtistHistory(
-                        id = rowData[0],
-                        userId = rowData[1],
-                        latitude = rowData[2].toDouble(),
-                        longitude = rowData[3].toDouble(),
-                        distance = rowData[4].toInt(),
-                        createdAt = rowData[5],
-                        artistsAroundHistories = listOf()
-                    )
-                )
-            }
-            bufferReader.close()
-
-        } catch (e: Exception) {
-            Timber.d(e.message)
-        }
-
-        return artistHistoryList
     }
 }

@@ -127,11 +127,6 @@ data class DeleteSearchHistoryRequest(
 ) : Parcelable
 
 @Parcelize
-data class CreateUserRequest(
-    val spotifyUserId: String = ""
-) : Parcelable
-
-@Parcelize
-data class ExistsUserRequest(
+data class UserRequest(
     val spotifyUserId: String = ""
 ) : Parcelable

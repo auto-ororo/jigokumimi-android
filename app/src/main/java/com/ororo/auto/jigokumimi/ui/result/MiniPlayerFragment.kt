@@ -8,7 +8,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.observe
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.ororo.auto.jigokumimi.R

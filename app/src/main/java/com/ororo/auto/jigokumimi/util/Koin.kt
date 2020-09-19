@@ -5,7 +5,6 @@ import com.google.firebase.firestore.BuildConfig
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.ororo.auto.jigokumimi.firebase.FirestoreService
-import com.ororo.auto.jigokumimi.network.JigokumimiApi
 import com.ororo.auto.jigokumimi.network.SpotifyApi
 import com.ororo.auto.jigokumimi.repository.*
 import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
@@ -17,8 +16,6 @@ import com.ororo.auto.jigokumimi.ui.login.LoginViewModel
 import com.ororo.auto.jigokumimi.ui.result.MiniPlayerViewModel
 import com.ororo.auto.jigokumimi.ui.result.ResultViewModel
 import com.ororo.auto.jigokumimi.ui.search.SearchViewModel
-import com.ororo.auto.jigokumimi.ui.setting.SettingViewModel
-import com.ororo.auto.jigokumimi.ui.signup.SignUpViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -48,14 +45,13 @@ val firebaseModule = module {
 
 val serviceModule = module {
     single { SpotifyApi.retrofitService }
-    single { JigokumimiApi.retrofitService }
     factory { FirestoreService(get()) }
 }
 
 val repositoryModule = module {
     single<ILocationRepository> { LocationRepository(androidApplication()) }
     single<IMusicRepository> { MusicRepository(get(), get(), get()) }
-    single<IAuthRepository> { AuthRepository(get(), get(), get(), get()) }
+    single<IAuthRepository> { AuthRepository(get(), get(), get()) }
 }
 
 val demoRepositoryModule = module {
@@ -104,18 +100,6 @@ val viewModelModule = module {
             androidApplication(),
             get(),
             get(),
-            get()
-        )
-    }
-    viewModel {
-        SettingViewModel(
-            androidApplication(),
-            get()
-        )
-    }
-    viewModel {
-        SignUpViewModel(
-            androidApplication(),
             get()
         )
     }
