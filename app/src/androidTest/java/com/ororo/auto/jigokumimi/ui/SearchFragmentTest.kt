@@ -168,7 +168,7 @@ class SearchFragmentTest {
         verify {
             navController.navigate(
                 SearchFragmentDirections.actionSearchFragmentToResultFragment(
-                    Constants.SearchType.TRACK,
+                    Constants.Type.TRACK,
                     500,
                     any()
                 )

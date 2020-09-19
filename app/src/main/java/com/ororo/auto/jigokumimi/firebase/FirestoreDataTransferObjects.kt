@@ -31,6 +31,16 @@ data class MusicAroundItem(
 ) : Parcelable
 
 @Parcelize
+data class User(
+    val id: String = "",
+    val spotify: Spotify? = null
+) : Parcelable {
+
+    @Parcelize
+    data class Spotify(val id: String) : Parcelable
+}
+
+@Parcelize
 data class PostMusicAroundRequest(
     val type: Constants.Type = Constants.Type.TRACK,
     val userId: String = "",
@@ -114,4 +124,14 @@ data class DeleteSearchHistoryRequest(
     val type: Constants.Type = Constants.Type.TRACK,
     val userId: String = "",
     val searchHistoryId: String = ""
+) : Parcelable
+
+@Parcelize
+data class CreateUserRequest(
+    val spotifyUserId: String = ""
+) : Parcelable
+
+@Parcelize
+data class ExistsUserRequest(
+    val spotifyUserId: String = ""
 ) : Parcelable

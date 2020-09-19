@@ -52,7 +52,7 @@ class FakeAndroidTestMusicRepository(
     }
 
     override suspend fun refreshArtists(
-        spotifyUserId: String,
+        userId: String,
         location: Location,
         distance: Int
     ): Unit? {

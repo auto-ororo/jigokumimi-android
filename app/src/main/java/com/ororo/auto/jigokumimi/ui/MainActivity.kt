@@ -123,46 +123,4 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         return true
     }
 
-    /**
-     * Spotify認証リクエストのコールバックを捕捉するイベントハンドラ
-     * ※Spotify SDKの仕様上、ActivityResultイベントが(Fragmentではなく)Activityに対して発火されるため、ここに実装
-     */
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == AUTH_TOKEN_REQUEST_CODE) {
-            val response = AuthorizationClient.getResponse(resultCode, data)
-
-            when (response.type) {
-                // 認証に成功した場合(トークンを取得できた場合)､端末内のSpotifyトークンを更新し､検索画面に遷移する
-                AuthorizationResponse.Type.TOKEN -> {
-
-                    viewModel.refreshSpotifyAuthToken(response.accessToken)
-
-                    // 検索画面に遷移
-                    this.findNavController(R.id.myNavHostFragment).navigate(R.id.searchFragment)
-                }
-
-                // 認証に失敗した場合(トークンを取得できなかった場合)､エラーメッセージを表示しログイン画面に遷移する
-                else -> {
-                    // エラーメッセージ表示
-                    viewModel.showMessageDialog(getString(R.string.spotify_auth_error_message))
-                    // ログイン画面に遷移
-                    this.findNavController(R.id.myNavHostFragment).navigate(R.id.loginFragment)
-                }
-            }
-        } else {
-            // ユーザーがSpotify認証を行わなかった等の理由でリクエストコードが帰ってこなかった場合､エラーメッセージを表示しログイン画面に遷移する
-
-            // エラーメッセージ表示
-            viewModel.showMessageDialog(getString(R.string.spotify_auth_error_message))
-            // ログイン画面に遷移
-            this.findNavController(R.id.myNavHostFragment).navigate(R.id.loginFragment)
-
-        }
-    }
 }

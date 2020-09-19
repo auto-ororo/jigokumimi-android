@@ -6,6 +6,7 @@
     <string name="demo_button">Demo</string>
     <string name="unregister_button">Unregister</string>
     <string name="sign_up_button">SignUp</string>
+    <string name="auth_button">Auth</string>
     <string name="distance_text">%1$dm</string>
     <string name="change_password_button">Change Password</string>
 

@@ -3,6 +3,8 @@ package com.ororo.auto.jigokumimi.ui
 import android.app.Application
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
+import com.google.firebase.firestore.FirebaseFirestore
+import com.ororo.auto.jigokumimi.firebase.FirestoreService
 import com.ororo.auto.jigokumimi.network.JigokumimiApi
 import com.ororo.auto.jigokumimi.network.SpotifyApi
 import com.ororo.auto.jigokumimi.repository.AuthRepository
@@ -31,23 +33,14 @@ class MainViewModel(
     }
 
     /**
-     * SpotifyAccessTokenを更新
-     */
-    fun refreshSpotifyAuthToken(token: String) {
-        viewModelScope.launch {
-            // Spotifyトークンを更新
-            authRepository.refreshSpotifyAuthToken(token)
-        }
-    }
-
-    /**
      * AuthRepositoryをセット
      */
     fun setAuthRepository() {
         authRepository = AuthRepository(
             PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
             JigokumimiApi.retrofitService,
-            SpotifyApi.retrofitService
+            SpotifyApi.retrofitService,
+            FirestoreService(FirebaseFirestore.getInstance())
         )
     }
 

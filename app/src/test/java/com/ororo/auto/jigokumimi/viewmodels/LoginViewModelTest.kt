@@ -152,61 +152,61 @@ class LoginViewModelTest {
         assertThat(ret, IsEqual(false))
     }
 
-    @Test
-    fun login_例外が発生しない_ログインフラグが立つこと() {
-
-        // ログイン情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-
-        // フラグをoff
-        viewModel.isLogin.value = false
-        runBlocking {
-            // メソッド呼び出し
-            viewModel.login()
-
-        }
-
-        val ret = viewModel.isLogin.getOrAwaitValue()
-        assertThat(ret, IsEqual(true))
-    }
-
-    @Test
-    fun login_例外発生_ログインフラグが立たずエラーメッセージが設定されること() {
-
-        // Exceptionを生成
-        val exception = Exception()
-        every { runBlocking { authRepository.loginJigokumimi(any(), any()) } } throws exception
-
-        // フラグをoff
-        viewModel.isLogin.value = false
-
-        // ログイン情報設定
-        viewModel.email.value = faker.internet().safeEmailAddress()
-        viewModel.password.value = faker.random().hex()
-
-        // メソッド呼び出し
-        viewModel.login()
-
-        val ret = viewModel.isLogin.getOrAwaitValue()
-        assertThat(ret, IsEqual(false))
-
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.general_error_message, exception.javaClass
-            )
-
-        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
-    }
-
-    @Test
-    fun doneLogin_isLoginがfalseになること() {
-        viewModel.isLogin.value = true
-
-        viewModel.doneLogin()
-
-        assertThat(viewModel.isLogin.getOrAwaitValue(), IsEqual(false))
-
-    }
+//    @Test
+//    fun login_例外が発生しない_ログインフラグが立つこと() {
+//
+//        // ログイン情報設定
+//        viewModel.email.value = faker.internet().safeEmailAddress()
+//        viewModel.password.value = faker.random().hex()
+//
+//        // フラグをoff
+//        viewModel.isLogin.value = false
+//        runBlocking {
+//            // メソッド呼び出し
+//            viewModel.login()
+//
+//        }
+//
+//        val ret = viewModel.isLogin.getOrAwaitValue()
+//        assertThat(ret, IsEqual(true))
+//    }
+//
+//    @Test
+//    fun login_例外発生_ログインフラグが立たずエラーメッセージが設定されること() {
+//
+//        // Exceptionを生成
+//        val exception = Exception()
+//        every { runBlocking { authRepository.loginJigokumimi(any(), any()) } } throws exception
+//
+//        // フラグをoff
+//        viewModel.isLogin.value = false
+//
+//        // ログイン情報設定
+//        viewModel.email.value = faker.internet().safeEmailAddress()
+//        viewModel.password.value = faker.random().hex()
+//
+//        // メソッド呼び出し
+//        viewModel.login()
+//
+//        val ret = viewModel.isLogin.getOrAwaitValue()
+//        assertThat(ret, IsEqual(false))
+//
+//        val extectedMessage =
+//            InstrumentationRegistry.getInstrumentation().context.resources.getString(
+//                R.string.general_error_message, exception.javaClass
+//            )
+//
+//        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
+//        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
+//    }
+//
+//    @Test
+//    fun doneLogin_isLoginがfalseになること() {
+//        viewModel.isLogin.value = true
+//
+//        viewModel.doneLogin()
+//
+//        assertThat(viewModel.isLogin.getOrAwaitValue(), IsEqual(false))
+//
+//    }
 }

@@ -7,7 +7,9 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ororo.auto.jigokumimi.R
+import com.ororo.auto.jigokumimi.firebase.FirestoreService
 import com.ororo.auto.jigokumimi.network.JigokumimiApi
 import com.ororo.auto.jigokumimi.network.SpotifyApi
 import com.ororo.auto.jigokumimi.repository.AuthRepository
@@ -25,7 +27,7 @@ import java.util.regex.Pattern
 /**
  * ログイン画面のViewModel
  */
-class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
+class LoginViewModel(private val app: Application, authRepository: IAuthRepository) :
     BaseAndroidViewModel(app, authRepository) {
 
     /**
@@ -122,7 +124,34 @@ class LoginViewModel(val app: Application, authRepository: IAuthRepository) :
         authRepository = AuthRepository(
             PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
             JigokumimiApi.retrofitService,
-            SpotifyApi.retrofitService
+            SpotifyApi.retrofitService,
+            FirestoreService(FirebaseFirestore.getInstance())
         )
+    }
+
+    /**
+     * SpotifyAccessTokenを更新
+     */
+    fun refreshSpotifyAuthToken(token: String) {
+        viewModelScope.launch {
+            // Spotifyトークンを更新
+            authRepository.refreshSpotifyAuthToken(token)
+        }
+    }
+
+    /**
+     * Userが存在しない場合作成する
+     */
+    fun createUserIfNeeded() {
+        viewModelScope.launch {
+            try {
+                val spotifyUserId = authRepository.getSpotifyUserProfile().id
+                if (!authRepository.existsUser(spotifyUserId)) {
+                    authRepository.createUser(spotifyUserId)
+                }
+            } catch (e: Exception) {
+                handleAuthException(e)
+            }
+        }
     }
 }

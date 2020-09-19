@@ -122,7 +122,7 @@ class ResultFragmentTest {
         val bundle = Bundle()
         bundle.putSerializable(
             "searchType",
-            Serializable::class.java.cast(Constants.SearchType.TRACK)
+            Serializable::class.java.cast(Constants.Type.TRACK)
         )
         bundle.putInt(
             "distance",
@@ -145,7 +145,7 @@ class ResultFragmentTest {
         val bundle = Bundle()
         bundle.putSerializable(
             "searchType",
-            Serializable::class.java.cast(Constants.SearchType.ARTIST)
+            Serializable::class.java.cast(Constants.Type.ARTIST)
         )
         bundle.putInt(
             "distance",
@@ -168,7 +168,7 @@ class ResultFragmentTest {
         val bundle = Bundle()
         bundle.putSerializable(
             "searchType",
-            Serializable::class.java.cast(Constants.SearchType.TRACK)
+            Serializable::class.java.cast(Constants.Type.TRACK)
         )
         bundle.putInt(
             "distance",

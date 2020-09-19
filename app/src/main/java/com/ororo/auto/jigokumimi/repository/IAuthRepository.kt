@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.repository
 
-import android.app.Application
 import com.ororo.auto.jigokumimi.network.*
 
 interface IAuthRepository {
@@ -54,4 +53,13 @@ interface IAuthRepository {
      */
     suspend fun getSpotifyUserProfile(): SpotifyUserResponse
 
+    /**
+     * Userの存在チェック
+     */
+    suspend fun existsUser(spotifyUserId: String): Boolean
+
+    /**
+     * Userの作成
+     */
+    suspend fun createUser(spotifyUserId: String): String
 }

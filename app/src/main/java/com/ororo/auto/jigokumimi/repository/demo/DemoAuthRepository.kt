@@ -72,4 +72,12 @@ class DemoAuthRepository(
         delay(1000)
         return cd.createDummySpotifyUserResponse()
     }
+
+    override suspend fun existsUser(spotifyUserId: String): Boolean {
+        return true
+    }
+
+    override suspend fun createUser(spotifyUserId: String): String {
+        return ""
+    }
 }

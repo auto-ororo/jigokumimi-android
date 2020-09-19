@@ -55,7 +55,7 @@ val serviceModule = module {
 val repositoryModule = module {
     single<ILocationRepository> { LocationRepository(androidApplication()) }
     single<IMusicRepository> { MusicRepository(get(), get(), get()) }
-    single<IAuthRepository> { AuthRepository(get(), get(), get()) }
+    single<IAuthRepository> { AuthRepository(get(), get(), get(), get()) }
 }
 
 val demoRepositoryModule = module {

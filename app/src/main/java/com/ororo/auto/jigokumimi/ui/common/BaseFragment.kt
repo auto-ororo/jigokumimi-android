@@ -2,7 +2,6 @@ package com.ororo.auto.jigokumimi.ui.common
 
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.ororo.auto.jigokumimi.R
@@ -56,11 +55,8 @@ open class BaseFragment(resId: Int) : Fragment(resId) {
     protected fun authenticateSpotify(viewModel: BaseAndroidViewModel) {
         val request = viewModel.getAuthenticationRequest(AuthorizationResponse.Type.TOKEN)
 
-        AuthorizationClient.openLoginActivity(
-            activity,
-            Constants.AUTH_TOKEN_REQUEST_CODE,
-            request
-        )
+        val intent = AuthorizationClient.createLoginActivityIntent(activity, request);
+        startActivityForResult(intent, Constants.AUTH_TOKEN_REQUEST_CODE)
     }
 
     /**

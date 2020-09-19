@@ -1,6 +1,9 @@
 package com.ororo.auto.jigokumimi.repository
 
 import android.content.SharedPreferences
+import com.ororo.auto.jigokumimi.firebase.CreateUserRequest
+import com.ororo.auto.jigokumimi.firebase.ExistsUserRequest
+import com.ororo.auto.jigokumimi.firebase.FirestoreService
 import com.ororo.auto.jigokumimi.network.*
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.Dispatchers
@@ -11,7 +14,8 @@ import timber.log.Timber
 class AuthRepository(
     private val prefData: SharedPreferences,
     private val jigokumimiApiService: JigokumimiApiService,
-    private val spotifyApiService: SpotifyApiService
+    private val spotifyApiService: SpotifyApiService,
+    private val firestoreService: FirestoreService,
 ) : IAuthRepository {
 
     /**
@@ -178,5 +182,21 @@ class AuthRepository(
             val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
             return@withContext spotifyApiService.getUserProfile(spotifyToken)
+        }
+
+    /**
+     * Userの存在チェック
+     */
+    override suspend fun existsUser(spotifyUserId: String) =
+        withContext(Dispatchers.IO) {
+            return@withContext firestoreService.existsUser(ExistsUserRequest(spotifyUserId))
+        }
+
+    /**
+     * Userの作成
+     */
+    override suspend fun createUser(spotifyUserId: String) =
+        withContext(Dispatchers.IO) {
+            return@withContext firestoreService.createUser(CreateUserRequest(spotifyUserId))
         }
 }
