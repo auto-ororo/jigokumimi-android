@@ -3,18 +3,13 @@ package com.ororo.auto.jigokumimi.ui.login
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
-import com.google.firebase.firestore.FirebaseFirestore
-import com.ororo.auto.jigokumimi.firebase.FirestoreService
-import com.ororo.auto.jigokumimi.network.SpotifyApi
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
-import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import com.ororo.auto.jigokumimi.util.SingleLiveEvent
 import com.ororo.auto.jigokumimi.util.demoRepositoryModule
 import com.ororo.auto.jigokumimi.util.repositoryModule
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 
@@ -31,22 +26,12 @@ class LoginViewModel(private val app: Application, authRepository: IAuthReposito
     fun setDemoMode() {
         unloadKoinModules(repositoryModule)
         loadKoinModules(demoRepositoryModule)
-        authRepository = DemoAuthRepository()
+
+        authRepository = app.get()
     }
 
     fun doneAuthenticated() {
         _authenticated.call()
-    }
-
-    fun initRepository() {
-        unloadKoinModules(demoRepositoryModule)
-        unloadKoinModules(repositoryModule)
-        loadKoinModules(repositoryModule)
-        authRepository = AuthRepository(
-            PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
-            SpotifyApi.retrofitService,
-            FirestoreService(FirebaseFirestore.getInstance())
-        )
     }
 
     fun refreshSpotifyAuthToken(token: String) {

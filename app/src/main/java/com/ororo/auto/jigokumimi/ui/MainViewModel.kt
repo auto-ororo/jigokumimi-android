@@ -2,16 +2,11 @@ package com.ororo.auto.jigokumimi.ui
 
 import android.app.Application
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
-import com.google.firebase.firestore.FirebaseFirestore
-import com.ororo.auto.jigokumimi.firebase.FirestoreService
-import com.ororo.auto.jigokumimi.network.SpotifyApi
-import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
-import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
 import com.spotify.sdk.android.auth.AuthorizationClient
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
 
 class MainViewModel(
     private val app: Application,
@@ -33,21 +28,10 @@ class MainViewModel(
     }
 
     /**
-     * AuthRepositoryをセット
-     */
-    fun setAuthRepository() {
-        authRepository = AuthRepository(
-            PreferenceManager.getDefaultSharedPreferences(app.applicationContext),
-            SpotifyApi.retrofitService,
-            FirestoreService(FirebaseFirestore.getInstance())
-        )
-    }
-
-    /**
      * Demo用AuthRepositoryをセット
      */
     fun setDemoAuthRepository() {
-        authRepository = DemoAuthRepository()
+        authRepository = app.get()
     }
 
 }

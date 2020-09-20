@@ -26,6 +26,7 @@
     <string name="remove_track_message">%1$s をSpotify上のお気に入り曲から削除しました｡</string>
     <string name="remove_history_message">%1$s の検索履歴を削除しました｡</string>
     <string name="permission_denied_message">権限が不十分なため､アプリを実行できません｡</string>
+    <string name="finish_demo_message">デモモードのためアプリを終了しました。正規のご利用の場合は再度アプリを起動して下さい。</string>
 
     <!--  title-->
     <string name="title_demo">(Demo)</string>

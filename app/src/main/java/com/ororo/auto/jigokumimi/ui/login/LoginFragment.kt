@@ -52,11 +52,6 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
         // 共通初期化処理
         baseInit(viewModel)
 
-        // リポジトリを初期化
-        viewModel.initRepository()
-        // MainViewModelのリポジトリ初期化
-        mainViewModel.setAuthRepository()
-
         // ドロワーアイコンを非表示
         if (activity is AppCompatActivity) {
             (activity as AppCompatActivity).supportActionBar?.run {

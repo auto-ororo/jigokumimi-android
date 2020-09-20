@@ -1,7 +1,9 @@
 package com.ororo.auto.jigokumimi.ui.history
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
@@ -63,6 +65,12 @@ class HistoryFragment : BaseFragment(R.layout.fragment_history) {
                     viewModel.searchDateTime.value!!
                 )
             )
+    }
+
+    // バックキーを無効化
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(owner = this) {}
     }
 }
 

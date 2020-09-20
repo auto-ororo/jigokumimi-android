@@ -4,6 +4,7 @@ import android.media.AudioManager
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -101,12 +102,16 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                     this.findNavController(R.id.myNavHostFragment)
                 )
             R.id.loginFragment -> {
-                // ログアウト
-                viewModel.logout()
-                NavigationUI.onNavDestinationSelected(
-                    item,
-                    this.findNavController(R.id.myNavHostFragment)
-                )
+                if( viewModel.isDemo()) {
+                    Toast.makeText(this, getString(R.string.finish_demo_message), Toast.LENGTH_LONG).show()
+                    finishAndRemoveTask()
+                } else {
+                    viewModel.logout()
+                    NavigationUI.onNavDestinationSelected(
+                        item,
+                        this.findNavController(R.id.myNavHostFragment)
+                    )
+                }
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START);
