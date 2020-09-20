@@ -272,20 +272,6 @@ class MusicRepository(
 
             firestoreService.postMusicAround(postMusicAroundRequest)
 
-            val key = if (postMusicAroundRequest.type == Constants.Type.TRACK) {
-                Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY
-            } else {
-                Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY
-            }
-
-            // 送信日時を保存
-            prefData.edit().let {
-                it.putLong(
-                    key,
-                    System.currentTimeMillis()
-                )
-                it.apply()
-            }
             return@withContext
         }
 

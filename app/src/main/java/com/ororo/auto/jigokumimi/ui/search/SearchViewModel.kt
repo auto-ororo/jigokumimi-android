@@ -59,16 +59,14 @@ class SearchViewModel(
                 // ユーザーIDを取得する
                 val userId = authRepository.getUserId()
 
-                if (musicRepository.shouldPostFavoriteMusic(type)) {
-                    val postMusic = if (type == Constants.Type.TRACK) {
-                        musicRepository.getMyFavoriteTracks()
-                            .asPostMusicAroundRequest(userId, location)
-                    } else {
-                        musicRepository.getMyFavoriteArtists()
-                            .asPostMusicAroundRequest(userId, location)
-                    }
-                    musicRepository.postMyFavoriteMusic(postMusic)
+                val postMusic = if (type == Constants.Type.TRACK) {
+                    musicRepository.getMyFavoriteTracks()
+                        .asPostMusicAroundRequest(userId, location)
+                } else {
+                    musicRepository.getMyFavoriteArtists()
+                        .asPostMusicAroundRequest(userId, location)
                 }
+                musicRepository.postMyFavoriteMusic(postMusic)
 
                 val place = locationRepository.getPlaceName(location.latitude, location.longitude)
 

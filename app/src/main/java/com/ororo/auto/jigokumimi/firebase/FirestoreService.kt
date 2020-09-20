@@ -11,7 +11,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import org.imperiumlabs.geofirestore.GeoFirestore
 import org.imperiumlabs.geofirestore.extension.getAtLocation
-import org.imperiumlabs.geofirestore.extension.setLocation
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -22,26 +21,13 @@ class FirestoreService(private val firestore: FirebaseFirestore) {
         private const val HISTORY = "history"
     }
 
-    suspend fun postMusicAround(request: PostMusicAroundRequest): Unit =
-        suspendCancellableCoroutine { continuation ->
-            val ref = firestore.collection(request.type.pathName)
+    suspend fun postMusicAround(request: PostMusicAroundRequest) {
+        val ref = firestore.collection(request.type.pathName).document(request.userId)
 
-            val doc = ref.document()
+        val musicAround = request.convertToMusicAround()
 
-            val musicAround = request.convertToMusicAround(doc.id)
-
-            firestore.runTransaction { transaction ->
-                transaction.set(doc, musicAround)
-
-            }.addOnSuccessListener {
-                GeoFirestore(ref).setLocation(doc.id, musicAround.l) { e ->
-                    e?.let { throw it }
-                    continuation.resume(Unit)
-                }
-            }.addOnFailureListener {
-                continuation.resumeWithException(it)
-            }
-        }
+        ref.set(musicAround).await()
+    }
 
     suspend fun getMusicAroundItems(
         itemsRequest: GetMusicAroundItemsRequest
@@ -50,7 +36,7 @@ class FirestoreService(private val firestore: FirebaseFirestore) {
 
             GeoFirestore(firestore.collection(itemsRequest.type.pathName)).getAtLocation(
                 GeoPoint(itemsRequest.location.latitude, itemsRequest.location.longitude),
-                itemsRequest.distance.toDouble() / 1000
+                itemsRequest.distance.toDouble()
             ) { docs, ex ->
                 ex?.let { continuation.resumeWithException(ex) }
 

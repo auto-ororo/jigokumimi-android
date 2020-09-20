@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="distance_array">
+        <item>10m</item>
+        <item>15m</item>
         <item>25m</item>
         <item>50m</item>
         <item>100m</item>
         <item>500m</item>
         <item>1000m</item>
         <item>3000m</item>
-        <item>5000m</item>
-        <item>10000m</item>
     </string-array>
 </resources>

@@ -8,6 +8,7 @@ import com.ororo.auto.jigokumimi.domain.HistoryItem
 import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.parcel.RawValue
+import org.imperiumlabs.geofirestore.core.GeoHash
 import java.util.*
 
 /**
@@ -16,11 +17,10 @@ import java.util.*
 
 @Parcelize
 data class MusicAround(
-    val id: String = "",
     val userId: String = "",
     val musicAroundItems: List<MusicAroundItem> = listOf(),
-    val l: @RawValue GeoPoint = GeoPoint(0.0, 0.0), // 位置情報 ※プロパティ名はライブラリ(GeoFirestore)の仕様によるもの
-    val g: String = "", // 距離計算に用いるハッシュ値 ※プロパティ名はライブラリ(GeoFirestore)の仕様によるもの
+    val l: @RawValue GeoPoint = GeoPoint(0.0, 0.0),
+    val g: String = "", // 距離計算に用いるハッシュ値
     val createdAt: Date = Date()
 ) : Parcelable
 
@@ -48,12 +48,16 @@ data class PostMusicAroundRequest(
     val location: Location = Location(""),
     val createdAt: Date = Date()
 ) : Parcelable {
-    fun convertToMusicAround(id: String) =
+    fun convertToMusicAround() =
         MusicAround(
-            id = id,
             userId = userId,
             musicAroundItems = musicAroundItems,
-            l = GeoPoint(location.latitude, location.longitude)
+            l = GeoPoint(location.latitude, location.longitude),
+            g = GeoHash(
+                latitude = location.latitude,
+                longitude = location.longitude,
+                precision = 12
+            ).geoHashString
         )
 }
 
