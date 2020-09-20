@@ -59,7 +59,7 @@ class LoginViewModel(private val app: Application, authRepository: IAuthReposito
         viewModelScope.launch {
             try {
                 val spotifyUserId = authRepository.getSpotifyUserId()
-                if (authRepository.existsUser(spotifyUserId) != null) {
+                if (!authRepository.existsUser(spotifyUserId)) {
                     authRepository.createUser(spotifyUserId)
                 }
             } catch (e: Exception) {
