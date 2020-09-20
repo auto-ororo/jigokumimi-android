@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Jigokumimi</string>
 
-    <string name="spotify_client_id">664aaf9b8611444ba447fd77e2faa0fc</string>
     <string name="demo_button">Demo</string>
     <string name="auth_button">Auth</string>
     <string name="distance_text">%1$dm</string>

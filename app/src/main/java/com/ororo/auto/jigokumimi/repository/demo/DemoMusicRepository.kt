@@ -86,8 +86,4 @@ class DemoMusicRepository(
         searchHistoryId: String
     ) {
     }
-
-    override fun shouldPostFavoriteMusic(type: Constants.Type): Boolean {
-        return true
-    }
 }

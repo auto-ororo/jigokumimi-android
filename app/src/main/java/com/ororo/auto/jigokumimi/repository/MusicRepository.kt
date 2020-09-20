@@ -36,7 +36,6 @@ class MusicRepository(
      */
     override val artists = MutableLiveData<List<Artist>>()
 
-    private val limit: Int = 20
     val offset: Int = 0
 
     override suspend fun refreshMusicFromHistory(type: Constants.Type, history: History): Unit? =
@@ -190,7 +189,7 @@ class MusicRepository(
 
             return@withContext spotifyApiService.getTracks(
                 spotifyToken,
-                limit,
+                Constants.MUSIC_LIST_SIZE,
                 offset
             )
         }
@@ -262,7 +261,7 @@ class MusicRepository(
 
             return@withContext spotifyApiService.getArtists(
                 spotifyToken,
-                limit,
+                Constants.MUSIC_LIST_SIZE,
                 offset
             )
         }
@@ -368,17 +367,4 @@ class MusicRepository(
             )
             return@withContext
         }
-
-    override fun shouldPostFavoriteMusic(type: Constants.Type): Boolean {
-        val sharedPreferencesKey = if (type == Constants.Type.TRACK) {
-            Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_TRACKS_DATETIME_KEY
-        } else {
-            Constants.SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY
-        }
-
-        // 「現在時刻 - 前回の送信日時」が「送信間隔」の外かどうかを返却
-        val previousPostedDateTime = prefData.getLong(sharedPreferencesKey, 0)
-        val currentDateTime = System.currentTimeMillis()
-        return (currentDateTime - previousPostedDateTime) > Constants.POST_MUSIC_PERIOD
-    }
 }

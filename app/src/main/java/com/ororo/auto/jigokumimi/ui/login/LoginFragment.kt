@@ -13,8 +13,6 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentLoginBinding
 import com.ororo.auto.jigokumimi.ui.MainViewModel
 import com.ororo.auto.jigokumimi.ui.common.BaseFragment
-import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
-import com.ororo.auto.jigokumimi.util.Constants.Companion.REQUEST_PERMISSION
 import com.ororo.auto.jigokumimi.util.dataBinding
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
@@ -25,6 +23,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * ログイン画面
  */
 class LoginFragment : BaseFragment(R.layout.fragment_login) {
+
+    companion object {
+        private const val AUTH_TOKEN_REQUEST_CODE = 0x10
+        private const val REQUEST_PERMISSION = 1000
+    }
 
     private val viewModel: LoginViewModel by viewModel()
 

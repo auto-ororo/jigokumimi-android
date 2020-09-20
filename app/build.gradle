@@ -21,6 +21,10 @@ android {
         testInstrumentationRunner "com.ororo.auto.jigokumimi.TestAppJUnitRunner"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
+
+        def properties = new Properties()
+        properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"${properties.getProperty("SPOTIFY_CLIENT_ID")}\"")
     }
     buildTypes {
         release {

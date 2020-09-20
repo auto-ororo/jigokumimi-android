@@ -7,6 +7,7 @@ import androidx.annotation.VisibleForTesting.PROTECTED
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.ororo.auto.jigokumimi.BuildConfig
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
@@ -169,7 +170,7 @@ open class BaseAndroidViewModel(
      */
     fun getAuthenticationRequest(type: AuthorizationResponse.Type): AuthorizationRequest {
         return AuthorizationRequest.Builder(
-            Constants.CLIENT_ID,
+            BuildConfig.SPOTIFY_CLIENT_ID,
             type,
             Uri.Builder().scheme(SPOTIFY_SDK_REDIRECT_SCHEME)
                 .authority(SPOTIFY_SDK_REDIRECT_HOST).build().toString()

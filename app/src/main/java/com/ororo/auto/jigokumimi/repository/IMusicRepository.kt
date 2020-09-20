@@ -71,10 +71,4 @@ interface IMusicRepository {
      * 検索履歴を削除する
      */
     suspend fun deleteSearchHistory(type: Constants.Type, userId: String, searchHistoryId: String)
-
-    /**
-     * 前回の送信日時を元にお気に入りの音楽を送信すべきかどうかを判断する
-     */
-    fun shouldPostFavoriteMusic(type: Constants.Type): Boolean
-
 }
