@@ -13,10 +13,10 @@
 
     <!--  message-->
     <string name="general_error_message">エラーが発生しました｡:%1$s</string>
-    <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nお使いの端末がインターネットに繋がっていない可能性があります｡</string>
-    <string name="no_music_error_message">近くので人気の音楽を見つけることができませんでした｡指定範囲を広げてみて下さい｡</string>
-    <string name="spotify_auth_error_message">Spotifyとの連携に失敗しました｡\nログイン画面から再度やり直して下さい｡</string>
-    <string name="token_expired_error_message">しばらく操作されていなかったため、認証期限が切れました。\n再ログインを行って下さい｡</string>
+    <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nインターネットに繋がっているか確認して下さい｡</string>
+    <string name="no_music_error_message">音楽を見つけることができませんでした｡範囲を広げてみて下さい｡</string>
+    <string name="spotify_auth_error_message">Spotifyとの連携に失敗しました｡\n電波の良いところで、再度認証を行って下さい｡</string>
+    <string name="token_expired_error_message">しばらく操作されていなかったため、認証期限が切れました。\n再認証を行って下さい｡</string>
     <string name="request_success_message">通信に成功しました｡</string>
     <string name="request_fail_message">サーバー側に予期せぬエラーが発生しました。\nしばらく時間を置いて再度お試しください。</string>
     <string name="success_sign_up">新規登録が完了しました。</string>
@@ -44,8 +44,6 @@
     <string name="search_text">Search</string>
     <string name="logout_text">Logout</string>
     <string name="history_text">History</string>
-    <string name="test_email_text">demo@demo.com</string>
-    <string name="test_password_text">demodemo</string>
 
 </resources>
 
