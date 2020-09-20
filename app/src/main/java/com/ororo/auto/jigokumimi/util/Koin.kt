@@ -65,7 +65,6 @@ val viewModelModule = module {
         HistoryViewModel(
             androidApplication(),
             get(),
-            get(),
             get()
         )
     }

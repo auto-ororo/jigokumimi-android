@@ -10,6 +10,7 @@ import com.ororo.auto.jigokumimi.repository.AuthRepository
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
+import com.spotify.sdk.android.auth.AuthorizationClient
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -24,7 +25,7 @@ class MainViewModel(
     fun logout() {
         viewModelScope.launch {
             try {
-                // Todo Spotifyトークンの削除
+                AuthorizationClient.clearCookies(app.applicationContext)
             } catch (e: Exception) {
                 handleAuthException(e)
             }

@@ -19,6 +19,7 @@ import timber.log.Timber
 import java.lang.Exception
 import java.util.*
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class LocationRepository(
     private val application: Application
@@ -51,7 +52,13 @@ class LocationRepository(
                     }
                 }, null)
             } else {
-                throw Throwable(application.applicationContext.getString(R.string.permission_denied_message))
+                continuation.resumeWithException(
+                    Throwable(
+                        application.applicationContext.getString(
+                            R.string.permission_denied_message
+                        )
+                    )
+                )
             }
         }
 
@@ -74,7 +81,7 @@ class LocationRepository(
             }
 
         } catch (e: Exception) {
-            Timber.d(e.message)
+            Timber.d(e)
         }
 
         return result.toString()

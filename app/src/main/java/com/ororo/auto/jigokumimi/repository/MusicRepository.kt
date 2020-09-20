@@ -280,9 +280,9 @@ class MusicRepository(
 
             // 送信日時を保存
             prefData.edit().let {
-                it.putString(
-                    System.currentTimeMillis().toString(),
-                    key
+                it.putLong(
+                    key,
+                    System.currentTimeMillis()
                 )
                 it.apply()
             }
@@ -391,7 +391,7 @@ class MusicRepository(
         }
 
         // 「現在時刻 - 前回の送信日時」が「送信間隔」の外かどうかを返却
-        val previousPostedDateTime = prefData.getString(sharedPreferencesKey, "0")!!.toLong()
+        val previousPostedDateTime = prefData.getLong(sharedPreferencesKey, 0)
         val currentDateTime = System.currentTimeMillis()
         return (currentDateTime - previousPostedDateTime) > Constants.POST_MUSIC_PERIOD
     }

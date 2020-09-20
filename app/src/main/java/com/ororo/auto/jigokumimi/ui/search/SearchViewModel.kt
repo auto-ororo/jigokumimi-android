@@ -86,12 +86,12 @@ class SearchViewModel(
                     _isSearchFinished.call()
                 }
 
-                _isLoading.value = false
-
                 Timber.d("Search Music Succeeded")
 
             } catch (e: Exception) {
                 handleConnectException(e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }
