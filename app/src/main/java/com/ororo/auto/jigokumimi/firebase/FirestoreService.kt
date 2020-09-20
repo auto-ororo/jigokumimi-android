@@ -1,6 +1,5 @@
 package com.ororo.auto.jigokumimi.firebase
 
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Query
@@ -78,24 +77,26 @@ class FirestoreService(private val firestore: FirebaseFirestore) {
         firestore.collection("$HISTORY/${request.userId}/${request.type.pathName}")
             .document(request.searchHistoryId).delete().await()
 
-    suspend fun createUser(request: UserRequest): String {
+    suspend fun createUser(request: UserRequest) {
         val ref = firestore.collection(USER)
 
         val doc = ref.document()
 
-        val user = User(doc.id, spotify = User.Spotify(request.spotifyUserId))
+        val user = User(doc.id, spotifyUserId = request.spotifyUserId)
 
         firestore.runTransaction { transaction ->
             transaction.set(doc, user)
         }.await()
-
-        return doc.id
     }
 
     suspend fun existsUser(request: UserRequest): Boolean =
         firestore.collection(USER)
-            .whereEqualTo(FieldPath.of("spotify", "id"), request.spotifyUserId)
+            .whereEqualTo("spotifyUserId", request.spotifyUserId)
             .get().await().isEmpty.not()
 
+    suspend fun getUser(request: UserRequest): User =
+        firestore.collection(USER)
+            .whereEqualTo("spotifyUserId", request.spotifyUserId)
+            .get().await().toObjects<User>().first()
 }
 

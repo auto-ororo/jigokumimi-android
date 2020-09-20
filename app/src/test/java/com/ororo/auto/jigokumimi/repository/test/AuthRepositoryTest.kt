@@ -314,7 +314,7 @@ class AuthRepositoryTest {
     @Test
     fun getSpotifyUserProfile_APIリクエストが呼ばれること() = runBlocking {
 
-        authRepository.getSpotifyUserProfile()
+        authRepository.getSpotifyUserId()
 
         // APIリクエストが呼ばれることを確認
         verify {

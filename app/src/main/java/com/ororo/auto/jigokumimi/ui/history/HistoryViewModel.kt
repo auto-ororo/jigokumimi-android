@@ -72,7 +72,7 @@ class HistoryViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val userId = authRepository.getUserId()
+                val userId = authRepository.getUserId(authRepository.getSpotifyUserId())
 
                 val list = musicRepository.getSearchHistories(searchType, userId)
 
@@ -98,7 +98,7 @@ class HistoryViewModel(
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val userId = authRepository.getUserId()
+                val userId = authRepository.getUserId(authRepository.getSpotifyUserId())
 
                 trackHistoryList.value?.get(historyIndex)?.let { history ->
                     musicRepository.deleteSearchHistory(searchType, userId, history.id)

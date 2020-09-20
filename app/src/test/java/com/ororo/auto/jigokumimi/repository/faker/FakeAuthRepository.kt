@@ -54,7 +54,7 @@ class FakeAuthRepository(exception: Exception? = null) : IAuthRepository, BaseFa
         launchExceptionByErrorMode()
     }
 
-    override suspend fun getSpotifyUserProfile(): SpotifyUserResponse {
+    override suspend fun getSpotifyUserId(): SpotifyUserResponse {
         launchExceptionByErrorMode()
 
         return testDataUtil.createDummySpotifyUserResponse()

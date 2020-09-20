@@ -31,7 +31,7 @@ class LoginViewModel(private val app: Application, authRepository: IAuthReposito
     fun setDemoMode() {
         unloadKoinModules(repositoryModule)
         loadKoinModules(demoRepositoryModule)
-        authRepository = DemoAuthRepository(app)
+        authRepository = DemoAuthRepository()
     }
 
     fun doneAuthenticated() {
@@ -58,8 +58,8 @@ class LoginViewModel(private val app: Application, authRepository: IAuthReposito
     fun createUserIfNeeded() {
         viewModelScope.launch {
             try {
-                val spotifyUserId = authRepository.getSpotifyUserProfile().id
-                if (!authRepository.existsUser(spotifyUserId)) {
+                val spotifyUserId = authRepository.getSpotifyUserId()
+                if (authRepository.existsUser(spotifyUserId) != null) {
                     authRepository.createUser(spotifyUserId)
                 }
             } catch (e: Exception) {

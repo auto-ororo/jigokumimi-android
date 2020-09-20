@@ -57,7 +57,7 @@ class SearchViewModel(
                 Timber.d("緯度:${location.latitude}, 経度:${location.longitude}")
 
                 // ユーザーIDを取得する
-                val userId = authRepository.getUserId()
+                val userId = authRepository.getUserId(authRepository.getSpotifyUserId())
 
                 val postMusic = if (type == Constants.Type.TRACK) {
                     musicRepository.getMyFavoriteTracks()

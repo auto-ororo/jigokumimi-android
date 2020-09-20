@@ -33,12 +33,8 @@ data class MusicAroundItem(
 @Parcelize
 data class User(
     val id: String = "",
-    val spotify: Spotify? = null
-) : Parcelable {
-
-    @Parcelize
-    data class Spotify(val id: String) : Parcelable
-}
+    val spotifyUserId:  String = ""
+) : Parcelable
 
 @Parcelize
 data class PostMusicAroundRequest(

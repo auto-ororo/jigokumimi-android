@@ -47,7 +47,7 @@ class MainViewModel(
      * Demo用AuthRepositoryをセット
      */
     fun setDemoAuthRepository() {
-        authRepository = DemoAuthRepository(app)
+        authRepository = DemoAuthRepository()
     }
 
 }

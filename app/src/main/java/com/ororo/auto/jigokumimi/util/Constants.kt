@@ -19,8 +19,6 @@ class Constants {
         const val SP_JIGOKUMIMI_POSTED_FAVORITE_ARTISTS_DATETIME_KEY =
             "jigokumimiPostedArtistsDatetime"
 
-        const val SP_SPOTIFY_EMAIL_KEY = "spotifyEmail"
-        const val SP_SPOTIFY_PASSWORD_KEY = "spotifyPassword"
         const val SP_SPOTIFY_TOKEN_KEY = "spotifyToken"
 
         const val REQUEST_PERMISSION = 1000

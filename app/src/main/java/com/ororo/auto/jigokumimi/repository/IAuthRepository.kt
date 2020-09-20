@@ -1,5 +1,6 @@
 package com.ororo.auto.jigokumimi.repository
 
+import com.ororo.auto.jigokumimi.firebase.User
 import com.ororo.auto.jigokumimi.network.*
 
 interface IAuthRepository {
@@ -9,22 +10,22 @@ interface IAuthRepository {
     fun refreshSpotifyAuthToken(token: String)
 
     /**
-     * Spotifyのユーザープロフィールを取得する
+     * SpotifyのユーザーIDを取得する
      */
-    suspend fun getSpotifyUserProfile(): SpotifyUserResponse
+    suspend fun getSpotifyUserId(): String
 
     /**
-     * Userの存在チェック
+     * Userの取得
      */
     suspend fun existsUser(spotifyUserId: String): Boolean
 
     /**
      * Userの作成
      */
-    suspend fun createUser(spotifyUserId: String): String
+    suspend fun createUser(spotifyUserId: String)
 
     /**
      * UserIDの取得
      */
-    fun getUserId(): String
+    suspend fun getUserId(spotifyUserId: String): String
 }

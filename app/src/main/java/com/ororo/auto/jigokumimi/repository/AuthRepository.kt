@@ -25,17 +25,17 @@ class AuthRepository(
     /**
      * Spotifyのユーザープロフィールを取得する
      */
-    override suspend fun getSpotifyUserProfile(): SpotifyUserResponse =
+    override suspend fun getSpotifyUserId(): String =
         withContext(Dispatchers.IO) {
             Timber.d("refresh spotify auth token is called")
 
             val spotifyToken = prefData.getString(Constants.SP_SPOTIFY_TOKEN_KEY, "")!!
 
-            return@withContext spotifyApiService.getUserProfile(spotifyToken)
+            return@withContext spotifyApiService.getUserProfile(spotifyToken).id
         }
 
     /**
-     * Userの存在チェック
+     * Userの取得
      */
     override suspend fun existsUser(spotifyUserId: String) =
         withContext(Dispatchers.IO) {
@@ -45,21 +45,16 @@ class AuthRepository(
     /**
      * UserIDの取得
      */
-    override fun getUserId() =
-        prefData.getString(Constants.SP_JIGOKUMIMI_USER_ID_KEY, "")!!
+    override suspend fun getUserId(spotifyUserId: String)  =
+        withContext(Dispatchers.IO) {
+            return@withContext firestoreService.getUser(UserRequest(spotifyUserId)).id
+        }
 
     /**
      * Userの作成
      */
-    override suspend fun createUser(spotifyUserId: String) =
+    override suspend fun createUser(spotifyUserId: String)  =
         withContext(Dispatchers.IO) {
-            val userId = firestoreService.createUser(UserRequest(spotifyUserId))
-
-            prefData.edit().let {
-                it.putString(Constants.SP_JIGOKUMIMI_USER_ID_KEY, userId)
-                it.apply()
-            }
-
-            return@withContext userId
+            return@withContext firestoreService.createUser(UserRequest(spotifyUserId))
         }
 }
