@@ -24,13 +24,13 @@ class HistoryListFragment : Fragment(R.layout.fragment_history_list) {
 
     private lateinit var viewModelAdapterHistory: HistoryListAdapter
 
-    lateinit var searchType: Constants.SearchType
+    lateinit var searchType: Constants.Type
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
         // 検索種別に応じて一覧表示する履歴を切り替え(Track or Artist)
-        if (searchType == Constants.SearchType.TRACK) {
+        if (searchType == Constants.Type.TRACK) {
             viewModel.trackHistoryList.observe(viewLifecycleOwner) { histories ->
                 histories?.apply {
                     viewModelAdapterHistory.histories = histories
@@ -50,7 +50,7 @@ class HistoryListFragment : Fragment(R.layout.fragment_history_list) {
 
         binding.viewModel = viewModel
 
-        searchType = arguments?.getSerializable("SearchType") as Constants.SearchType
+        searchType = arguments?.getSerializable("SearchType") as Constants.Type
 
         viewModel.getSearchHistories(searchType)
 
@@ -92,14 +92,14 @@ class HistoryListFragment : Fragment(R.layout.fragment_history_list) {
     /**
      * 履歴をタップした時の処理
      */
-    private fun onHistoryClicked(searchType: Constants.SearchType, historyIndex: Int) {
+    private fun onHistoryClicked(searchType: Constants.Type, historyIndex: Int) {
         viewModel.searchHistoryDetails(searchType, historyIndex)
     }
 
     /**
      * 履歴削除ボタンをタップした時の処理
      */
-    private fun onDeleteHistoryClicked(searchType: Constants.SearchType, historyIndex: Int) {
+    private fun onDeleteHistoryClicked(searchType: Constants.Type, historyIndex: Int) {
         viewModel.deleteHistory(searchType, historyIndex)
     }
 }

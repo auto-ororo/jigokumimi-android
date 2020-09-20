@@ -1,6 +1,7 @@
 package com.ororo.auto.jigokumimi
 
 import android.app.Application
+import com.google.firebase.FirebaseApp
 import com.ororo.auto.jigokumimi.util.koinModules
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -24,5 +25,7 @@ class JigokumimiApplication : Application() {
 
             modules(koinModules)
         }
+
+        FirebaseApp.initializeApp(this);
     }
 }

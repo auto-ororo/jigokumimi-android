@@ -1,7 +1,10 @@
 package com.ororo.auto.jigokumimi.util
 
 import androidx.preference.PreferenceManager
-import com.ororo.auto.jigokumimi.network.JigokumimiApi
+import com.google.firebase.firestore.BuildConfig
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.ororo.auto.jigokumimi.firebase.FirestoreService
 import com.ororo.auto.jigokumimi.network.SpotifyApi
 import com.ororo.auto.jigokumimi.repository.*
 import com.ororo.auto.jigokumimi.repository.demo.DemoAuthRepository
@@ -13,8 +16,6 @@ import com.ororo.auto.jigokumimi.ui.login.LoginViewModel
 import com.ororo.auto.jigokumimi.ui.result.MiniPlayerViewModel
 import com.ororo.auto.jigokumimi.ui.result.ResultViewModel
 import com.ororo.auto.jigokumimi.ui.search.SearchViewModel
-import com.ororo.auto.jigokumimi.ui.setting.SettingViewModel
-import com.ororo.auto.jigokumimi.ui.signup.SignUpViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -24,9 +25,27 @@ val prefModule = module {
     factory { PreferenceManager.getDefaultSharedPreferences(androidContext()) }
 }
 
-val apiModule = module {
+val firebaseModule = module {
+    factory {
+        if (BuildConfig.DEBUG) {
+            // DEBUGビルド時はエミュレータを使用
+            FirebaseFirestore.getInstance().apply {
+                useEmulator(
+                    "10.0.2.2", 8080
+                )
+                firestoreSettings = FirebaseFirestoreSettings.Builder()
+                    .setPersistenceEnabled(false)
+                    .build()
+            }
+        } else {
+            FirebaseFirestore.getInstance()
+        }
+    }
+}
+
+val serviceModule = module {
     single { SpotifyApi.retrofitService }
-    single { JigokumimiApi.retrofitService }
+    factory { FirestoreService(get()) }
 }
 
 val repositoryModule = module {
@@ -38,14 +57,13 @@ val repositoryModule = module {
 val demoRepositoryModule = module {
     single<ILocationRepository> { DemoLocationRepository(androidApplication()) }
     single<IMusicRepository> { DemoMusicRepository(get()) }
-    single<IAuthRepository> { DemoAuthRepository(get()) }
+    single<IAuthRepository> { DemoAuthRepository() }
 }
 
 val viewModelModule = module {
     viewModel {
         HistoryViewModel(
             androidApplication(),
-            get(),
             get(),
             get()
         )
@@ -84,23 +102,12 @@ val viewModelModule = module {
             get()
         )
     }
-    viewModel {
-        SettingViewModel(
-            androidApplication(),
-            get()
-        )
-    }
-    viewModel {
-        SignUpViewModel(
-            androidApplication(),
-            get()
-        )
-    }
 }
 
 val koinModules = listOf(
     prefModule,
-    apiModule,
+    firebaseModule,
+    serviceModule,
     repositoryModule,
     viewModelModule
 )

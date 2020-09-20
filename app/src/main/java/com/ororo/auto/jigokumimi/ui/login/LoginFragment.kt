@@ -1,20 +1,21 @@
 package com.ororo.auto.jigokumimi.ui.login
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentLoginBinding
 import com.ororo.auto.jigokumimi.ui.MainViewModel
 import com.ororo.auto.jigokumimi.ui.common.BaseFragment
-import com.ororo.auto.jigokumimi.util.Constants.Companion.REQUEST_PERMISSION
 import com.ororo.auto.jigokumimi.util.dataBinding
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationResponse
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -22,6 +23,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
  * ログイン画面
  */
 class LoginFragment : BaseFragment(R.layout.fragment_login) {
+
+    companion object {
+        private const val AUTH_TOKEN_REQUEST_CODE = 0x10
+        private const val REQUEST_PERMISSION = 1000
+    }
 
     private val viewModel: LoginViewModel by viewModel()
 
@@ -35,31 +41,16 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
         binding.viewModel = viewModel
 
         // リスナー設定
-        binding.demoButton.setOnClickListener {
-            onDemoButtonClicked()
-        }
-        binding.loginButton.setOnClickListener {
-            onLoginButtonClicked()
-        }
-        binding.signupButton.setOnClickListener {
-            onSignUpButtonClicked()
-        }
+        binding.demoButton.setOnClickListener { onDemoButtonClicked() }
+        binding.authButton.setOnClickListener { onAuthButtonClicked() }
 
         // LiveDataの監視
-        viewModel.isLogin.observe(viewLifecycleOwner) {
-            onLoginSucceed()
-        }
-        viewModel.loginButtonEnabledState.observe(viewLifecycleOwner) {
-            binding.loginButton.isEnabled = it
+        viewModel.authenticated.observe(viewLifecycleOwner) {
+            navigateToSearch()
         }
 
         // 共通初期化処理
         baseInit(viewModel)
-
-        // リポジトリを初期化
-        viewModel.initRepository()
-        // MainViewModelのリポジトリ初期化
-        mainViewModel.setAuthRepository()
 
         // ドロワーアイコンを非表示
         if (activity is AppCompatActivity) {
@@ -119,18 +110,8 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
         }
     }
 
-    /**
-     *  ログイン成功時の処理
-     *  Spotifyへ認証リクエストを送信しトークンを取得する
-     */
-    private fun onLoginSucceed() {
-        if (viewModel.isDemoUser()) {
-            mainViewModel.setDemoAuthRepository()
-            this.findNavController()
-                .navigate(LoginFragmentDirections.actionLoginFragmentToSearchFragment())
-        } else {
-            authenticateSpotify(viewModel)
-        }
+    private fun navigateToSearch() {
+        this.findNavController().navigate(R.id.searchFragment)
     }
 
     /**
@@ -138,26 +119,52 @@ class LoginFragment : BaseFragment(R.layout.fragment_login) {
      * デモ用ログイン情報を設定する
      */
     private fun onDemoButtonClicked() {
-        // デモ用ログイン情報
-        viewModel.email.value = getString(R.string.test_email_text)
-        viewModel.password.value = getString(R.string.test_password_text)
+        viewModel.setDemoMode()
+        mainViewModel.setDemoAuthRepository()
+        viewModel.doneAuthenticated()
     }
 
     /**
-     * ログインボタンタップ時の処理
-     * ログインを実行
+     * 認証ボタンタップ時の処理
+     * Spotify認証を試みる
      */
-    private fun onLoginButtonClicked() {
-        viewModel.login()
+    private fun onAuthButtonClicked() {
+        val request = viewModel.getAuthenticationRequest(AuthorizationResponse.Type.TOKEN)
+
+        val intent = AuthorizationClient.createLoginActivityIntent(activity, request);
+        startActivityForResult(intent, AUTH_TOKEN_REQUEST_CODE)
     }
 
     /**
-     * 新規登録ボタンタップ時の処理
-     * 新規登録画面に遷移
+     * Spotify認証リクエストのコールバックを捕捉するイベントハンドラ
      */
-    private fun onSignUpButtonClicked() {
-        this.findNavController()
-            .navigate(LoginFragmentDirections.actionLoginFragmentToSignUpFragment())
-    }
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
 
+        if (requestCode == AUTH_TOKEN_REQUEST_CODE) {
+            val response = AuthorizationClient.getResponse(resultCode, data)
+
+            when (response.type) {
+                AuthorizationResponse.Type.TOKEN -> {
+
+                    viewModel.refreshSpotifyAuthToken(response.accessToken)
+                    viewModel.createUserIfNeeded()
+                    viewModel.doneAuthenticated()
+                }
+
+                // 認証に失敗した場合(トークンを取得できなかった場合)､エラーメッセージを表示しログイン画面に遷移する
+                else -> {
+                    // エラーメッセージ表示
+                    viewModel.showMessageDialog(getString(R.string.spotify_auth_error_message))
+                }
+            }
+        } else {
+            // ユーザーがSpotify認証を行わなかった等の理由でリクエストコードが帰ってこなかった場合､エラーメッセージを表示
+            viewModel.showMessageDialog(getString(R.string.spotify_auth_error_message))
+        }
+    }
 }

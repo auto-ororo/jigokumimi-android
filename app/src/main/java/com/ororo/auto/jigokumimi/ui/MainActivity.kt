@@ -1,10 +1,10 @@
 package com.ororo.auto.jigokumimi.ui
 
-import android.content.Intent
 import android.media.AudioManager
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -19,10 +19,7 @@ import com.google.android.material.navigation.NavigationView
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.ActivityMainBinding
 import com.ororo.auto.jigokumimi.ui.common.MessageDialogFragment
-import com.ororo.auto.jigokumimi.util.Constants.Companion.AUTH_TOKEN_REQUEST_CODE
 import com.ororo.auto.jigokumimi.util.dataBinding
-import com.spotify.sdk.android.auth.AuthorizationClient
-import com.spotify.sdk.android.auth.AuthorizationResponse
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(R.layout.activity_main),
@@ -65,8 +62,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
             setOf(
                 R.id.loginFragment,
                 R.id.searchFragment,
-                R.id.historyFragment,
-                R.id.settingFragment
+                R.id.historyFragment
             ), drawerLayout
         )
         val navController = Navigation.findNavController(this, R.id.myNavHostFragment).also {
@@ -105,64 +101,21 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                     item,
                     this.findNavController(R.id.myNavHostFragment)
                 )
-            R.id.settingFragment ->
-                NavigationUI.onNavDestinationSelected(
-                    item,
-                    this.findNavController(R.id.myNavHostFragment)
-                )
             R.id.loginFragment -> {
-                // ログアウト
-                viewModel.logout()
-                NavigationUI.onNavDestinationSelected(
-                    item,
-                    this.findNavController(R.id.myNavHostFragment)
-                )
+                if( viewModel.isDemo()) {
+                    Toast.makeText(this, getString(R.string.finish_demo_message), Toast.LENGTH_LONG).show()
+                    finishAndRemoveTask()
+                } else {
+                    viewModel.logout()
+                    NavigationUI.onNavDestinationSelected(
+                        item,
+                        this.findNavController(R.id.myNavHostFragment)
+                    )
+                }
             }
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true
     }
 
-    /**
-     * Spotify認証リクエストのコールバックを捕捉するイベントハンドラ
-     * ※Spotify SDKの仕様上、ActivityResultイベントが(Fragmentではなく)Activityに対して発火されるため、ここに実装
-     */
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == AUTH_TOKEN_REQUEST_CODE) {
-            val response = AuthorizationClient.getResponse(resultCode, data)
-
-            when (response.type) {
-                // 認証に成功した場合(トークンを取得できた場合)､端末内のSpotifyトークンを更新し､検索画面に遷移する
-                AuthorizationResponse.Type.TOKEN -> {
-
-                    viewModel.refreshSpotifyAuthToken(response.accessToken)
-
-                    // 検索画面に遷移
-                    this.findNavController(R.id.myNavHostFragment).navigate(R.id.searchFragment)
-                }
-
-                // 認証に失敗した場合(トークンを取得できなかった場合)､エラーメッセージを表示しログイン画面に遷移する
-                else -> {
-                    // エラーメッセージ表示
-                    viewModel.showMessageDialog(getString(R.string.spotify_auth_error_message))
-                    // ログイン画面に遷移
-                    this.findNavController(R.id.myNavHostFragment).navigate(R.id.loginFragment)
-                }
-            }
-        } else {
-            // ユーザーがSpotify認証を行わなかった等の理由でリクエストコードが帰ってこなかった場合､エラーメッセージを表示しログイン画面に遷移する
-
-            // エラーメッセージ表示
-            viewModel.showMessageDialog(getString(R.string.spotify_auth_error_message))
-            // ログイン画面に遷移
-            this.findNavController(R.id.myNavHostFragment).navigate(R.id.loginFragment)
-
-        }
-    }
 }

@@ -96,7 +96,7 @@ class SearchFragmentTest {
             null
         )
         every { runBlocking { musicRepository.refreshTracks(any(), any(), any()) } } returns Unit
-        every { runBlocking { authRepository.getSpotifyUserProfile() } } returns testDataUtil.createDummySpotifyUserResponse()
+        every { runBlocking { authRepository.getSpotifyUserId() } } returns testDataUtil.createDummySpotifyUserResponse()
         every { runBlocking { locationRepository.getCurrentLocation() } } returns callbackFlow {
             val location = Location("test")
             location.latitude = faker.number().randomDouble(10, 2, 5)
@@ -168,7 +168,7 @@ class SearchFragmentTest {
         verify {
             navController.navigate(
                 SearchFragmentDirections.actionSearchFragmentToResultFragment(
-                    Constants.SearchType.TRACK,
+                    Constants.Type.TRACK,
                     500,
                     any()
                 )

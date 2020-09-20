@@ -1,11 +1,12 @@
 package com.ororo.auto.jigokumimi.ui.search
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentSearchBinding
@@ -37,7 +38,7 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
         }
 
         viewModel.searchType.observe(viewLifecycleOwner) {
-            if (it == Constants.SearchType.TRACK) {
+            if (it == Constants.Type.TRACK) {
                 binding.trackButton.setBackgroundResource(R.drawable.shape_rounded_corners_color_primary)
                 binding.artistButton.setBackgroundResource(R.drawable.shape_rounded_corners_color_grey)
             } else {
@@ -93,12 +94,20 @@ class SearchFragment : BaseFragment(R.layout.fragment_search) {
             (activity as AppCompatActivity).supportActionBar?.run {
                 show()
                 val titleStr =
-                    "${context?.getString(R.string.title_search)} ${if (viewModel.isDemo()) context?.getString(
-                        R.string.title_demo
-                    ) else ""}"
+                    "${context?.getString(R.string.title_search)} ${
+                        if (viewModel.isDemo()) context?.getString(
+                            R.string.title_demo
+                        ) else ""
+                    }"
                 title = titleStr
             }
         }
+    }
+
+    // バックキーを無効化
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(owner = this) {}
     }
 
     /**

@@ -14,7 +14,7 @@
     <dimen name="size_s">50dp</dimen>
     <dimen name="size_m">100dp</dimen>
     <dimen name="size_l">150dp</dimen>
-    <dimen name="size_xl">200dp</dimen>
+    <dimen name="size_xl">300dp</dimen>
 
     <!-- 文字の大きさ -->
     <dimen name="text_size_xs">14sp</dimen>

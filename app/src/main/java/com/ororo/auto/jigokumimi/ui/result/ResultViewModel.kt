@@ -43,8 +43,8 @@ class ResultViewModel(
     /**
      * 検索種別
      */
-    private val _searchType = MutableLiveData(Constants.SearchType.TRACK)
-    val searchType: LiveData<Constants.SearchType>
+    private val _searchType = MutableLiveData(Constants.Type.TRACK)
+    val searchType: LiveData<Constants.Type>
         get() = _searchType
 
     /**
@@ -71,7 +71,7 @@ class ResultViewModel(
     /**
      * 検索種別を設定
      */
-    fun setSearchType(searchType: Constants.SearchType) {
+    fun setSearchType(searchType: Constants.Type) {
         _searchType.value = searchType
     }
 

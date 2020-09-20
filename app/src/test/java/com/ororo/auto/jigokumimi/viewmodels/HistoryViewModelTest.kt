@@ -104,7 +104,7 @@ class HistoryViewModelTest {
     fun getSearchHistories_Track_Track検索履歴のLivedataが更新されること() = runBlocking {
 
         // メソッド呼び出し
-        viewModel.getSearchHistories(Constants.SearchType.TRACK)
+        viewModel.getSearchHistories(Constants.Type.TRACK)
 
         // UserIdが取得されることを確認
         verify { runBlocking { authRepository.getSavedJigokumimiUserId() } }
@@ -140,7 +140,7 @@ class HistoryViewModelTest {
     fun getSearchHistories_Artist_Artist検索履歴のLivedataが更新されること() = runBlocking {
 
         // メソッド呼び出し
-        viewModel.getSearchHistories(Constants.SearchType.ARTIST)
+        viewModel.getSearchHistories(Constants.Type.ARTIST)
 
         // UserIdが取得されることを確認
         verify { runBlocking { authRepository.getSavedJigokumimiUserId() } }
@@ -180,7 +180,7 @@ class HistoryViewModelTest {
         every { authRepository.getSavedJigokumimiUserId() } throws exception
 
         // メソッド呼び出し
-        viewModel.getSearchHistories(Constants.SearchType.TRACK)
+        viewModel.getSearchHistories(Constants.Type.TRACK)
 
         // エラーメッセージが表示されることを確認
         val extectedMessage =
@@ -197,10 +197,10 @@ class HistoryViewModelTest {
         val deleteIndex = 1
 
         // 検索履歴情報を設定
-        viewModel.getSearchHistories(Constants.SearchType.TRACK)
+        viewModel.getSearchHistories(Constants.Type.TRACK)
 
         // メソッド呼び出し
-        viewModel.deleteHistory(Constants.SearchType.TRACK, deleteIndex)
+        viewModel.deleteHistory(Constants.Type.TRACK, deleteIndex)
         // 削除対象データを取得
         val history = viewModel.trackHistoryList.getOrAwaitValue()[deleteIndex]
 
@@ -218,7 +218,7 @@ class HistoryViewModelTest {
         assertThat(viewModel.deleteDataIndex.getOrAwaitValue(), IsEqual(deleteIndex))
 
         // 検索履歴が更新されることを確認
-        verify { viewModel.getSearchHistories(Constants.SearchType.TRACK) }
+        verify { viewModel.getSearchHistories(Constants.Type.TRACK) }
     }
 
     @Test
@@ -227,10 +227,10 @@ class HistoryViewModelTest {
         val deleteIndex = 1
 
         // 検索履歴情報を設定
-        viewModel.getSearchHistories(Constants.SearchType.ARTIST)
+        viewModel.getSearchHistories(Constants.Type.ARTIST)
 
         // メソッド呼び出し
-        viewModel.deleteHistory(Constants.SearchType.ARTIST, deleteIndex)
+        viewModel.deleteHistory(Constants.Type.ARTIST, deleteIndex)
         // 削除対象データを取得
         val history = viewModel.artistHistoryList.getOrAwaitValue()[deleteIndex]
 
@@ -248,7 +248,7 @@ class HistoryViewModelTest {
         assertThat(viewModel.deleteDataIndex.getOrAwaitValue(), IsEqual(deleteIndex))
 
         // 検索履歴が更新されることを確認
-        verify { viewModel.getSearchHistories(Constants.SearchType.ARTIST) }
+        verify { viewModel.getSearchHistories(Constants.Type.ARTIST) }
     }
 
     @Test
@@ -257,14 +257,14 @@ class HistoryViewModelTest {
         val deleteIndex = 1
 
         // 検索履歴情報を設定
-        viewModel.getSearchHistories(Constants.SearchType.TRACK)
+        viewModel.getSearchHistories(Constants.Type.TRACK)
 
         // 例外が発生するように設定
         val exception = Exception()
         every { runBlocking { musicRepository.deleteTracksAroundSearchHistories(any()) } } throws exception
 
         // メソッド呼び出し
-        viewModel.deleteHistory(Constants.SearchType.TRACK, deleteIndex)
+        viewModel.deleteHistory(Constants.Type.TRACK, deleteIndex)
 
         // エラーメッセージが表示されることを確認
         val extectedMessage =
@@ -275,83 +275,83 @@ class HistoryViewModelTest {
         assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
     }
 
-    @Test
-    fun searchHistoryDetails_Track_Track履歴詳細情報が更新されること() = runBlocking {
-
-        // 検索履歴情報を設定
-        viewModel.getSearchHistories(Constants.SearchType.TRACK)
-
-        // データ取得位置を設定
-        val searchIndex = 1
-
-        // 対象データを取得
-        val history = viewModel.trackHistoryList.getOrAwaitValue()[searchIndex]
-
-        // メソッド呼び出し
-        viewModel.searchHistoryDetails(Constants.SearchType.TRACK, searchIndex)
-
-        // 検索履歴の更新処理が呼ばれることを確認
-        verify { runBlocking { musicRepository.refreshTracksFromHistory(history) } }
-        // 検索フラグがTrueになることを確認
-        assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(true))
-
-    }
-
-    @Test
-    fun searchHistoryDetails_Artist_Artist履歴詳細情報が更新されること() = runBlocking {
-
-        // 検索履歴情報を設定
-        viewModel.getSearchHistories(Constants.SearchType.ARTIST)
-
-        // データ取得位置を設定
-        val searchIndex = 1
-
-        // 対象データを取得
-        val history = viewModel.artistHistoryList.getOrAwaitValue()[searchIndex]
-
-        // メソッド呼び出し
-        viewModel.searchHistoryDetails(Constants.SearchType.ARTIST, searchIndex)
-
-        // 検索履歴の更新処理が呼ばれることを確認
-        verify { runBlocking { musicRepository.refreshArtistsFromHistory(history) } }
-        // 検索フラグがTrueになることを確認
-        assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(true))
-    }
-
-    @Test
-    fun searchHistoryDetails_例外発生_エラーメッセージが表示されること() = runBlocking {
-
-        // 検索履歴情報を設定
-        viewModel.getSearchHistories(Constants.SearchType.ARTIST)
-
-        // 例外が発生するように設定
-        val exception = Exception()
-
-        // 検索履歴の更新処理が呼ばれることを確認
-        every { runBlocking { musicRepository.refreshArtistsFromHistory(any()) } } throws exception
-
-        // データ取得位置を設定
-        val searchIndex = 1
-
-        // メソッド呼び出し
-        viewModel.searchHistoryDetails(Constants.SearchType.ARTIST, searchIndex)
-
-        // エラーメッセージが表示されることを確認
-        val extectedMessage =
-            InstrumentationRegistry.getInstrumentation().context.resources.getString(
-                R.string.general_error_message, exception.javaClass
-            )
-        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
-        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
-    }
-
-    @Test
-    fun doneSearchMusic_検索完了フラグがFalseになること() = runBlocking {
-
-        // メソッド呼び出し
-        viewModel.doneSearchMusic()
-
-        // falseになることを確認
-        assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(false))
-    }
+//    @Test
+//    fun searchHistoryDetails_Track_Track履歴詳細情報が更新されること() = runBlocking {
+//
+//        // 検索履歴情報を設定
+//        viewModel.getSearchHistories(Constants.SearchType.TRACK)
+//
+//        // データ取得位置を設定
+//        val searchIndex = 1
+//
+//        // 対象データを取得
+//        val history = viewModel.trackHistoryList.getOrAwaitValue()[searchIndex]
+//
+//        // メソッド呼び出し
+//        viewModel.searchHistoryDetails(Constants.SearchType.TRACK, searchIndex)
+//
+//        // 検索履歴の更新処理が呼ばれることを確認
+//        verify { runBlocking { musicRepository.refreshTracksFromHistory(history) } }
+//        // 検索フラグがTrueになることを確認
+//        assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(true))
+//
+//    }
+//
+//    @Test
+//    fun searchHistoryDetails_Artist_Artist履歴詳細情報が更新されること() = runBlocking {
+//
+//        // 検索履歴情報を設定
+//        viewModel.getSearchHistories(Constants.SearchType.ARTIST)
+//
+//        // データ取得位置を設定
+//        val searchIndex = 1
+//
+//        // 対象データを取得
+//        val history = viewModel.artistHistoryList.getOrAwaitValue()[searchIndex]
+//
+//        // メソッド呼び出し
+//        viewModel.searchHistoryDetails(Constants.SearchType.ARTIST, searchIndex)
+//
+//        // 検索履歴の更新処理が呼ばれることを確認
+//        verify { runBlocking { musicRepository.refreshArtistsFromHistory(history) } }
+//        // 検索フラグがTrueになることを確認
+//        assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(true))
+//    }
+//
+//    @Test
+//    fun searchHistoryDetails_例外発生_エラーメッセージが表示されること() = runBlocking {
+//
+//        // 検索履歴情報を設定
+//        viewModel.getSearchHistories(Constants.SearchType.ARTIST)
+//
+//        // 例外が発生するように設定
+//        val exception = Exception()
+//
+//        // 検索履歴の更新処理が呼ばれることを確認
+//        every { runBlocking { musicRepository.refreshArtistsFromHistory(any()) } } throws exception
+//
+//        // データ取得位置を設定
+//        val searchIndex = 1
+//
+//        // メソッド呼び出し
+//        viewModel.searchHistoryDetails(Constants.SearchType.ARTIST, searchIndex)
+//
+//        // エラーメッセージが表示されることを確認
+//        val extectedMessage =
+//            InstrumentationRegistry.getInstrumentation().context.resources.getString(
+//                R.string.general_error_message, exception.javaClass
+//            )
+//        assertThat(viewModel.errorMessage.getOrAwaitValue(), IsEqual(extectedMessage))
+//        assertThat(viewModel.isErrorDialogShown.getOrAwaitValue(), IsEqual(true))
+//    }
+//
+//    @Test
+//    fun doneSearchMusic_検索完了フラグがFalseになること() = runBlocking {
+//
+//        // メソッド呼び出し
+//        viewModel.doneSearchMusic()
+//
+//        // falseになることを確認
+//        assertThat(viewModel.isSearchFinished.getOrAwaitValue(), IsEqual(false))
+//    }
 }

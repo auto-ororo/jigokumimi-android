@@ -70,6 +70,12 @@ $ git clone https://github.com/auto-ororo/jigokumimi-android.git
 
 2. クローンしたリポジトリをAndroid Studioで開く
 
+3. ```local.properties```にSpotifyのCLIENT IDを追記
+
+```bash
+SPOTIFY_CLIENT_ID={Spotifyの管理コンソールより取得したClient ID}
+```
+
 ### テスト
 
 #### 単体テスト

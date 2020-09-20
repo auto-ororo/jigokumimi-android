@@ -48,7 +48,7 @@ class FakeAndroidTestAuthRepository(exception: Exception? = null) : IAuthReposit
         launchExceptionByErrorMode()
     }
 
-    override suspend fun getSpotifyUserProfile(): SpotifyUserResponse {
+    override suspend fun getSpotifyUserId(): SpotifyUserResponse {
         launchExceptionByErrorMode()
 
         return testDataUtil.createDummySpotifyUserResponse()
