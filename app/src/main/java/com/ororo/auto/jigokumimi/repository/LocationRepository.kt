@@ -11,12 +11,8 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.ororo.auto.jigokumimi.R
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
-import java.lang.Exception
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException

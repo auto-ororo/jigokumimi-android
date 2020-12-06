@@ -6,8 +6,8 @@ import com.google.firebase.firestore.GeoPoint
 import com.ororo.auto.jigokumimi.domain.History
 import com.ororo.auto.jigokumimi.domain.HistoryItem
 import com.ororo.auto.jigokumimi.util.Constants
-import kotlinx.android.parcel.Parcelize
-import kotlinx.android.parcel.RawValue
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 import org.imperiumlabs.geofirestore.core.GeoHash
 import java.util.*
 

@@ -1,6 +1,6 @@
 package com.ororo.auto.jigokumimi.firebase
 
-import TestCoroutineRule
+import com.ororo.auto.jigokumimi.util.TestCoroutineRule
 import android.location.Location
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -66,8 +66,6 @@ class FirestoreServiceTest {
                     longitude
                 ),
                 userId = "userId1",
-                itemId = "1",
-                popularity = 1
             ),
             MusicAround(
                 l = GeoPoint(
@@ -75,8 +73,6 @@ class FirestoreServiceTest {
                     longitude + 0.01
                 ),
                 userId = "userId1",
-                itemId = "2",
-                popularity = 2
             )
         )
 
@@ -91,13 +87,11 @@ class FirestoreServiceTest {
 
 //            service.postTracksAround(tracksAround)
 
-            ret = service.getMusicAround("aa", location, 0.01)
+//            ret = service.getMusicAround("aa", location, 0.01)
 
             isRunning = false
         }
 
-        while (isRunning) {
-        }
         assertThat(emptyList(), IsEqual(ret))
 
         print("aaa")
