@@ -9,8 +9,6 @@ import com.ororo.auto.jigokumimi.domain.Artist
 import com.ororo.auto.jigokumimi.domain.Track
 import com.ororo.auto.jigokumimi.network.GetMyFavoriteArtistsResponse
 import com.ororo.auto.jigokumimi.network.GetMyFavoriteTracksResponse
-import com.ororo.auto.jigokumimi.network.asPostMyFavoriteArtistsRequest
-import com.ororo.auto.jigokumimi.network.asPostMyFavoriteTracksRequest
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.ILocationRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository

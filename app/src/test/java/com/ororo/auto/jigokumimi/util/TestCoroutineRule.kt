@@ -1,3 +1,5 @@
+package com.ororo.auto.jigokumimi.util
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
@@ -11,7 +13,7 @@ class TestCoroutineRule() : TestWatcher() {
     val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
     private val testCoroutineScope = TestCoroutineScope(testDispatcher)
 
-    override fun apply(base: Statement, description: Description?) = object: Statement() {
+    override fun apply(base: Statement, description: Description?) = object : Statement() {
         @Throws(Throwable::class)
         override fun evaluate() {
             Dispatchers.setMain(testDispatcher)

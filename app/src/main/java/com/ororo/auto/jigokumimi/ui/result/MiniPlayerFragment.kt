@@ -14,7 +14,6 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.FragmentMiniPlayerBinding
 import com.ororo.auto.jigokumimi.util.dataBinding
 import com.ororo.auto.jigokumimi.util.setFavIconFromTrackList
-import kotlinx.android.synthetic.main.fragment_mini_player.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
 
@@ -38,7 +37,7 @@ class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player) {
         viewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
             if (isPlaying) {
                 viewModel.showMiniPlayer()
-                seekBar.max = viewModel.mp?.duration!!
+                binding.seekBar.max = viewModel.mp?.duration!!
                 viewModel.mp?.setOnCompletionListener(viewModel)
                 binding.playStopButton.setImageResource(R.drawable.ic_pause)
             } else {

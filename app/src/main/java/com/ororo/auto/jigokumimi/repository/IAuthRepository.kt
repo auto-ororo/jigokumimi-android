@@ -1,8 +1,5 @@
 package com.ororo.auto.jigokumimi.repository
 
-import com.ororo.auto.jigokumimi.firebase.User
-import com.ororo.auto.jigokumimi.network.*
-
 interface IAuthRepository {
     /**
      * 端末に保存したSpotifyのアクセストークンを更新する
