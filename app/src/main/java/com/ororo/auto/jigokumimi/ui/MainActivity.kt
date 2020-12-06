@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
@@ -20,6 +21,7 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.databinding.ActivityMainBinding
 import com.ororo.auto.jigokumimi.ui.common.MessageDialogFragment
 import com.ororo.auto.jigokumimi.util.dataBinding
+import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity(R.layout.activity_main),
@@ -74,6 +76,16 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         NavigationUI.setupWithNavController(binding.navView, navController)
 
         binding.navView.setNavigationItemSelectedListener(this);
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.isOnline.collect {
+                binding.networkConnection.visibility = if (it) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
+            }
+        }
     }
 
     /**
@@ -102,8 +114,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
                     this.findNavController(R.id.myNavHostFragment)
                 )
             R.id.loginFragment -> {
-                if( viewModel.isDemo()) {
-                    Toast.makeText(this, getString(R.string.finish_demo_message), Toast.LENGTH_LONG).show()
+                if (viewModel.isDemo()) {
+                    Toast.makeText(this, getString(R.string.finish_demo_message), Toast.LENGTH_LONG)
+                        .show()
                     finishAndRemoveTask()
                 } else {
                     viewModel.logout()
