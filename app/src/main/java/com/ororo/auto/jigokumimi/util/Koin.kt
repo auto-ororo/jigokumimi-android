@@ -52,6 +52,7 @@ val repositoryModule = module {
     single<ILocationRepository> { LocationRepository(androidApplication()) }
     single<IMusicRepository> { MusicRepository(get(), get(), get()) }
     single<IAuthRepository> { AuthRepository(get(), get(), get()) }
+    single<IDeviceRepository> { DeviceRepository(get())}
 }
 
 val demoRepositoryModule = module {
@@ -77,6 +78,7 @@ val viewModelModule = module {
     viewModel {
         MainViewModel(
             androidApplication(),
+            get(),
             get()
         )
     }

@@ -10,7 +10,6 @@ import com.ororo.auto.jigokumimi.R
 import com.ororo.auto.jigokumimi.repository.IAuthRepository
 import com.ororo.auto.jigokumimi.repository.IMusicRepository
 import com.ororo.auto.jigokumimi.ui.common.BaseAndroidViewModel
-import com.ororo.auto.jigokumimi.util.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

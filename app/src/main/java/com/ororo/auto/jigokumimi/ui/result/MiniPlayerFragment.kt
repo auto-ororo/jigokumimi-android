@@ -22,7 +22,7 @@ import org.koin.androidx.viewmodel.ext.android.sharedViewModel
  */
 class MiniPlayerFragment : Fragment(R.layout.fragment_mini_player) {
 
-    private val resultViewModel : ResultViewModel by sharedViewModel()
+    private val resultViewModel: ResultViewModel by sharedViewModel()
 
     private val viewModel: MiniPlayerViewModel by sharedViewModel()
 

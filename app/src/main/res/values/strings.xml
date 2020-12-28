@@ -13,6 +13,7 @@
 
     <!--  message-->
     <string name="general_error_message">エラーが発生しました｡:%1$s</string>
+    <string name="general_error_offline">インターネットに接続されていません。</string>
     <string name="no_connection_error_message">サーバーとの通信に失敗しました｡\nインターネットに繋がっているか確認して下さい｡</string>
     <string name="no_music_error_message">音楽を見つけることができませんでした｡範囲を広げてみて下さい｡</string>
     <string name="spotify_auth_error_message">Spotifyとの連携に失敗しました｡\n電波の良いところで、再度認証を行って下さい｡</string>
