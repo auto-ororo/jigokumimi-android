@@ -21,7 +21,7 @@ jobs:
       - name: Access SPOTIFY_CLIENT_ID
         env:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-        run: echo SPOTIFY_CLIENT_ID=\"$SPOTIFY_CLIENT_ID\" > ./local.properties
+        run: echo $SPOTIFY_CLIENT_ID | base64 --decode --ignore-garbage > ./local.properties
       - name: Access GOOGLE_SERVICES_JSON_DEV
         env:
           GOOGLE_SERVICES_JSON_DEV  : ${{ secrets.GOOGLE_SERVICES_JSON_DEV  }}
