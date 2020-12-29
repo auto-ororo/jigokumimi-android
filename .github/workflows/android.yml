@@ -22,6 +22,10 @@ jobs:
         env:
           SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
         run: echo SPOTIFY_CLIENT_ID=\"$SPOTIFY_CLIENT_ID\" > ./local.properties
+      - name: Access GOOGLE_SERVICE_JSON_DEV
+        env:
+          GOOGLE_SERVICE_JSON_DEV : ${{ secrets.GOOGLE_SERVICE_JSON_DEV }}
+        run: echo $GOOGLE_SERVICE_JSON_DEV  | base64 --decode --ignore-garbage > ./app/google-services.json
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
