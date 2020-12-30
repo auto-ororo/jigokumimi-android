@@ -9,7 +9,7 @@ on:
 
 env:
   SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
-  GOOGLE_SERVICES_JSON_DEV  : ${{ secrets.GOOGLE_SERVICES_JSON_DEV  }}
+  GOOGLE_SERVICES_JSON_DEV: ${{ secrets.GOOGLE_SERVICES_JSON_DEV  }}
 
 jobs:
   lint:
@@ -69,4 +69,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Run Compile
-        run: ./gradlew assembleDebug
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+          export KEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}"
+          export KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
+          export KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
+          ./gradlew assembleRelease
+#      - name: Deploy Firebase App Distribution [DEV]
+#        uses: wzieba/Firebase-Distribution-Github-Action@v1.1.1
+#        with:
+#          appId: ${{secrets.FIREBASE_DEV_APP_ID}}
+#          token: ${{secrets.FIREBASE_TOKEN}}
+#          groups: developer
+#          file: app/build/outputs/apk/debug/app-debug.apk
