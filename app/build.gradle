@@ -23,15 +23,7 @@ android {
     }
 
     signingConfigs {
-        debug {
-            // デバッグ用の証明書はリポジトリににコミットしてしまってもよいと思います。
-            // 今回はプロジェクトのルートに debug.keystore が配置されているものとします。
-            // 尚、Android Studio でデフォルトで用意される証明書であれば、パスワード類の記載は必要ありません。
-            storeFile rootProject.file('debug.keystore')
-        }
         release {
-            // GitHub Actions のワークフローで、プロジェクトのルートに release.keystore が配置され、
-            // パスワード類は環境変数へ設定される想定です。
             storeFile rootProject.file('release.keystore')
             storePassword System.getenv('KEYSTORE_PASSWORD')
             keyAlias System.getenv('KEY_ALIAS')
@@ -41,7 +33,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
