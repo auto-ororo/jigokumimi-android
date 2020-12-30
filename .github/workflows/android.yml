@@ -50,7 +50,7 @@ jobs:
       - name: Run test
         run: ./gradlew testDebug
 
-  build:
+  deploy:
 
     needs: [lint, test]
 
@@ -68,17 +68,22 @@ jobs:
         run: echo $GOOGLE_SERVICES_JSON_DEV   | base64 --decode --ignore-garbage > ./app/google-services.json
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Run Compile
+      - name: Run Release Build
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
           export KEYSTORE_PASSWORD="${{ secrets.KEYSTORE_PASSWORD }}"
           export KEY_ALIAS="${{ secrets.KEY_ALIAS }}"
           export KEY_PASSWORD="${{ secrets.KEY_PASSWORD }}"
           ./gradlew assembleRelease
-#      - name: Deploy Firebase App Distribution [DEV]
-#        uses: wzieba/Firebase-Distribution-Github-Action@v1.1.1
-#        with:
-#          appId: ${{secrets.FIREBASE_DEV_APP_ID}}
-#          token: ${{secrets.FIREBASE_TOKEN}}
-#          groups: developer
-#          file: app/build/outputs/apk/debug/app-debug.apk
+      - name: Get apk path
+        id: apk-path
+        run: |
+          path=$(find **/build/outputs/apk -name '*.apk' -type f | head -1)
+          echo "::set-output name=path::$path"
+      - name: Deploy Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.1.1
+        with:
+          appId: ${{secrets.FIREBASE_DEV_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: developer
+          file: ${{ steps.apk-path.outputs.path }}
