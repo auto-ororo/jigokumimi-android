@@ -32,3 +32,19 @@ jobs:
     steps:
       - name: Run Compile
         run: ./gradlew assembleDebug
+
+  lint:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Lint
+        run: ./gradlew Lint
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run test
+        run: ./gradlew Test
